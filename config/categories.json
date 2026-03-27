@@ -1,0 +1,76 @@
+{
+  "categories": {
+    "b2c": [
+      {
+        "id": "skincare",
+        "name": "Skincare",
+        "description": "Personal skincare and beauty products",
+        "price_range": "$20-$150",
+        "typical_decision_factors": ["ingredients", "reviews", "brand reputation", "price"]
+      },
+      {
+        "id": "fitness_app",
+        "name": "Fitness App",
+        "description": "Health and fitness tracking applications",
+        "price_range": "$5-$30/month",
+        "typical_decision_factors": ["features", "user base", "integration", "content library"]
+      },
+      {
+        "id": "streaming",
+        "name": "Streaming Service",
+        "description": "Video and music streaming subscriptions",
+        "price_range": "$8-$25/month",
+        "typical_decision_factors": ["content library", "price", "device support", "exclusives"]
+      },
+      {
+        "id": "footwear",
+        "name": "Athletic Footwear",
+        "description": "Running and athletic shoes",
+        "price_range": "$80-$250",
+        "typical_decision_factors": ["fit", "performance", "durability", "style"]
+      },
+      {
+        "id": "food_delivery",
+        "name": "Food Delivery",
+        "description": "Food delivery app services",
+        "price_range": "$10-$50/order",
+        "typical_decision_factors": ["restaurant selection", "delivery speed", "fees", "reliability"]
+      },
+      {
+        "id": "appliances",
+        "name": "Home Appliances",
+        "description": "Kitchen and household appliances",
+        "price_range": "$100-$800",
+        "typical_decision_factors": ["reliability", "features", "energy efficiency", "warranty"]
+      }
+    ],
+    "b2b": [
+      {
+        "id": "financial",
+        "name": "Financial Services",
+        "description": "Business banking and financial management",
+        "price_range": "$50-$500/month",
+        "typical_decision_factors": ["security", "integration", "compliance", "support"],
+        "stakeholders": ["CFO", "Finance Team", "IT Security"]
+      },
+      {
+        "id": "tax_software",
+        "name": "Tax Software",
+        "description": "Business tax preparation and filing software",
+        "price_range": "$200-$2000/year",
+        "typical_decision_factors": ["accuracy", "audit support", "integration", "compliance"],
+        "stakeholders": ["CFO", "Accountant", "Compliance Officer"]
+      }
+    ]
+  },
+  "category_pairs": [
+    {"b2c": "skincare", "b2b": "financial"},
+    {"b2c": "fitness_app", "b2b": "financial"},
+    {"b2c": "streaming", "b2b": "tax_software"},
+    {"b2c": "footwear", "b2b": "tax_software"},
+    {"b2c": "food_delivery", "b2b": "financial"},
+    {"b2c": "appliances", "b2b": "tax_software"},
+    {"b2c": "skincare", "b2b": "tax_software"},
+    {"b2c": "fitness_app", "b2b": "tax_software"}
+  ]
+}

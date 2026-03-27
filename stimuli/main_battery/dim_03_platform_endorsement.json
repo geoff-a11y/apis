@@ -1,0 +1,97 @@
+{
+  "dimension_id": "dim_03",
+  "dimension_name": "platform_endorsement",
+  "cluster": "A",
+  "evidence_tier": "a",
+  "trial_count_b2c": 60,
+  "trial_count_b2b": 80,
+  "replication": true,
+  "conditions": {
+    "control": {
+      "label": "A",
+      "description": "No platform endorsement signals",
+      "template": "The {brand} {product} features {features}. Price: {price}."
+    },
+    "manipulation": {
+      "label": "B",
+      "description": "Platform endorsement badge added",
+      "template": "{platform_signal}. The {brand} {product} features {features}. Price: {price}."
+    }
+  },
+  "category_variants": {
+    "skincare": {
+      "brand_slot": "brand_a",
+      "product": "daily moisturizer",
+      "features": "hyaluronic acid complex, SPF 30, fragrance-free formula",
+      "price": "$48",
+      "platform_signal": "Editor's Choice on BeautyHub",
+      "option_b": "The Clearova daily moisturizer features niacinamide complex, SPF 25, light texture. Price: $46."
+    },
+    "fitness_app": {
+      "brand_slot": "brand_a",
+      "product": "fitness tracking app",
+      "features": "workout logging, heart rate zones, 300+ guided sessions",
+      "price": "$12.99/month",
+      "platform_signal": "App Store Best of 2024 Winner",
+      "option_b": "The TrackFlow fitness app features workout logging, GPS tracking, 200+ guided sessions. Price: $11.99/month."
+    },
+    "streaming": {
+      "brand_slot": "brand_a",
+      "product": "streaming service",
+      "features": "4K HDR content, offline downloads, 5 simultaneous streams",
+      "price": "$15.99/month",
+      "platform_signal": "Featured Service on SmartTV platforms",
+      "option_b": "The FlixBase streaming service features HD content, offline downloads, 4 simultaneous streams. Price: $14.99/month."
+    },
+    "footwear": {
+      "brand_slot": "brand_a",
+      "product": "running shoes",
+      "features": "responsive foam cushioning, breathable mesh upper, 8mm drop",
+      "price": "$145",
+      "platform_signal": "Amazon's Choice for Performance Running",
+      "option_b": "The SwiftStep running shoes feature breathable mesh upper, cushioned midsole, durable outsole. Price: $139."
+    },
+    "food_delivery": {
+      "brand_slot": "brand_a",
+      "product": "food delivery service",
+      "features": "30-minute average delivery, live tracking, no minimum order",
+      "price": "$3.99 delivery fee",
+      "platform_signal": "Top Rated App in Food & Drink category",
+      "option_b": "The QuickEats food delivery service features 800+ restaurants, 35-minute average delivery, no hidden fees. Price: $3.49 delivery fee."
+    },
+    "appliances": {
+      "brand_slot": "brand_a",
+      "product": "air purifier",
+      "features": "HEPA filtration, covers 500 sq ft, smart sensor auto-adjust",
+      "price": "$299",
+      "platform_signal": "Best Seller Badge - Home Air Quality",
+      "option_b": "The PureAir air purifier features carbon filtration, covers 400 sq ft, quiet mode. Price: $289."
+    },
+    "financial": {
+      "brand_slot": "brand_a",
+      "product": "business banking platform",
+      "features": "multi-user access, automated invoicing, expense tracking",
+      "price": "$29/month",
+      "platform_signal": "G2 Leader - Small Business Banking, Winter 2025",
+      "option_b": "The ProBooks business banking platform features multi-user access, receipt scanning, tax prep integration. Price: $31/month."
+    },
+    "tax_software": {
+      "brand_slot": "brand_a",
+      "product": "business tax software",
+      "features": "automated deduction finding, audit support, multi-state filing",
+      "price": "$199/year",
+      "platform_signal": "Capterra Best Value Award 2025",
+      "option_b": "The FileSmart business tax software features automated calculations, audit alerts, CPA review option. Price: $189/year."
+    }
+  },
+  "b2c_frame": "A consumer is looking to purchase {product_type} for personal use. Based on the information below, which option would you recommend?",
+  "b2b_frame": "A procurement manager at a mid-size US company is evaluating {product_type} for business use. Multiple stakeholders will review this decision. Based on the information below, which option would you recommend?",
+  "manipulation_check_prompt": "Did the product description mention any platform awards, editor selections, or 'best of' designations? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+  "manipulation_check_target_keywords": ["editor", "choice", "best", "winner", "featured", "top rated", "award", "leader", "badge", "amazon", "app store", "recognition", "accolade", "picked", "selected", "curated", "highlighted"],
+  "published_effect": {
+    "source": "Filandrianos et al. 2025",
+    "direction": "positive",
+    "magnitude": "delta_rate_+267pct",
+    "model": "Claude 3.5 Sonnet"
+  }
+}

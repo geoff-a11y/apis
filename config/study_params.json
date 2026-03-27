@@ -1,0 +1,30 @@
+{
+  "trial_counts": {
+    "pilot_per_condition": 15,
+    "replication_dims_per_condition": 60,
+    "novel_dims_per_condition": 100,
+    "agentic_dims_scripts": 40,
+    "interaction_study_per_condition": 40,
+    "b2b_replication_per_condition": 80
+  },
+  "manipulation_check_fail_threshold": 0.30,
+  "icc_minimum_threshold": 0.70,
+  "alpha": 0.05,
+  "minimum_effect_sizes": {
+    "replication_dims": 0.4,
+    "novel_dims": 0.3,
+    "b2b_interaction": 0.2
+  },
+  "contexts": ["b2c", "b2b"],
+  "intent_types": ["recommendation", "comparison", "delegated_purchase"],
+  "categories": [
+    "skincare",
+    "fitness_app",
+    "financial",
+    "appliances",
+    "streaming",
+    "footwear",
+    "food_delivery",
+    "tax_software"
+  ]
+}

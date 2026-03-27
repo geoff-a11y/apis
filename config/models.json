@@ -1,0 +1,83 @@
+{
+  "models": [
+    {
+      "id": "gpt4o",
+      "name": "GPT-4o",
+      "provider": "openai",
+      "model_string": "gpt-4o",
+      "temperature": 0.3,
+      "max_tokens": 800,
+      "notes": "Pin exact model string at registration time"
+    },
+    {
+      "id": "o1",
+      "name": "o1",
+      "provider": "openai",
+      "model_string": "o1",
+      "temperature": 1.0,
+      "max_tokens": 800,
+      "notes": "Reasoning model — temperature fixed at 1.0"
+    },
+    {
+      "id": "gemini",
+      "name": "Gemini 2.0 Flash",
+      "provider": "google",
+      "model_string": "gemini-2.0-flash",
+      "temperature": 0.3,
+      "max_tokens": 800
+    },
+    {
+      "id": "claude",
+      "name": "Claude Sonnet 4",
+      "provider": "anthropic",
+      "model_string": "claude-sonnet-4-20250514",
+      "temperature": 0.3,
+      "max_tokens": 800,
+      "notes": "Test subject only — not used as judge for its own responses"
+    },
+    {
+      "id": "llama",
+      "name": "Llama 3.3 70B",
+      "provider": "together",
+      "model_string": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "temperature": 0.3,
+      "max_tokens": 800
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity Sonar Pro",
+      "provider": "perplexity",
+      "model_string": "sonar-pro",
+      "temperature": 0.3,
+      "max_tokens": 800,
+      "notes": "Live retrieval active by default — document this"
+    }
+  ],
+  "judge_models": [
+    {
+      "id": "judge_opus",
+      "name": "Claude Opus 4",
+      "provider": "anthropic",
+      "model_string": "claude-opus-4-20250514",
+      "temperature": 0.1,
+      "max_tokens": 400,
+      "notes": "Primary judge. Blinded to model identity."
+    },
+    {
+      "id": "judge_gpt4o",
+      "name": "GPT-4o (judge)",
+      "provider": "openai",
+      "model_string": "gpt-4o",
+      "temperature": 0.1,
+      "max_tokens": 400
+    },
+    {
+      "id": "judge_gemini",
+      "name": "Gemini 2.0 Flash (judge)",
+      "provider": "google",
+      "model_string": "gemini-2.0-flash",
+      "temperature": 0.1,
+      "max_tokens": 400
+    }
+  ]
+}

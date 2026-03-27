@@ -1,0 +1,282 @@
+{
+  "dimensions": [
+    {
+      "id": "dim_01",
+      "name": "third_party_authority",
+      "display_name": "Third-Party Authority",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Sensitivity to expert endorsements and authority figures",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_02",
+      "name": "social_proof_sensitivity",
+      "display_name": "Social Proof Sensitivity",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Responsiveness to ratings, reviews, and user counts",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_03",
+      "name": "platform_endorsement",
+      "display_name": "Platform Endorsement",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Sensitivity to 'Editor's Choice' and platform badges",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_04",
+      "name": "scarcity_urgency",
+      "display_name": "Scarcity and Urgency",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Response to limited availability and time pressure signals",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_05",
+      "name": "anchoring_susceptibility",
+      "display_name": "Anchoring Susceptibility",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Influence of initial price anchors on value perception",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_06",
+      "name": "brand_premium_acceptance",
+      "display_name": "Brand Premium Acceptance",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Willingness to pay premium for established brands",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_07",
+      "name": "free_trial_conversion",
+      "display_name": "Free Trial Conversion",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Influence of free trial offers on recommendation",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_08",
+      "name": "bundle_preference",
+      "display_name": "Bundle Preference",
+      "cluster": "A",
+      "evidence_tier": "a",
+      "replication": true,
+      "description": "Preference for bundled vs. unbundled offerings",
+      "published_source": "Filandrianos et al. 2025"
+    },
+    {
+      "id": "dim_09",
+      "name": "sustainability_premium",
+      "display_name": "Sustainability Premium",
+      "cluster": "B",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Weight given to environmental and sustainability claims"
+    },
+    {
+      "id": "dim_10",
+      "name": "privacy_tradeoff",
+      "display_name": "Privacy Tradeoff",
+      "cluster": "B",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Willingness to trade privacy for functionality/price"
+    },
+    {
+      "id": "dim_11",
+      "name": "local_preference",
+      "display_name": "Local Preference",
+      "cluster": "B",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Preference for local/domestic products over imports"
+    },
+    {
+      "id": "dim_12",
+      "name": "novelty_seeking",
+      "display_name": "Novelty Seeking",
+      "cluster": "C",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Preference for new/innovative vs. established products"
+    },
+    {
+      "id": "dim_13",
+      "name": "risk_aversion",
+      "display_name": "Risk Aversion",
+      "cluster": "C",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Preference for safe/proven vs. potentially better options"
+    },
+    {
+      "id": "dim_14",
+      "name": "warranty_weight",
+      "display_name": "Warranty Weight",
+      "cluster": "C",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Importance placed on warranty and guarantee terms"
+    },
+    {
+      "id": "dim_15",
+      "name": "return_policy_sensitivity",
+      "display_name": "Return Policy Sensitivity",
+      "cluster": "C",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Weight given to return/refund policy generosity"
+    },
+    {
+      "id": "dim_16",
+      "name": "negative_review_weight",
+      "display_name": "Negative Review Weight",
+      "cluster": "D",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "How heavily negative reviews influence decisions"
+    },
+    {
+      "id": "dim_17",
+      "name": "recency_bias",
+      "display_name": "Recency Bias",
+      "cluster": "D",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Weight given to recent vs. older reviews/information"
+    },
+    {
+      "id": "dim_18",
+      "name": "specificity_preference",
+      "display_name": "Specificity Preference",
+      "cluster": "D",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Preference for specific claims vs. general descriptions"
+    },
+    {
+      "id": "dim_19",
+      "name": "comparison_framing",
+      "display_name": "Comparison Framing",
+      "cluster": "D",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Influence of explicit competitor comparisons"
+    },
+    {
+      "id": "dim_20",
+      "name": "information_seeking_depth",
+      "display_name": "Information Seeking Depth",
+      "cluster": "F",
+      "evidence_tier": "c",
+      "replication": false,
+      "agentic": true,
+      "description": "Tendency to request additional information before deciding"
+    },
+    {
+      "id": "dim_21",
+      "name": "clarification_requests",
+      "display_name": "Clarification Requests",
+      "cluster": "F",
+      "evidence_tier": "c",
+      "replication": false,
+      "agentic": true,
+      "description": "Frequency of asking clarifying questions"
+    },
+    {
+      "id": "dim_22",
+      "name": "recommendation_revision",
+      "display_name": "Recommendation Revision",
+      "cluster": "F",
+      "evidence_tier": "c",
+      "replication": false,
+      "agentic": true,
+      "description": "Willingness to change recommendation given new info"
+    },
+    {
+      "id": "dim_23",
+      "name": "confidence_calibration",
+      "display_name": "Confidence Calibration",
+      "cluster": "F",
+      "evidence_tier": "c",
+      "replication": false,
+      "agentic": true,
+      "description": "Accuracy of stated confidence in recommendations"
+    },
+    {
+      "id": "dim_24",
+      "name": "ethical_concern_weight",
+      "display_name": "Ethical Concern Weight",
+      "cluster": "E",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Sensitivity to ethical issues (labor, sourcing)"
+    },
+    {
+      "id": "dim_25",
+      "name": "default_option_bias",
+      "display_name": "Default Option Bias",
+      "cluster": "E",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Tendency to recommend default/featured options"
+    },
+    {
+      "id": "dim_26",
+      "name": "loss_framing_sensitivity",
+      "display_name": "Loss Framing Sensitivity",
+      "cluster": "E",
+      "evidence_tier": "b",
+      "replication": false,
+      "description": "Responsiveness to loss-framed vs. gain-framed messaging"
+    }
+  ],
+  "clusters": {
+    "A": {
+      "name": "Replication Dimensions",
+      "description": "Based on Filandrianos et al. 2025 findings",
+      "dimension_count": 8
+    },
+    "B": {
+      "name": "Value-Based Dimensions",
+      "description": "Sustainability, privacy, and provenance",
+      "dimension_count": 3
+    },
+    "C": {
+      "name": "Risk and Assurance",
+      "description": "Novelty, risk, warranty, returns",
+      "dimension_count": 4
+    },
+    "D": {
+      "name": "Information Processing",
+      "description": "Review weighting and framing effects",
+      "dimension_count": 4
+    },
+    "E": {
+      "name": "Choice Architecture",
+      "description": "Defaults, ethics, loss framing",
+      "dimension_count": 3
+    },
+    "F": {
+      "name": "Agentic Behaviors",
+      "description": "Multi-turn interaction patterns",
+      "dimension_count": 4
+    }
+  }
+}

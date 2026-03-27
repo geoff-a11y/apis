@@ -1,0 +1,170 @@
+{
+  "brands": {
+    "skincare": {
+      "brand_a": {
+        "name": "Lumina Derm",
+        "tagline": "Science-backed skincare",
+        "founding_year": 2019,
+        "origin": "San Francisco, CA"
+      },
+      "brand_b": {
+        "name": "AquaVeil",
+        "tagline": "Hydration redefined",
+        "founding_year": 2020,
+        "origin": "Austin, TX"
+      },
+      "brand_c": {
+        "name": "PureGlow Labs",
+        "tagline": "Clean beauty, real results",
+        "founding_year": 2018,
+        "origin": "Boulder, CO"
+      }
+    },
+    "fitness_app": {
+      "brand_a": {
+        "name": "FitPulse",
+        "tagline": "Your personal fitness companion",
+        "founding_year": 2020,
+        "origin": "Seattle, WA"
+      },
+      "brand_b": {
+        "name": "TrainWell",
+        "tagline": "Smarter workouts, better results",
+        "founding_year": 2021,
+        "origin": "Denver, CO"
+      },
+      "brand_c": {
+        "name": "MotionTrack",
+        "tagline": "Move with purpose",
+        "founding_year": 2019,
+        "origin": "Portland, OR"
+      }
+    },
+    "streaming": {
+      "brand_a": {
+        "name": "StreamVault",
+        "tagline": "Endless entertainment",
+        "founding_year": 2021,
+        "origin": "Los Angeles, CA"
+      },
+      "brand_b": {
+        "name": "WatchNow",
+        "tagline": "Your screen, your way",
+        "founding_year": 2020,
+        "origin": "New York, NY"
+      },
+      "brand_c": {
+        "name": "FlixHub",
+        "tagline": "Stories without limits",
+        "founding_year": 2019,
+        "origin": "Chicago, IL"
+      }
+    },
+    "footwear": {
+      "brand_a": {
+        "name": "StrideForce",
+        "tagline": "Engineered for performance",
+        "founding_year": 2018,
+        "origin": "Boston, MA"
+      },
+      "brand_b": {
+        "name": "RunCore",
+        "tagline": "Built for the long run",
+        "founding_year": 2019,
+        "origin": "Portland, OR"
+      },
+      "brand_c": {
+        "name": "VeloStep",
+        "tagline": "Speed meets comfort",
+        "founding_year": 2020,
+        "origin": "San Diego, CA"
+      }
+    },
+    "food_delivery": {
+      "brand_a": {
+        "name": "QuickBite",
+        "tagline": "Fast food, faster delivery",
+        "founding_year": 2020,
+        "origin": "Miami, FL"
+      },
+      "brand_b": {
+        "name": "MealDash",
+        "tagline": "Your favorite restaurants, delivered",
+        "founding_year": 2019,
+        "origin": "Atlanta, GA"
+      },
+      "brand_c": {
+        "name": "FreshRoute",
+        "tagline": "Quality food at your door",
+        "founding_year": 2021,
+        "origin": "Phoenix, AZ"
+      }
+    },
+    "appliances": {
+      "brand_a": {
+        "name": "HomeEdge",
+        "tagline": "Smart appliances for modern living",
+        "founding_year": 2017,
+        "origin": "Minneapolis, MN"
+      },
+      "brand_b": {
+        "name": "KitchenPro",
+        "tagline": "Professional performance at home",
+        "founding_year": 2018,
+        "origin": "Detroit, MI"
+      },
+      "brand_c": {
+        "name": "ApexHome",
+        "tagline": "Reliability you can count on",
+        "founding_year": 2016,
+        "origin": "Cleveland, OH"
+      }
+    },
+    "financial": {
+      "brand_a": {
+        "name": "TrustLedger",
+        "tagline": "Business banking reimagined",
+        "founding_year": 2019,
+        "origin": "Charlotte, NC"
+      },
+      "brand_b": {
+        "name": "CapitalFlow",
+        "tagline": "Your financial partner",
+        "founding_year": 2018,
+        "origin": "San Francisco, CA"
+      },
+      "brand_c": {
+        "name": "SecureVault Finance",
+        "tagline": "Protection meets performance",
+        "founding_year": 2020,
+        "origin": "New York, NY"
+      }
+    },
+    "tax_software": {
+      "brand_a": {
+        "name": "TaxEdge Pro",
+        "tagline": "Precision tax solutions",
+        "founding_year": 2017,
+        "origin": "Dallas, TX"
+      },
+      "brand_b": {
+        "name": "FileSmart",
+        "tagline": "Simplify your tax season",
+        "founding_year": 2018,
+        "origin": "Austin, TX"
+      },
+      "brand_c": {
+        "name": "ComplianceHub",
+        "tagline": "Stay compliant, stay confident",
+        "founding_year": 2019,
+        "origin": "Washington, DC"
+      }
+    }
+  },
+  "notes": {
+    "design_principle": "All brands are fictional to avoid real-world associations",
+    "naming_convention": "Names designed to be neutral and professional",
+    "brand_count": 24,
+    "categories": 8
+  }
+}

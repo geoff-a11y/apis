@@ -1,0 +1,97 @@
+{
+  "dimension_id": "dim_01",
+  "dimension_name": "third_party_authority",
+  "cluster": "A",
+  "evidence_tier": "a",
+  "trial_count_b2c": 60,
+  "trial_count_b2b": 80,
+  "replication": true,
+  "conditions": {
+    "control": {
+      "label": "A",
+      "description": "No third-party authority signals",
+      "template": "The {brand} {product} features {features}. Price: {price}."
+    },
+    "manipulation": {
+      "label": "B",
+      "description": "Third-party expert endorsement added",
+      "template": "{authority_signal}. The {brand} {product} features {features}. Price: {price}."
+    }
+  },
+  "category_variants": {
+    "skincare": {
+      "brand_slot": "brand_a",
+      "product": "daily moisturizer",
+      "features": "hyaluronic acid complex, SPF 30, fragrance-free formula",
+      "price": "$48",
+      "authority_signal": "Recommended by the American Dermatological Association",
+      "option_b": "The Clearova daily moisturizer features niacinamide complex, SPF 25, light texture. Price: $46."
+    },
+    "fitness_app": {
+      "brand_slot": "brand_a",
+      "product": "fitness tracking app",
+      "features": "workout logging, heart rate zones, 300+ guided sessions",
+      "price": "$12.99/month",
+      "authority_signal": "Endorsed by the National Academy of Sports Medicine",
+      "option_b": "The TrackFlow fitness app features workout logging, GPS tracking, 200+ guided sessions. Price: $11.99/month."
+    },
+    "streaming": {
+      "brand_slot": "brand_a",
+      "product": "streaming service",
+      "features": "4K HDR content, offline downloads, 5 simultaneous streams",
+      "price": "$15.99/month",
+      "authority_signal": "Winner of the Digital Entertainment Excellence Award 2025",
+      "option_b": "The FlixBase streaming service features HD content, offline downloads, 4 simultaneous streams. Price: $14.99/month."
+    },
+    "footwear": {
+      "brand_slot": "brand_a",
+      "product": "running shoes",
+      "features": "responsive foam cushioning, breathable mesh upper, 8mm drop",
+      "price": "$145",
+      "authority_signal": "Rated Best Running Shoe by Runner's World Magazine",
+      "option_b": "The SwiftStep running shoes feature breathable mesh upper, cushioned midsole, durable outsole. Price: $139."
+    },
+    "food_delivery": {
+      "brand_slot": "brand_a",
+      "product": "food delivery service",
+      "features": "30-minute average delivery, live tracking, no minimum order",
+      "price": "$3.99 delivery fee",
+      "authority_signal": "Certified by the Food Safety Excellence Council",
+      "option_b": "The QuickEats food delivery service features 800+ restaurants, 35-minute average delivery, no hidden fees. Price: $3.49 delivery fee."
+    },
+    "appliances": {
+      "brand_slot": "brand_a",
+      "product": "air purifier",
+      "features": "HEPA filtration, covers 500 sq ft, smart sensor auto-adjust",
+      "price": "$299",
+      "authority_signal": "Certified by the Asthma and Allergy Foundation of America",
+      "option_b": "The PureAir air purifier features carbon filtration, covers 400 sq ft, quiet mode. Price: $289."
+    },
+    "financial": {
+      "brand_slot": "brand_a",
+      "product": "business banking platform",
+      "features": "multi-user access, automated invoicing, expense tracking",
+      "price": "$29/month",
+      "authority_signal": "SOC 2 Type II certified, recommended by the Small Business Association",
+      "option_b": "The ProBooks business banking platform features multi-user access, receipt scanning, tax prep integration. Price: $31/month."
+    },
+    "tax_software": {
+      "brand_slot": "brand_a",
+      "product": "business tax software",
+      "features": "automated deduction finding, audit support, multi-state filing",
+      "price": "$199/year",
+      "authority_signal": "Endorsed by the American Institute of CPAs",
+      "option_b": "The FileSmart business tax software features automated calculations, audit alerts, CPA review option. Price: $189/year."
+    }
+  },
+  "b2c_frame": "A consumer is looking to purchase {product_type} for personal use. Based on the information below, which option would you recommend?",
+  "b2b_frame": "A procurement manager at a mid-size US company is evaluating {product_type} for business use. Multiple stakeholders will review this decision. Based on the information below, which option would you recommend?",
+  "manipulation_check_prompt": "Did the product description mention any endorsements, certifications, or recommendations from professional organizations or experts? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+  "manipulation_check_target_keywords": ["endorsed", "recommended", "certified", "association", "award", "expert", "authority", "foundation", "institute", "dermatological", "academy", "credibility", "third-party", "official", "professional"],
+  "published_effect": {
+    "source": "Filandrianos et al. 2025",
+    "direction": "positive",
+    "magnitude": "delta_rate_+289pct",
+    "model": "Claude 3.5 Sonnet"
+  }
+}

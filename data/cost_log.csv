@@ -1,0 +1,4 @@
+timestamp,script,model_id,trials_run,prompt_tokens,completion_tokens,cost_usd
+2026-03-27T17:28:44.204427Z,02_pilot_run.py,gpt4o,90,0,0,0.406515
+2026-03-27T17:48:30.677917Z,02_pilot_run.py,gpt4o,90,0,0,0.399450
+2026-03-27T18:55:22.520377Z,02_pilot_run.py,gpt4o,90,0,0,0.540685

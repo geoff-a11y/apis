@@ -1,0 +1,439 @@
+{
+  "description": "Manipulation check prompts and scoring keywords for each dimension. Used as follow-up prompts in the same conversation after the initial recommendation response.",
+  "version": "1.0",
+  "usage": "After receiving a model's recommendation response, send the manipulation_check_prompt for that dimension as a follow-up. Score the response as PASS if it contains any of the target_keywords.",
+  "pass_threshold": 0.70,
+  "dimensions": {
+    "dim_01": {
+      "dimension_name": "third_party_authority",
+      "manipulation_check_prompt": "Did the product description mention any endorsements, certifications, or recommendations from professional organizations or experts? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "endorsed",
+        "recommended",
+        "certified",
+        "association",
+        "award",
+        "expert",
+        "authority",
+        "foundation",
+        "institute",
+        "dermatological",
+        "academy",
+        "credibility",
+        "third-party",
+        "official",
+        "professional"
+      ]
+    },
+    "dim_02": {
+      "dimension_name": "social_proof_sensitivity",
+      "manipulation_check_prompt": "Did the product description include any customer ratings, reviews, or user statistics? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "review",
+        "rating",
+        "customer",
+        "user",
+        "star",
+        "verified",
+        "member",
+        "subscriber",
+        "million",
+        "thousand",
+        "buyer",
+        "satisfaction",
+        "feedback",
+        "popular",
+        "4.8",
+        "41,200"
+      ]
+    },
+    "dim_03": {
+      "dimension_name": "platform_endorsement",
+      "manipulation_check_prompt": "Did the product description mention any platform awards, editor selections, or 'best of' designations? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "editor",
+        "choice",
+        "best",
+        "winner",
+        "featured",
+        "top rated",
+        "award",
+        "leader",
+        "badge",
+        "amazon",
+        "app store",
+        "recognition",
+        "accolade",
+        "picked",
+        "selected",
+        "curated",
+        "highlighted"
+      ]
+    },
+    "dim_04": {
+      "dimension_name": "scarcity_signals",
+      "manipulation_check_prompt": "Did the product description mention any limited availability, low stock levels, or time-limited offers? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "limited",
+        "scarce",
+        "stock",
+        "left",
+        "remaining",
+        "running out",
+        "hurry",
+        "last",
+        "few",
+        "exclusive",
+        "sold out",
+        "back in stock",
+        "availability"
+      ]
+    },
+    "dim_05": {
+      "dimension_name": "urgency_framing",
+      "manipulation_check_prompt": "Did the product description mention any time-sensitive offers, deadlines, or expiring deals? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "urgent",
+        "deadline",
+        "expires",
+        "ending",
+        "today only",
+        "hours left",
+        "limited time",
+        "act now",
+        "soon",
+        "quick",
+        "immediately",
+        "flash sale",
+        "countdown"
+      ]
+    },
+    "dim_06": {
+      "dimension_name": "price_anchoring",
+      "manipulation_check_prompt": "Did the product description mention any original prices, discounts, or price comparisons? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "was",
+        "now",
+        "original",
+        "discount",
+        "save",
+        "off",
+        "reduced",
+        "sale",
+        "compared to",
+        "value",
+        "deal",
+        "markdown",
+        "regular price"
+      ]
+    },
+    "dim_07": {
+      "dimension_name": "reciprocity_triggers",
+      "manipulation_check_prompt": "Did the product description mention any free gifts, bonuses, or included extras? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "free",
+        "bonus",
+        "gift",
+        "included",
+        "complimentary",
+        "extra",
+        "no charge",
+        "added value",
+        "bundle",
+        "thrown in",
+        "at no cost"
+      ]
+    },
+    "dim_08": {
+      "dimension_name": "commitment_consistency",
+      "manipulation_check_prompt": "Did the product description reference any previous purchases, browsing history, or stated preferences? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "previous",
+        "history",
+        "before",
+        "consistent",
+        "preference",
+        "past",
+        "again",
+        "return",
+        "loyal",
+        "continuing",
+        "based on your"
+      ]
+    },
+    "dim_09": {
+      "dimension_name": "sustainability_preference",
+      "manipulation_check_prompt": "Did the product description mention any environmental, sustainability, or eco-friendly attributes? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "sustainable",
+        "eco",
+        "green",
+        "environmental",
+        "carbon",
+        "recyclable",
+        "organic",
+        "ethical",
+        "planet",
+        "footprint",
+        "renewable",
+        "biodegradable"
+      ]
+    },
+    "dim_10": {
+      "dimension_name": "privacy_sensitivity",
+      "manipulation_check_prompt": "Did the product description mention any data privacy, security, or information handling practices? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "privacy",
+        "data",
+        "secure",
+        "encrypted",
+        "confidential",
+        "protected",
+        "GDPR",
+        "no tracking",
+        "anonymous",
+        "personal information"
+      ]
+    },
+    "dim_11": {
+      "dimension_name": "local_preference",
+      "manipulation_check_prompt": "Did the product description mention where the product was made, sourced, or where the company is based? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "local",
+        "made in",
+        "domestic",
+        "american",
+        "usa",
+        "sourced",
+        "hometown",
+        "regional",
+        "nearby",
+        "national"
+      ]
+    },
+    "dim_12": {
+      "dimension_name": "novelty_seeking",
+      "manipulation_check_prompt": "Did the product description emphasize newness, innovation, or cutting-edge features? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "new",
+        "latest",
+        "innovative",
+        "cutting-edge",
+        "breakthrough",
+        "first",
+        "revolutionary",
+        "advanced",
+        "next-gen",
+        "modern"
+      ]
+    },
+    "dim_13": {
+      "dimension_name": "risk_aversion",
+      "manipulation_check_prompt": "Did the product description mention any guarantees, safety assurances, or risk reduction claims? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "guaranteed",
+        "safe",
+        "risk-free",
+        "proven",
+        "trusted",
+        "reliable",
+        "tested",
+        "assured",
+        "no risk",
+        "money back"
+      ]
+    },
+    "dim_14": {
+      "dimension_name": "warranty_weight",
+      "manipulation_check_prompt": "Did the product description mention any warranty, guarantee period, or protection plan? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "warranty",
+        "guarantee",
+        "year",
+        "coverage",
+        "protection",
+        "replacement",
+        "repair",
+        "lifetime",
+        "extended"
+      ]
+    },
+    "dim_15": {
+      "dimension_name": "return_policy_weight",
+      "manipulation_check_prompt": "Did the product description mention any return policy, refund terms, or trial period? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "return",
+        "refund",
+        "trial",
+        "money back",
+        "exchange",
+        "no questions",
+        "hassle-free",
+        "day return",
+        "satisfaction"
+      ]
+    },
+    "dim_16": {
+      "dimension_name": "negative_review_weight",
+      "manipulation_check_prompt": "Did the product description include any negative reviews, criticisms, or complaints? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "negative",
+        "complaint",
+        "issue",
+        "problem",
+        "concern",
+        "criticism",
+        "drawback",
+        "con",
+        "downside",
+        "disappointed"
+      ]
+    },
+    "dim_17": {
+      "dimension_name": "recency_bias",
+      "manipulation_check_prompt": "Did the product description emphasize how recently reviews were posted or when features were updated? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "recent",
+        "latest",
+        "updated",
+        "this week",
+        "this month",
+        "2024",
+        "2025",
+        "just",
+        "newly",
+        "fresh"
+      ]
+    },
+    "dim_18": {
+      "dimension_name": "specificity_preference",
+      "manipulation_check_prompt": "Did the product description include specific technical details, measurements, or precise specifications? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "specific",
+        "exact",
+        "precise",
+        "measurement",
+        "specification",
+        "technical",
+        "detailed",
+        "percentage",
+        "number",
+        "metric"
+      ]
+    },
+    "dim_19": {
+      "dimension_name": "comparison_framing",
+      "manipulation_check_prompt": "Did the product description include direct comparisons to competitors or alternative products? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "compared to",
+        "versus",
+        "vs",
+        "competitor",
+        "alternative",
+        "unlike",
+        "better than",
+        "outperforms",
+        "beats"
+      ]
+    },
+    "dim_20": {
+      "dimension_name": "multi_turn_persistence",
+      "manipulation_check_prompt": "Did you notice any information that was repeated or emphasized across multiple parts of the conversation? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "repeated",
+        "mentioned again",
+        "emphasized",
+        "reiterated",
+        "consistent",
+        "multiple times",
+        "reinforced"
+      ]
+    },
+    "dim_21": {
+      "dimension_name": "clarification_seeking",
+      "manipulation_check_prompt": "Did the product description contain any ambiguous or unclear information that you felt needed clarification? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "unclear",
+        "ambiguous",
+        "clarify",
+        "question",
+        "confusing",
+        "vague",
+        "uncertain",
+        "more information"
+      ]
+    },
+    "dim_22": {
+      "dimension_name": "delegation_comfort",
+      "manipulation_check_prompt": "Did the product description frame the decision as something you were being trusted or delegated to make? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "trust",
+        "delegate",
+        "behalf",
+        "decide for",
+        "your judgment",
+        "your choice",
+        "autonomy",
+        "responsibility"
+      ]
+    },
+    "dim_23": {
+      "dimension_name": "uncertainty_handling",
+      "manipulation_check_prompt": "Did the product description acknowledge any limitations, unknowns, or areas of uncertainty? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "uncertain",
+        "unknown",
+        "limited data",
+        "may vary",
+        "depends",
+        "individual results",
+        "not guaranteed",
+        "could differ"
+      ]
+    },
+    "dim_24": {
+      "dimension_name": "ethical_considerations",
+      "manipulation_check_prompt": "Did the product description mention any ethical claims, fair trade practices, or social responsibility? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "ethical",
+        "fair trade",
+        "responsible",
+        "social",
+        "community",
+        "charitable",
+        "giving back",
+        "impact",
+        "values"
+      ]
+    },
+    "dim_25": {
+      "dimension_name": "default_option_bias",
+      "manipulation_check_prompt": "Was one of the options presented as a default, pre-selected, or recommended choice? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "default",
+        "pre-selected",
+        "recommended",
+        "suggested",
+        "popular choice",
+        "most chosen",
+        "standard",
+        "preset"
+      ]
+    },
+    "dim_26": {
+      "dimension_name": "loss_framing",
+      "manipulation_check_prompt": "Did the product description frame any aspects in terms of what you might lose or miss out on? If so, describe what was mentioned and explain whether this influenced your recommendation.",
+      "target_keywords": [
+        "lose",
+        "miss",
+        "without",
+        "don't miss",
+        "risk losing",
+        "forfeit",
+        "sacrifice",
+        "cost of not",
+        "regret"
+      ]
+    }
+  }
+}
