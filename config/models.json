@@ -1,47 +1,49 @@
 {
   "models": [
     {
-      "id": "gpt4o",
-      "name": "GPT-4o",
+      "id": "gpt54",
+      "name": "GPT-5.4",
       "provider": "openai",
-      "model_string": "gpt-4o",
+      "model_string": "gpt-5.4",
       "temperature": 0.3,
       "max_tokens": 800,
-      "notes": "Pin exact model string at registration time"
+      "notes": "Latest GPT flagship as of 2026-03-27"
     },
     {
-      "id": "o1",
-      "name": "o1",
+      "id": "o3",
+      "name": "o3",
       "provider": "openai",
-      "model_string": "o1",
+      "model_string": "o3",
       "temperature": 1.0,
       "max_tokens": 800,
-      "notes": "Reasoning model — temperature fixed at 1.0"
+      "notes": "Latest reasoning model — temperature fixed at 1.0"
     },
     {
       "id": "gemini",
-      "name": "Gemini 2.0 Flash",
+      "name": "Gemini 3.1 Pro",
       "provider": "google",
-      "model_string": "gemini-2.0-flash",
+      "model_string": "gemini-3.1-pro-preview",
       "temperature": 0.3,
-      "max_tokens": 800
+      "max_tokens": 800,
+      "notes": "Latest Gemini flagship as of 2026-03-27"
     },
     {
       "id": "claude",
-      "name": "Claude Sonnet 4",
+      "name": "Claude Sonnet 4.6",
       "provider": "anthropic",
-      "model_string": "claude-sonnet-4-20250514",
+      "model_string": "claude-sonnet-4-6",
       "temperature": 0.3,
       "max_tokens": 800,
       "notes": "Test subject only — not used as judge for its own responses"
     },
     {
       "id": "llama",
-      "name": "Llama 3.3 70B",
+      "name": "Llama 4 Maverick",
       "provider": "together",
-      "model_string": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "model_string": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
       "temperature": 0.3,
-      "max_tokens": 800
+      "max_tokens": 800,
+      "notes": "Llama 4 via Together AI"
     },
     {
       "id": "perplexity",
@@ -64,18 +66,18 @@
       "notes": "Primary judge. Blinded to model identity."
     },
     {
-      "id": "judge_gpt4o",
-      "name": "GPT-4o (judge)",
+      "id": "judge_gpt54",
+      "name": "GPT-5.4 (judge)",
       "provider": "openai",
-      "model_string": "gpt-4o",
+      "model_string": "gpt-5.4",
       "temperature": 0.1,
       "max_tokens": 400
     },
     {
       "id": "judge_gemini",
-      "name": "Gemini 2.0 Flash (judge)",
+      "name": "Gemini 3.1 Pro (judge)",
       "provider": "google",
-      "model_string": "gemini-2.0-flash",
+      "model_string": "gemini-3.1-pro-preview",
       "temperature": 0.1,
       "max_tokens": 400
     }

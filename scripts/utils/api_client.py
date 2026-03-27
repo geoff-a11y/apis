@@ -119,8 +119,8 @@ async def call_openai(
 
     start_time = time.time()
 
-    # o1 models don't support system prompts or temperature
-    if model_string.startswith("o1"):
+    # o-series reasoning models (o1, o3, o4) don't support system prompts or temperature
+    if model_string.startswith(("o1", "o3", "o4")):
         response = await client.chat.completions.create(
             model=model_string,
             messages=[
@@ -434,8 +434,8 @@ async def _call_multiturn_provider(
 
         start_time = time.time()
 
-        if model_string.startswith("o1"):
-            # o1 models: merge system into first user message
+        if model_string.startswith(("o1", "o3", "o4")):
+            # o-series reasoning models: merge system into first user message, no temperature
             api_messages = []
             for i, m in enumerate(messages):
                 if i == 0 and m["role"] == "user":
