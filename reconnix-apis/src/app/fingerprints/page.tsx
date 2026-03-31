@@ -6,6 +6,14 @@ import { useState } from 'react';
 import { getConfirmatoryFingerprints, getConfirmatoryModels, getModel } from '@/lib/data';
 import FingerprintRadar from '@/components/charts/FingerprintRadar';
 
+// Models with light backgrounds that need dark text
+const LIGHT_BG_MODELS = ['o3'];
+
+function getModelTextColor(modelId: string, isSelected: boolean): string {
+  if (!isSelected) return 'var(--color-text-mid)';
+  return LIGHT_BG_MODELS.includes(modelId) ? 'var(--color-text)' : 'white';
+}
+
 export default function FingerprintsPage() {
   const fingerprints = getConfirmatoryFingerprints();
   const models = getConfirmatoryModels();
@@ -47,17 +55,15 @@ export default function FingerprintsPage() {
                 key={model.id}
                 onClick={() => toggleModel(model.id)}
                 className="badge transition-all cursor-pointer"
-                style={
-                  isSelected
-                    ? {
-                        backgroundColor: `var(--model-${model.id})`,
-                        color: 'white',
-                      }
-                    : {
-                        backgroundColor: 'var(--color-surface-2)',
-                        color: 'var(--color-text-mid)',
-                      }
-                }
+                style={{
+                  backgroundColor: isSelected
+                    ? `var(--model-${model.id})`
+                    : 'var(--color-surface-2)',
+                  color: getModelTextColor(model.id, isSelected),
+                  border: isSelected && LIGHT_BG_MODELS.includes(model.id)
+                    ? '1px solid var(--color-border)'
+                    : 'none',
+                }}
               >
                 {model.name}
               </button>

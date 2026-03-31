@@ -40,6 +40,8 @@ interface TooltipPayloadEntry {
     display_name: string;
     dimension: string;
     cluster: string;
+    description: string;
+    what_it_measures: string;
   };
 }
 
@@ -48,16 +50,21 @@ interface CustomTooltipProps {
   payload?: TooltipPayloadEntry[];
 }
 
-// Custom tooltip component
+// Custom tooltip component with dimension explanation
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
   const dimension = payload[0].payload;
 
   return (
-    <div className="bg-white border border-border rounded-lg shadow-md p-3 max-w-xs" role="tooltip">
-      <p className="font-semibold text-sm text-navy mb-2">{dimension.display_name}</p>
-      <div className="space-y-1">
+    <div className="bg-white border border-border rounded-lg shadow-lg p-4 max-w-sm" role="tooltip">
+      <p className="font-semibold text-sm mb-1" style={{ color: '#1a1a2e' }}>
+        {dimension.display_name}
+      </p>
+      <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+        {dimension.what_it_measures || dimension.description}
+      </p>
+      <div className="space-y-1.5 pt-2" style={{ borderTop: '1px solid #e5e7eb' }}>
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2">
@@ -66,9 +73,9 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
                 style={{ backgroundColor: entry.color }}
                 aria-hidden="true"
               />
-              <span className="text-text-mid">{entry.name}</span>
+              <span style={{ color: '#4b5563' }}>{entry.name}</span>
             </div>
-            <span className="font-mono font-semibold text-navy">
+            <span className="font-mono font-semibold" style={{ color: '#1a1a2e' }}>
               {entry.value.toFixed(1)}
             </span>
           </div>
@@ -130,10 +137,12 @@ export default function FingerprintRadar({
   // Transform data for Recharts
   // Each data point represents one dimension with values for each selected model
   const radarData = dimensions.map((dim, index) => {
-    const dataPoint: any = {
+    const dataPoint: Record<string, string | number> = {
       dimension: dim.id,
       display_name: dim.display_name,
       cluster: dim.cluster,
+      description: dim.description,
+      what_it_measures: dim.what_it_measures,
     };
 
     // Add each model's value for this dimension

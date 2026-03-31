@@ -6,10 +6,11 @@ import { useState } from 'react';
 
 const navLinks = [
   { href: '/', label: 'Overview' },
+  { href: '/models', label: 'Models' },
   { href: '/fingerprints', label: 'Fingerprints' },
   { href: '/dimensions', label: 'Dimensions' },
   { href: '/compare', label: 'Compare' },
-  { href: '/score', label: 'Machine Likeability Score' },
+  { href: '/score', label: 'ML Score' },
   { href: '/research', label: 'Research' },
 ];
 
