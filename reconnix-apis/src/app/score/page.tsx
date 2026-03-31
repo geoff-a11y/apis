@@ -58,7 +58,20 @@ export default function ScorePage() {
         throw new Error(`Failed to score URL: ${response.statusText}`);
       }
 
-      const data: MLScore = await response.json();
+      const rawData = await response.json();
+
+      // Normalize API response to match MLScore type with defaults for missing fields
+      const data: MLScore = {
+        ...rawData,
+        recommendations: rawData.recommendations || [],
+        readability_score: rawData.readability_score ?? 0,
+        readability_flags: rawData.readability_flags || [],
+        extraction_quality: rawData.extraction_quality || 'partial',
+        signal_inventory: (rawData.signal_inventory || []).map((s: { dimension_id: string; score: number; zone_contributions?: unknown[] }) => ({
+          ...s,
+          zone_contributions: s.zone_contributions || [],
+        })),
+      };
 
       // Detect product category from URL
       const detectedCategory = detectCategory(url);

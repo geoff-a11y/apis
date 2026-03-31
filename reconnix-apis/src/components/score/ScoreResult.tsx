@@ -108,22 +108,26 @@ export default function ScoreResult({ score }: ScoreResultProps) {
           <div>
             <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>Content Quality Metrics</h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Extraction Quality</span>
-                <span className={`font-medium ${
-                  score.extraction_quality === 'full' ? 'text-score-high' :
-                  score.extraction_quality === 'partial' ? 'text-score-mid' :
-                  'text-score-low'
-                }`}>
-                  {score.extraction_quality.charAt(0).toUpperCase() + score.extraction_quality.slice(1)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Readability Score</span>
-                <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                  {Math.round(score.readability_score)}/100
-                </span>
-              </div>
+              {score.extraction_quality && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Extraction Quality</span>
+                  <span className={`font-medium ${
+                    score.extraction_quality === 'full' ? 'text-score-high' :
+                    score.extraction_quality === 'partial' ? 'text-score-mid' :
+                    'text-score-low'
+                  }`}>
+                    {score.extraction_quality.charAt(0).toUpperCase() + score.extraction_quality.slice(1)}
+                  </span>
+                </div>
+              )}
+              {score.readability_score !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Readability Score</span>
+                  <span className="font-medium" style={{ color: 'var(--color-text)' }}>
+                    {Math.round(score.readability_score)}/100
+                  </span>
+                </div>
+              )}
               {score.platform && (
                 <div className="flex justify-between items-center">
                   <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Platform</span>
