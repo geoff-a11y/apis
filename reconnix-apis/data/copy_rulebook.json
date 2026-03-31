@@ -1,0 +1,444 @@
+[
+  {
+    "dimension_id": "dim_01",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Endorsed by the American Institute of CPAs",
+      "SOC 2 Type II certified, recommended by the Small Business Association",
+      "Certified by the Food Safety Excellence Council",
+      "Certified by the Asthma and Allergy Foundation of America",
+      "Rated Best Running Shoe by Runner's World Magazine"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Recommended by the American Dermatological Association"
+    }
+  },
+  {
+    "dimension_id": "dim_02",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Used by 180,000 businesses, 4.8/5 rating from 12,400 reviews",
+      "Used by 2.1 million members, rated 4.7/5 across 89,400 reviews",
+      "Trusted by 45,000 small businesses, 4.7/5 on G2 from 2,100 reviews",
+      "4.7/5 stars from 28,500 runners on RunningGearReviews",
+      "4.6/5 stars from 15,800 verified purchasers"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Rated 4.8/5 by 41,200 verified buyers on SkinReview"
+    }
+  },
+  {
+    "dimension_id": "dim_03",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "App Store Best of 2024 Winner",
+      "Capterra Best Value Award 2025",
+      "Editor's Choice on BeautyHub",
+      "Top Rated App in Food & Drink category",
+      "Best Seller Badge - Home Air Quality"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Editor's Choice on BeautyHub"
+    }
+  },
+  {
+    "dimension_id": "dim_04",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Low stock alert: only 8 pairs left in popular sizes",
+      "Launch pricing ends in 48 hours \u2014 limited spots at this rate",
+      "Promotional rate expires tonight \u2014 only 200 slots remaining",
+      "Q1 pricing locked for first 100 signups only \u2014 23 spots left",
+      "Warehouse clearance: only 15 units at this price before restock"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Only 12 units left in stock \u2014 selling fast this week"
+    }
+  },
+  {
+    "dimension_id": "dim_05",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "List price $499, sale price $299 \u2014 $200 instant savings",
+      "Comparable services charge $29.99/month \u2014 this is $15.99/month",
+      "CPA services average $800+ \u2014 this software is $199/year",
+      "Standard delivery $7.99, member rate $3.99 \u2014 50% less",
+      "Was $24.99/month, reduced to $12.99/month \u2014 48% savings"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Originally $89, now $48 \u2014 46% off retail price"
+    }
+  },
+  {
+    "dimension_id": "dim_06",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "From TrustLedger, the enterprise-grade financial platform trusted by Fortune 500 companies",
+      "From StrideMax, the heritage running brand worn by marathon champions since 1972",
+      "From HomeEdge, the luxury home appliance maker with German engineering since 1965",
+      "From FitPulse, the premium fitness brand trusted by Olympic athletes and professional trainers",
+      "From StreamVault, the award-winning entertainment company with 20 years of original content creation"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "From Lumina Derm, the trusted skincare brand since 1987 with 35+ years of dermatological expertise"
+    }
+  },
+  {
+    "dimension_id": "dim_07",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "First 3 deliveries free \u2014 no commitment required",
+      "60-day wear test included \u2014 full refund if not satisfied",
+      "Includes free 14-day sample kit and complimentary skin consultation",
+      "Free 60-day business trial with full feature access and dedicated onboarding",
+      "Free trial through first quarterly filing \u2014 pay only if you continue"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Includes free 14-day sample kit and complimentary skin consultation"
+    }
+  },
+  {
+    "dimension_id": "dim_08",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Runner's bundle: includes performance socks, shoe bag, and reflective laces ($40 value)",
+      "Complete skincare bundle: includes cleanser, toner, and travel pouch ($85 value)",
+      "Entertainment bundle: includes music streaming and ad-free podcasts at no extra cost",
+      "Premium bundle: includes nutrition tracking, meal plans, and 1-on-1 coaching session",
+      "DashPass bundle: unlimited free delivery plus grocery delivery and priority support"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Complete skincare bundle: includes cleanser, toner, and travel pouch ($85 value)"
+    }
+  },
+  {
+    "dimension_id": "dim_09",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Energy Star certified, manufactured in solar-powered facility, with filter recycling program",
+      "Paperless-first platform hosted on renewable energy with carbon offset for every filing",
+      "Electric vehicle delivery fleet, compostable packaging only, and restaurant sustainability ratings",
+      "Certified B-Corp with carbon-neutral shipping, recyclable packaging, and 1% donated to ocean conservation",
+      "Made from 70% recycled ocean plastics with take-back recycling program and carbon-offset shipping"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Certified B-Corp with carbon-neutral shipping, recyclable packaging, and 1% donated to ocean conservation"
+    }
+  },
+  {
+    "dimension_id": "dim_10",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Order history auto-deleted, no location tracking beyond delivery, no data sold to restaurants",
+      "SOC 2 Type II certified, zero-knowledge encryption, no third-party data sharing, GDPR compliant",
+      "Bank-level encryption, data never sold, automatic deletion after filing, IRS-only data sharing",
+      "Guest checkout available, no account required, purchase history automatically deleted after 30 days",
+      "Fully offline operation, no WiFi required, no usage data transmitted to manufacturer"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Zero data collection policy \u2014 no account required, no tracking, discreet plain packaging"
+    }
+  },
+  {
+    "dimension_id": "dim_11",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "American-owned platform featuring independent US filmmakers and domestic production studios",
+      "Designed and assembled in Wisconsin, USA \u2014 supporting American manufacturing since 1998",
+      "US-headquartered fintech with American banking partners and domestic regulatory compliance",
+      "American tax software company with US-based CPAs and domestic IRS liaison team",
+      "Assembled in Maine with American-made materials, supporting US manufacturing jobs"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Made in USA \u2014 formulated and manufactured in California with domestically-sourced ingredients"
+    }
+  },
+  {
+    "dimension_id": "dim_12",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Industry-first interactive storytelling technology with viewer-influenced plot paths using cutting-edge AI",
+      "Launch exclusive - first delivery platform with drone capability for select neighborhoods, cutting delivery times in half",
+      "Revolutionary AI-powered adaptive training - first app to offer real-time form correction using computer vision",
+      "Pioneering graphene-enhanced sole technology - we're the first brand to bring this space-age material to running shoes",
+      "Industry-pioneering AI tax optimizer - first software to use machine learning trained on 10M+ returns to find hidden deductions"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Just launched with breakthrough peptide technology - first formula to use this patented innovation"
+    }
+  },
+  {
+    "dimension_id": "dim_13",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Dependable service since 2010 with 98% on-time delivery rate and 5 million repeat customers",
+      "Established leader since 2012 with 8 million active users and consistently ranked #1 by fitness professionals",
+      "Trusted brand for 25+ years with rigorous safety testing, FDA clearance, and verified by independent labs",
+      "Market leader for 18 years with IRS-certified accuracy guarantee and proven track record of successful audits",
+      "Proven performance over 20 years - worn by Olympic athletes and backed by independent biomechanics research"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Trusted by dermatologists for 15+ years with proven results across 2 million satisfied customers"
+    }
+  },
+  {
+    "dimension_id": "dim_14",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Protected by 60-day money-back guarantee plus lifetime access to purchased content if you cancel",
+      "Covered by 5-year comprehensive warranty including parts, labor, and free replacement filters for first year",
+      "Includes quality guarantee with automatic credits for buffering issues and 30-day commitment-free trial period",
+      "Backed by 90-day satisfaction guarantee with full refund plus comprehensive skin sensitivity protection coverage",
+      "Protected by fraud guarantee with 100% reimbursement plus service level agreement ensuring 99.9% uptime"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Backed by 90-day satisfaction guarantee with full refund plus comprehensive skin sensitivity protection coverage"
+    }
+  },
+  {
+    "dimension_id": "dim_15",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "90-day wear test with full refund available even after running in them, free prepaid return label included",
+      "Instant refund policy for any order issue - credits applied within minutes, no need to return the food",
+      "365-day return window with free pickup service and full refund, no restocking fees ever charged",
+      "100% refund guarantee until the moment you file your taxes, plus free migration support if you switch away",
+      "Cancel anytime with full refund for unused months and easy data export - no lock-in period or termination fees"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Hassle-free 120-day return policy with free return shipping, no questions asked, even if partially used"
+    }
+  },
+  {
+    "dimension_id": "dim_16",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Note: A few users report the interface has a learning curve, but support team provides excellent onboarding help",
+      "Note: A minority of runners find the fit runs slightly narrow, though the brand offers wide sizes upon request",
+      "Note: A few reviews mention the indicator light is bright at night, though this can be disabled in the settings",
+      "Note: Some businesses report the mobile app lacks a few desktop features, though the company has these on their Q2 roadmap",
+      "Note: A handful of users mention the cryptocurrency tax module is still basic, though it handles standard cases accurately"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Note: Some reviewers mention the texture takes 2-3 minutes to fully absorb, though most say the wait is worth it for the results"
+    }
+  },
+  {
+    "dimension_id": "dim_17",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "New 2026 edition launched in January with upgraded sensors and 30% quieter operation",
+      "Platform upgraded February 2026 with enhanced route optimization cutting average delivery time by 15%",
+      "2026 version released with updated tax code compliance and new AI-powered deduction finder",
+      "Latest update rolled out March 2026 with enhanced security features and faster transaction processing",
+      "2026 model released January with next-generation cushioning compound and improved durability"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Recently reformulated in March 2026 with enhanced absorption technology and upgraded packaging"
+    }
+  },
+  {
+    "dimension_id": "dim_18",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Partners with 1,247 restaurants, 27.4-minute average delivery time, 96.8% on-time rate, GPS updates every 15 seconds",
+      "Tracks 47 specific workout metrics with 98.3% accuracy, includes exactly 312 guided sessions averaging 28 minutes each",
+      "Processes invoices in 1.2 seconds average, supports up to 25 users, syncs with 847 financial institutions, 256-bit encryption",
+      "Contains precisely 2.5% hyaluronic acid concentration, clinically proven to increase skin hydration by 47% within 14 days",
+      "Weighs exactly 9.2 oz (size 9), foam provides 34% energy return, mesh has 89% breathability rating"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Contains precisely 2.5% hyaluronic acid concentration, clinically proven to increase skin hydration by 47% within 14 days"
+    }
+  },
+  {
+    "dimension_id": "dim_19",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Biomechanics lab testing shows 25% more energy return than Nike Pegasus and superior durability over 500 miles",
+      "Processes invoices 3x faster than QuickBooks with 50% fewer user-reported errors in accounting accuracy",
+      "Head-to-head testing found 23% more deductions than TurboTax Business with identical input data",
+      "Independent testing shows 40% better hydration retention compared to leading competitor brands in the $45-55 range",
+      "Delivers 8 minutes faster on average than DoorDash with 15% higher customer satisfaction ratings"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Independent testing shows 40% better hydration retention compared to leading competitor brands in the $45-55 range"
+    }
+  },
+  {
+    "dimension_id": "dim_20",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Complete feature comparison matrix, integration compatibility list, and user success metrics available if needed",
+      "Detailed ingredient sourcing, clinical trial results, and dermatologist recommendations available upon request",
+      "Security audit reports, API documentation, compliance certifications, and implementation timeline available if needed",
+      "Tax code coverage details, CPA partnership network, audit defense procedures, and accuracy guarantees available upon request",
+      "Biomechanical testing data, material specifications, sizing charts, and athlete endorsements available upon request"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Detailed ingredient sourcing, clinical trial results, and dermatologist recommendations available upon request"
+    }
+  },
+  {
+    "dimension_id": "dim_21",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Coverage area estimates based on standard room layouts - actual performance may vary with ceiling height and layout",
+      "Suitable for most skin types, though individual results may vary depending on your specific skin conditions",
+      "Compatible with major fitness devices, though some features may require specific hardware configurations",
+      "Sizing recommendations vary by foot type - some runners size up while others find true-to-size works best",
+      "Integrates with common accounting software, though setup requirements may differ based on your existing systems"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Suitable for most skin types, though individual results may vary depending on your specific skin conditions"
+    }
+  },
+  {
+    "dimension_id": "dim_22",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Praised for intuitive interface and beginner-friendly design, though the advanced analytics features require technical knowledge to fully utilize",
+      "Offers comprehensive features for complete business management, though new users report the full feature set requires a learning period to master",
+      "Fully automated to save time with minimal user input required, though the software occasionally flags items for manual review to ensure accuracy",
+      "Features whisper-quiet operation for undisturbed sleep, though the smart sensors activate audible alerts when detecting air quality changes",
+      "Partners with premium local restaurants for authentic quality, though the focus on quality sometimes means longer preparation times than fast-food chains"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Top-rated for sensitive skin and designed for daily use, though the formula includes active ingredients that some users find too potent for everyday application"
+    }
+  },
+  {
+    "dimension_id": "dim_23",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Delivery estimates are usually accurate, though we can't always guarantee exact timing due to unpredictable traffic and restaurant factors",
+      "Many runners report improved comfort, though it's challenging to predict exactly how they'll feel for your specific running style and biomechanics",
+      "Integration typically works smoothly with major accounting software, though we cannot confirm compatibility with all possible system configurations",
+      "Streaming quality is generally excellent, though actual performance may vary depending on factors outside our control like your internet connection",
+      "Heart rate tracking seems accurate based on user reports, though we cannot guarantee precision across all device combinations"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "While results appear promising in most users, individual skin response can be difficult to predict with certainty"
+    }
+  },
+  {
+    "dimension_id": "dim_24",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Fair compensation model for creators, transparent content moderation policies, and strong user privacy protections with no data selling",
+      "Refuses to lobby against free filing options, transparent pricing with no hidden upsells, and actively supports tax reform advocacy",
+      "Manufactured in certified ethical factories with fair wages, conflict-free materials sourcing, and third-party labor audits",
+      "B-Corp certified with transparent business practices, refuses investments from problematic industries, and donates 2% to financial literacy programs",
+      "Drivers are classified as employees with benefits and minimum wage guarantees, plus transparent tip policies ensuring 100% goes to drivers"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Certified Fair Trade ingredients with transparent supply chain, cruelty-free testing, and living wages paid to all farm workers"
+    }
+  },
+  {
+    "dimension_id": "dim_25",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "\u2713 EXPERT RECOMMENDED - Selected by 74% of buyers looking for similar room coverage",
+      "\u2b50 RECOMMENDED FOR YOUR BUSINESS SIZE - Chosen by 69% of similar mid-size companies",
+      "\u2b50 MOST POPULAR - Default choice for 70% of customers in your neighborhood",
+      "\u2713 RECOMMENDED OPTION - Chosen by 72% of users with similar fitness goals",
+      "\u2b50 TOP PICK - Default selection for 65% of households with your viewing preferences"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "\u2b50 MOST POPULAR CHOICE - Selected by 68% of customers browsing similar products"
+    }
+  },
+  {
+    "dimension_id": "dim_26",
+    "signal_absent_example": "The [Brand] [product] features [features]. Price: $XX.",
+    "signal_patterns": [
+      "Prevents workout plateaus and stops you from wasting time on ineffective routines that don't deliver results",
+      "Protects against running injuries and prevents the joint damage that inferior cushioning can cause over time",
+      "Eliminates buffering frustration and prevents missing out on must-watch content before it leaves other platforms",
+      "Avoids cold food disappointment and prevents wasting money on meals that arrive too late to enjoy properly",
+      "Prevents premature aging and protects against UV damage that would otherwise accelerate skin deterioration"
+    ],
+    "zone_guidance": "Place signal in headline or trust certification zone for maximum effect.",
+    "intensity_guidance": {
+      "low": "Generic mention without specifics",
+      "medium": "Named entity with basic claim",
+      "strong": "Prevents premature aging and protects against UV damage that would otherwise accelerate skin deterioration"
+    }
+  }
+]

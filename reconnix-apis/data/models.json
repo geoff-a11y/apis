@@ -1,0 +1,87 @@
+[
+  {
+    "id": "gpt4o",
+    "name": "GPT-4o",
+    "provider": "Openai",
+    "model_string": "gpt-4o",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-15",
+    "color": "var(--model-gpt4o)",
+    "logo": "/images/model-logos/openai.svg",
+    "study_type": "pilot",
+    "notes": "Pilot study model"
+  },
+  {
+    "id": "gpt54",
+    "name": "GPT-5.4",
+    "provider": "Openai",
+    "model_string": "gpt-5.4",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-gpt54)",
+    "logo": "/images/model-logos/openai.svg",
+    "study_type": "confirmatory",
+    "notes": "Latest GPT flagship as of 2026-03-27"
+  },
+  {
+    "id": "o3",
+    "name": "o3",
+    "provider": "Openai",
+    "model_string": "o3",
+    "temperature": 1.0,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-o3)",
+    "logo": "/images/model-logos/openai.svg",
+    "study_type": "confirmatory",
+    "notes": "Latest reasoning model \u2014 temperature fixed at 1.0",
+    "reasoning_effort": "medium"
+  },
+  {
+    "id": "gemini",
+    "name": "Gemini 3.1 Pro",
+    "provider": "Google",
+    "model_string": "gemini-3.1-pro-preview",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-gemini)",
+    "logo": "/images/model-logos/google.svg",
+    "study_type": "confirmatory",
+    "notes": "Latest Gemini flagship as of 2026-03-27"
+  },
+  {
+    "id": "claude",
+    "name": "Claude Sonnet 4.6",
+    "provider": "Anthropic",
+    "model_string": "claude-sonnet-4-6",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-claude)",
+    "logo": "/images/model-logos/anthropic.svg",
+    "study_type": "confirmatory",
+    "notes": "Test subject only \u2014 not used as judge for its own responses"
+  },
+  {
+    "id": "llama",
+    "name": "Llama 4 Maverick",
+    "provider": "Together",
+    "model_string": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-llama)",
+    "logo": "/images/model-logos/meta.svg",
+    "study_type": "confirmatory",
+    "notes": "Llama 4 via Together AI"
+  },
+  {
+    "id": "perplexity",
+    "name": "Perplexity Sonar Pro",
+    "provider": "Perplexity",
+    "model_string": "sonar-pro",
+    "temperature": 0.3,
+    "measurement_date": "2026-03-27",
+    "color": "var(--model-sonar)",
+    "logo": "/images/model-logos/perplexity.svg",
+    "study_type": "confirmatory",
+    "notes": "Live retrieval active by default \u2014 document this"
+  }
+]

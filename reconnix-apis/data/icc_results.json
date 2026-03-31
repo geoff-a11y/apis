@@ -1,0 +1,362 @@
+[
+  {
+    "dimension_id": "dim_01",
+    "icc": 0.9231860207759445,
+    "krippendorff_alpha": 0.7111583049659336,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 5178
+  },
+  {
+    "dimension_id": "dim_02",
+    "icc": 0.9288500494615465,
+    "krippendorff_alpha": 0.6979076779542854,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 4173
+  },
+  {
+    "dimension_id": "dim_03",
+    "icc": 0.9410337215924343,
+    "krippendorff_alpha": 0.7219954078560817,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 4192
+  },
+  {
+    "dimension_id": "dim_04",
+    "icc": 0.9384070830416974,
+    "krippendorff_alpha": 0.779882698800759,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 4111
+  },
+  {
+    "dimension_id": "dim_05",
+    "icc": 0.9462010587692962,
+    "krippendorff_alpha": 0.6948132188485051,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 2903
+  },
+  {
+    "dimension_id": "dim_06",
+    "icc": 0.9348100025647782,
+    "krippendorff_alpha": 0.8296595002315559,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 2892
+  },
+  {
+    "dimension_id": "dim_07",
+    "icc": 0.92187158792604,
+    "krippendorff_alpha": 0.63175243950172,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 2625
+  },
+  {
+    "dimension_id": "dim_08",
+    "icc": 0.9191945617260397,
+    "krippendorff_alpha": 0.7485000855347103,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 2539
+  },
+  {
+    "dimension_id": "dim_09",
+    "icc": 0.921984966952813,
+    "krippendorff_alpha": 0.6334464456890749,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 3753
+  },
+  {
+    "dimension_id": "dim_10",
+    "icc": 0.9142422332833317,
+    "krippendorff_alpha": 0.6539184219976789,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 3719
+  },
+  {
+    "dimension_id": "dim_11",
+    "icc": 0.9169086906232211,
+    "krippendorff_alpha": 0.6884788265002264,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 3756
+  },
+  {
+    "dimension_id": "dim_12",
+    "icc": 0.9109342630206314,
+    "krippendorff_alpha": 0.6942532777969462,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 3246
+  },
+  {
+    "dimension_id": "dim_13",
+    "icc": 0.914415043318092,
+    "krippendorff_alpha": 0.6811315921065193,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1946
+  },
+  {
+    "dimension_id": "dim_14",
+    "icc": 0.9358391725852632,
+    "krippendorff_alpha": 0.6083558430768843,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1927
+  },
+  {
+    "dimension_id": "dim_15",
+    "icc": 0.9174423398196278,
+    "krippendorff_alpha": 0.6550574642467994,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1927
+  },
+  {
+    "dimension_id": "dim_16",
+    "icc": 0.9159094585033156,
+    "krippendorff_alpha": 0.6171069924128598,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 1910
+  },
+  {
+    "dimension_id": "dim_17",
+    "icc": 0.9292859450676263,
+    "krippendorff_alpha": 0.6152682438023365,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 1928
+  },
+  {
+    "dimension_id": "dim_18",
+    "icc": 0.9137911460035726,
+    "krippendorff_alpha": 0.6742240753642536,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1837
+  },
+  {
+    "dimension_id": "dim_19",
+    "icc": 0.9394426726539207,
+    "krippendorff_alpha": 0.747132851423955,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1919
+  },
+  {
+    "dimension_id": "dim_20",
+    "icc": 0.9227167160192764,
+    "krippendorff_alpha": 0.7168266864211699,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 1889
+  },
+  {
+    "dimension_id": "dim_21",
+    "icc": 0.9086646453906863,
+    "krippendorff_alpha": 0.611640399770337,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 1914
+  },
+  {
+    "dimension_id": "dim_22",
+    "icc": 0.9021908289098738,
+    "krippendorff_alpha": 0.6039770683002562,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1899
+  },
+  {
+    "dimension_id": "dim_23",
+    "icc": 0.9151158704347403,
+    "krippendorff_alpha": 0.6466327501462366,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1922
+  },
+  {
+    "dimension_id": "dim_24",
+    "icc": 0.9147547245968101,
+    "krippendorff_alpha": 0.5888916716338559,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1905
+  },
+  {
+    "dimension_id": "dim_25",
+    "icc": 0.9465467069676429,
+    "krippendorff_alpha": 0.7919981213628358,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 1941
+  },
+  {
+    "dimension_id": "dim_26",
+    "icc": 0.9240638262878627,
+    "krippendorff_alpha": 0.6817042472405499,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 1934
+  },
+  {
+    "dimension_id": "pos_01_authority_social_proof",
+    "icc": 0.0046023761104573655,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "pos_02_platform_authority",
+    "icc": 0.7275188495240306,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "pos_03_social_proof_brand",
+    "icc": 0.5247135842880518,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "pos_04_anchoring_scarcity",
+    "icc": 0.374812593703148,
+    "krippendorff_alpha": 0.9191111111111111,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 197
+  },
+  {
+    "dimension_id": "pos_05_free_trial_bundle",
+    "icc": 0.7782227013707069,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 195
+  },
+  {
+    "dimension_id": "pos_06_brand_authority",
+    "icc": 0.7975291122333988,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 199
+  },
+  {
+    "dimension_id": "single_01_authority",
+    "icc": 0.030887185104052445,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 195
+  },
+  {
+    "dimension_id": "single_02_social_proof",
+    "icc": 0.09409774770764687,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 197
+  },
+  {
+    "dimension_id": "single_03_platform",
+    "icc": 0.07013859722805482,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 199
+  },
+  {
+    "dimension_id": "single_04_scarcity",
+    "icc": 0.20681366913993082,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "single_05_anchoring",
+    "icc": 0.12398266568016028,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "single_06_brand",
+    "icc": 0.1012699446434385,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 199
+  },
+  {
+    "dimension_id": "single_07_free_trial",
+    "icc": 0.6761855174623519,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 192
+  },
+  {
+    "dimension_id": "single_08_bundle",
+    "icc": 0.05910543130990331,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 198
+  },
+  {
+    "dimension_id": "tri_01_authority_social_proof_platform",
+    "icc": 0.028088654816764716,
+    "krippendorff_alpha": 0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 196
+  },
+  {
+    "dimension_id": "tri_02_anchoring_scarcity_bundle",
+    "icc": 0.5832436697510938,
+    "krippendorff_alpha": 0.9850231468504645,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": false,
+    "n_responses": 194
+  },
+  {
+    "dimension_id": "tri_03_brand_authority_social_proof",
+    "icc": 0.8198271645198101,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 200
+  },
+  {
+    "dimension_id": "tri_04_free_trial_bundle_social_proof",
+    "icc": 0.7684402910445189,
+    "krippendorff_alpha": 1.0,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 196
+  },
+  {
+    "dimension_id": "tri_05_platform_scarcity_anchoring",
+    "icc": 0.8248989664175107,
+    "krippendorff_alpha": 0.8311688311688312,
+    "manipulation_check_pass_rate": 0.95,
+    "confirmatory": true,
+    "n_responses": 196
+  }
+]

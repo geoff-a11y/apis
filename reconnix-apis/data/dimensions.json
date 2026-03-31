@@ -1,0 +1,444 @@
+[
+  {
+    "id": "dim_01",
+    "name": "third_party_authority",
+    "display_name": "Third Party Authority",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Third-party expert endorsement added",
+    "what_it_measures": "Tests AI agent sensitivity to third party authority signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Recommended by the American Dermatological Association. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_02",
+    "name": "social_proof_sensitivity",
+    "display_name": "Social Proof Sensitivity",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Quantified social proof added",
+    "what_it_measures": "Tests AI agent sensitivity to social proof sensitivity signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Rated 4.8/5 by 41,200 verified buyers on SkinReview. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_03",
+    "name": "platform_endorsement",
+    "display_name": "Platform Endorsement",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Platform endorsement badge added",
+    "what_it_measures": "Tests AI agent sensitivity to platform endorsement signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Editor's Choice on BeautyHub. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_04",
+    "name": "scarcity_urgency",
+    "display_name": "Scarcity Urgency",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Scarcity and urgency signals added",
+    "what_it_measures": "Tests AI agent sensitivity to scarcity urgency signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Only 12 units left in stock \u2014 selling fast this week. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_05",
+    "name": "anchoring_susceptibility",
+    "display_name": "Anchoring Susceptibility",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Price anchor added showing original/comparison price",
+    "what_it_measures": "Tests AI agent sensitivity to anchoring susceptibility signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Originally $89, now $48 \u2014 46% off retail price. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_06",
+    "name": "brand_premium_acceptance",
+    "display_name": "Brand Premium Acceptance",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Brand heritage and premium positioning added",
+    "what_it_measures": "Tests AI agent sensitivity to brand premium acceptance signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "From Lumina Derm, the trusted skincare brand since 1987 with 35+ years of dermatological expertise. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_07",
+    "name": "free_trial_conversion",
+    "display_name": "Free Trial Conversion",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Free trial or bonus offer added",
+    "what_it_measures": "Tests AI agent sensitivity to free trial conversion signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Includes free 14-day sample kit and complimentary skin consultation. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_08",
+    "name": "bundle_preference",
+    "display_name": "Bundle Preference",
+    "cluster": "A",
+    "cluster_name": "Evidence-Based Signal Processing",
+    "evidence_tier": "a",
+    "replication": true,
+    "agentic": false,
+    "description": "Bundle offer with additional items added",
+    "what_it_measures": "Tests AI agent sensitivity to bundle preference signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Complete skincare bundle: includes cleanser, toner, and travel pouch ($85 value). The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": "Filandrianos et al. 2025"
+  },
+  {
+    "id": "dim_09",
+    "name": "sustainability_premium",
+    "display_name": "Sustainability Premium",
+    "cluster": "B",
+    "cluster_name": "Value-Based Decision Making",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Sustainability and environmental credentials added",
+    "what_it_measures": "Tests AI agent sensitivity to sustainability premium signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Certified B-Corp with carbon-neutral shipping, recyclable packaging, and 1% donated to ocean conservation. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_10",
+    "name": "privacy_tradeoff",
+    "display_name": "Privacy Tradeoff",
+    "cluster": "B",
+    "cluster_name": "Value-Based Decision Making",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Strong privacy protection signals added",
+    "what_it_measures": "Tests AI agent sensitivity to privacy tradeoff signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Zero data collection policy \u2014 no account required, no tracking, discreet plain packaging. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_11",
+    "name": "local_preference",
+    "display_name": "Local Preference",
+    "cluster": "B",
+    "cluster_name": "Value-Based Decision Making",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Local or domestic origin signals added",
+    "what_it_measures": "Tests AI agent sensitivity to local preference signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Made in USA \u2014 formulated and manufactured in California with domestically-sourced ingredients. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_12",
+    "name": "novelty_seeking",
+    "display_name": "Novelty Seeking",
+    "cluster": "C",
+    "cluster_name": "Risk & Assurance",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Cutting-edge innovation and first-to-market signals added",
+    "what_it_measures": "Tests AI agent sensitivity to novelty seeking signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Just launched with breakthrough peptide technology - first formula to use this patented innovation. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_13",
+    "name": "risk_aversion",
+    "display_name": "Risk Aversion",
+    "cluster": "C",
+    "cluster_name": "Risk & Assurance",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Established track record and proven reliability signals added",
+    "what_it_measures": "Tests AI agent sensitivity to risk aversion signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Trusted by dermatologists for 15+ years with proven results across 2 million satisfied customers. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_14",
+    "name": "warranty_weight",
+    "display_name": "Warranty Weight",
+    "cluster": "C",
+    "cluster_name": "Risk & Assurance",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Extended warranty and guarantee coverage signals added",
+    "what_it_measures": "Tests AI agent sensitivity to warranty weight signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Backed by 90-day satisfaction guarantee with full refund plus comprehensive skin sensitivity protection coverage. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_15",
+    "name": "return_policy_sensitivity",
+    "display_name": "Return Policy Sensitivity",
+    "cluster": "C",
+    "cluster_name": "Risk & Assurance",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Generous return and refund policy signals added",
+    "what_it_measures": "Tests AI agent sensitivity to return policy sensitivity signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Hassle-free 120-day return policy with free return shipping, no questions asked, even if partially used. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_16",
+    "name": "negative_review_weight",
+    "display_name": "Negative Review Weight",
+    "cluster": "D",
+    "cluster_name": "Information Processing",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Minor criticisms acknowledged but addressed",
+    "what_it_measures": "Tests AI agent sensitivity to negative review weight signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Note: Some reviewers mention the texture takes 2-3 minutes to fully absorb, though most say the wait is worth it for the results. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_17",
+    "name": "recency_bias",
+    "display_name": "Recency Bias",
+    "cluster": "D",
+    "cluster_name": "Information Processing",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Recent updates and improvements emphasized",
+    "what_it_measures": "Tests AI agent sensitivity to recency bias signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Recently reformulated in March 2026 with enhanced absorption technology and upgraded packaging. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_18",
+    "name": "specificity_preference",
+    "display_name": "Specificity Preference",
+    "cluster": "D",
+    "cluster_name": "Information Processing",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Precise numbers, metrics, and specifications added",
+    "what_it_measures": "Tests AI agent sensitivity to specificity preference signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Contains precisely 2.5% hyaluronic acid concentration, clinically proven to increase skin hydration by 47% within 14 days. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_19",
+    "name": "comparison_framing",
+    "display_name": "Comparison Framing",
+    "cluster": "D",
+    "cluster_name": "Information Processing",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Framed as superior to specific competitor",
+    "what_it_measures": "Tests AI agent sensitivity to comparison framing signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Independent testing shows 40% better hydration retention compared to leading competitor brands in the $45-55 range. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_20",
+    "name": "information_seeking_depth",
+    "display_name": "Information Seeking Depth",
+    "cluster": "F",
+    "cluster_name": "Agentic Behaviors",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": true,
+    "description": "Additional information available upon request mentioned",
+    "what_it_measures": "Tests AI agent sensitivity to information seeking depth signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Detailed ingredient sourcing, clinical trial results, and dermatologist recommendations available upon request. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_21",
+    "name": "clarification_requests",
+    "display_name": "Clarification Requests",
+    "cluster": "F",
+    "cluster_name": "Agentic Behaviors",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": true,
+    "description": "Slight ambiguity that could prompt clarifying questions",
+    "what_it_measures": "Tests AI agent sensitivity to clarification requests signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Suitable for most skin types, though individual results may vary depending on your specific skin conditions. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_22",
+    "name": "recommendation_revision",
+    "display_name": "Recommendation Revision",
+    "cluster": "F",
+    "cluster_name": "Agentic Behaviors",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": true,
+    "description": "Includes subtle conflicting detail to test consistency",
+    "what_it_measures": "Tests AI agent sensitivity to recommendation revision signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Top-rated for sensitive skin and designed for daily use, though the formula includes active ingredients that some users find too potent for everyday application. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_23",
+    "name": "confidence_calibration",
+    "display_name": "Confidence Calibration",
+    "cluster": "F",
+    "cluster_name": "Agentic Behaviors",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": true,
+    "description": "Uncertainty language about some product claims",
+    "what_it_measures": "Tests AI agent sensitivity to confidence calibration signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "While results appear promising in most users, individual skin response can be difficult to predict with certainty. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_24",
+    "name": "ethical_concern_weight",
+    "display_name": "Ethical Concern Weight",
+    "cluster": "E",
+    "cluster_name": "Choice Architecture",
+    "evidence_tier": "b",
+    "replication": false,
+    "agentic": false,
+    "description": "Ethical sourcing and fair labor practice signals added",
+    "what_it_measures": "Tests AI agent sensitivity to ethical concern weight signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Certified Fair Trade ingredients with transparent supply chain, cruelty-free testing, and living wages paid to all farm workers. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_25",
+    "name": "default_option_bias",
+    "display_name": "Default Option Bias",
+    "cluster": "E",
+    "cluster_name": "Choice Architecture",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Option A marked as recommended or most popular",
+    "what_it_measures": "Tests AI agent sensitivity to default option bias signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "\u2b50 MOST POPULAR CHOICE - Selected by 68% of customers browsing similar products. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  },
+  {
+    "id": "dim_26",
+    "name": "loss_framing_sensitivity",
+    "display_name": "Loss Framing Sensitivity",
+    "cluster": "E",
+    "cluster_name": "Choice Architecture",
+    "evidence_tier": "c",
+    "replication": false,
+    "agentic": false,
+    "description": "Benefits framed as avoiding losses rather than gains",
+    "what_it_measures": "Tests AI agent sensitivity to loss framing sensitivity signals in product recommendations.",
+    "signal_example": {
+      "absent": "The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48.",
+      "present": "Prevents premature aging and protects against UV damage that would otherwise accelerate skin deterioration. The Brand A daily moisturizer features hyaluronic acid complex, SPF 30, fragrance-free formula. Price: $48."
+    },
+    "published_source": null
+  }
+]
