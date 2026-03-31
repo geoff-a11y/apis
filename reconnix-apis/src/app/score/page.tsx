@@ -39,7 +39,7 @@ export default function ScorePage() {
 
     try {
       // Use agentonomics ML Score API
-      const apiUrl = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://reconnix-staging.up.railway.app';
+      const apiUrl = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
