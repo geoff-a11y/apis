@@ -1,0 +1,3462 @@
+{
+  "generated_at": "2026-04-01T10:39:08.863231Z",
+  "summary": {
+    "total_pages": 213,
+    "avg_score": 49.6,
+    "score_range": {
+      "min": 40.0,
+      "max": 81.3
+    },
+    "success_rate": 1.0
+  },
+  "by_category": [
+    {
+      "category": "apparel",
+      "count": 7,
+      "avg_score": 44.5,
+      "min": 42.0,
+      "max": 46.5
+    },
+    {
+      "category": "electronics",
+      "count": 41,
+      "avg_score": 51.0,
+      "min": 40.5,
+      "max": 72.1
+    },
+    {
+      "category": "food_beverage",
+      "count": 16,
+      "avg_score": 47.5,
+      "min": 40.0,
+      "max": 70.2
+    },
+    {
+      "category": "home_goods",
+      "count": 35,
+      "avg_score": 47.2,
+      "min": 40.0,
+      "max": 68.5
+    },
+    {
+      "category": "personal_care",
+      "count": 8,
+      "avg_score": 46.4,
+      "min": 40.0,
+      "max": 52.8
+    },
+    {
+      "category": "software",
+      "count": 81,
+      "avg_score": 49.4,
+      "min": 40.0,
+      "max": 68.8
+    },
+    {
+      "category": "telecom",
+      "count": 25,
+      "avg_score": 55.4,
+      "min": 41.2,
+      "max": 81.3
+    }
+  ],
+  "dimension_analysis": [
+    {
+      "dimension_id": "dim_01",
+      "dimension_name": "third_party_authority",
+      "avg_score": 0.07,
+      "presence_rate": 0.33,
+      "avg_gap": 0.53,
+      "pages_at_target": 3
+    },
+    {
+      "dimension_id": "dim_02",
+      "dimension_name": "social_proof_sensitivity",
+      "avg_score": 0.04,
+      "presence_rate": 0.17,
+      "avg_gap": 0.56,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_03",
+      "dimension_name": "platform_endorsement",
+      "avg_score": 0.05,
+      "presence_rate": 0.25,
+      "avg_gap": 0.55,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_04",
+      "dimension_name": "scarcity_urgency",
+      "avg_score": 0.07,
+      "presence_rate": 0.38,
+      "avg_gap": 0.53,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_05",
+      "dimension_name": "anchoring_susceptibility",
+      "avg_score": 0.04,
+      "presence_rate": 0.18,
+      "avg_gap": 0.56,
+      "pages_at_target": 1
+    },
+    {
+      "dimension_id": "dim_06",
+      "dimension_name": "brand_premium_acceptance",
+      "avg_score": 0.06,
+      "presence_rate": 0.32,
+      "avg_gap": 0.54,
+      "pages_at_target": 1
+    },
+    {
+      "dimension_id": "dim_07",
+      "dimension_name": "free_trial_conversion",
+      "avg_score": 0.05,
+      "presence_rate": 0.27,
+      "avg_gap": 0.55,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_08",
+      "dimension_name": "bundle_preference",
+      "avg_score": 0.17,
+      "presence_rate": 0.53,
+      "avg_gap": 0.43,
+      "pages_at_target": 24
+    },
+    {
+      "dimension_id": "dim_09",
+      "dimension_name": "sustainability_premium",
+      "avg_score": 0.04,
+      "presence_rate": 0.17,
+      "avg_gap": 0.56,
+      "pages_at_target": 2
+    },
+    {
+      "dimension_id": "dim_10",
+      "dimension_name": "privacy_tradeoff",
+      "avg_score": 0.07,
+      "presence_rate": 0.37,
+      "avg_gap": 0.53,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_11",
+      "dimension_name": "local_preference",
+      "avg_score": 0.01,
+      "presence_rate": 0.06,
+      "avg_gap": 0.59,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_12",
+      "dimension_name": "novelty_seeking",
+      "avg_score": 0.21,
+      "presence_rate": 0.77,
+      "avg_gap": 0.39,
+      "pages_at_target": 17
+    },
+    {
+      "dimension_id": "dim_13",
+      "dimension_name": "risk_aversion",
+      "avg_score": 0.08,
+      "presence_rate": 0.36,
+      "avg_gap": 0.52,
+      "pages_at_target": 1
+    },
+    {
+      "dimension_id": "dim_14",
+      "dimension_name": "warranty_weight",
+      "avg_score": 0.1,
+      "presence_rate": 0.38,
+      "avg_gap": 0.5,
+      "pages_at_target": 10
+    },
+    {
+      "dimension_id": "dim_15",
+      "dimension_name": "return_policy_sensitivity",
+      "avg_score": 0.08,
+      "presence_rate": 0.33,
+      "avg_gap": 0.52,
+      "pages_at_target": 2
+    },
+    {
+      "dimension_id": "dim_16",
+      "dimension_name": "negative_review_weight",
+      "avg_score": 0.03,
+      "presence_rate": 0.14,
+      "avg_gap": 0.57,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_17",
+      "dimension_name": "recency_bias",
+      "avg_score": 0.08,
+      "presence_rate": 0.39,
+      "avg_gap": 0.52,
+      "pages_at_target": 1
+    },
+    {
+      "dimension_id": "dim_18",
+      "dimension_name": "specificity_preference",
+      "avg_score": 0.21,
+      "presence_rate": 0.69,
+      "avg_gap": 0.39,
+      "pages_at_target": 16
+    },
+    {
+      "dimension_id": "dim_19",
+      "dimension_name": "comparison_framing",
+      "avg_score": 0.05,
+      "presence_rate": 0.23,
+      "avg_gap": 0.55,
+      "pages_at_target": 3
+    },
+    {
+      "dimension_id": "dim_20",
+      "dimension_name": "information_seeking_depth",
+      "avg_score": 0.16,
+      "presence_rate": 0.66,
+      "avg_gap": 0.44,
+      "pages_at_target": 6
+    },
+    {
+      "dimension_id": "dim_21",
+      "dimension_name": "clarification_requests",
+      "avg_score": 0.04,
+      "presence_rate": 0.21,
+      "avg_gap": 0.56,
+      "pages_at_target": 1
+    },
+    {
+      "dimension_id": "dim_22",
+      "dimension_name": "recommendation_revision",
+      "avg_score": 0.19,
+      "presence_rate": 0.61,
+      "avg_gap": 0.41,
+      "pages_at_target": 20
+    },
+    {
+      "dimension_id": "dim_23",
+      "dimension_name": "confidence_calibration",
+      "avg_score": 0.09,
+      "presence_rate": 0.37,
+      "avg_gap": 0.51,
+      "pages_at_target": 4
+    },
+    {
+      "dimension_id": "dim_24",
+      "dimension_name": "ethical_concern_weight",
+      "avg_score": 0.01,
+      "presence_rate": 0.03,
+      "avg_gap": 0.59,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_25",
+      "dimension_name": "default_option_bias",
+      "avg_score": 0.08,
+      "presence_rate": 0.35,
+      "avg_gap": 0.52,
+      "pages_at_target": 0
+    },
+    {
+      "dimension_id": "dim_26",
+      "dimension_name": "loss_framing_sensitivity",
+      "avg_score": 0.07,
+      "presence_rate": 0.29,
+      "avg_gap": 0.53,
+      "pages_at_target": 5
+    }
+  ],
+  "model_distribution": {
+    "claude": {
+      "avg": 46.1,
+      "min": 40.0,
+      "max": 70.1
+    },
+    "gemini": {
+      "avg": 49.1,
+      "min": 40.0,
+      "max": 71.0
+    },
+    "gpt54": {
+      "avg": 46.8,
+      "min": 40.0,
+      "max": 72.2
+    },
+    "llama": {
+      "avg": 47.4,
+      "min": 40.0,
+      "max": 72.8
+    },
+    "o3": {
+      "avg": 47.7,
+      "min": 40.0,
+      "max": 74.1
+    },
+    "perplexity": {
+      "avg": 44.6,
+      "min": 40.0,
+      "max": 71.0
+    }
+  },
+  "top_performers": [
+    {
+      "url": "https://www.t-mobile.com/home-internet",
+      "domain": "t-mobile.com",
+      "category": "telecom",
+      "universal_score": 81.3,
+      "model_scores": {
+        "claude": 70.1,
+        "gemini": 71.0,
+        "gpt54": 72.2,
+        "llama": 72.8,
+        "o3": 74.1,
+        "perplexity": 71.0
+      },
+      "top_signals": [
+        "dim_08: 0.6",
+        "dim_01: 0.54"
+      ],
+      "why_successful": "Strong Third Party Authority, Bundle Preference, Warranty Weight signals"
+    },
+    {
+      "url": "https://www.razer.com/gaming-headsets/razer-blackshark-v2-pro",
+      "domain": "razer.com",
+      "category": "electronics",
+      "universal_score": 72.1,
+      "model_scores": {
+        "claude": 57.3,
+        "gemini": 63.8,
+        "gpt54": 65.0,
+        "llama": 65.6,
+        "o3": 68.2,
+        "perplexity": 50.3
+      },
+      "top_signals": [
+        "dim_08: 0.6",
+        "dim_12: 0.6"
+      ],
+      "why_successful": "Strong Bundle Preference, Novelty Seeking, Comparison Framing signals"
+    },
+    {
+      "url": "https://soylent.com/products/soylent-drink-original",
+      "domain": "soylent.com",
+      "category": "food_beverage",
+      "universal_score": 70.2,
+      "model_scores": {},
+      "top_signals": [
+        "dim_22: 0.6",
+        "dim_09: 0.54"
+      ],
+      "why_successful": "Strong Sustainability Premium, Recommendation Revision signals"
+    },
+    {
+      "url": "https://www.verizon.com/home/fios-fastest-internet/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 69.7,
+      "model_scores": {},
+      "top_signals": [
+        "dim_05: 0.54",
+        "dim_08: 0.54"
+      ],
+      "why_successful": "Strong Anchoring Susceptibility, Bundle Preference, Specificity Preference signals"
+    },
+    {
+      "url": "https://www.verizon.com/plans/unlimited/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 69.0,
+      "model_scores": {},
+      "top_signals": [
+        "dim_08: 0.54",
+        "dim_12: 0.54"
+      ],
+      "why_successful": "Strong Bundle Preference, Novelty Seeking signals"
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 68.8,
+      "model_scores": {
+        "claude": 54.9,
+        "gemini": 66.5,
+        "gpt54": 56.7,
+        "llama": 59.5,
+        "o3": 59.5,
+        "perplexity": 45.8
+      },
+      "top_signals": [
+        "dim_22: 0.6",
+        "dim_08: 0.54"
+      ],
+      "why_successful": "Strong Bundle Preference, Warranty Weight, Specificity Preference signals"
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 68.8,
+      "model_scores": {
+        "claude": 54.9,
+        "gemini": 66.5,
+        "gpt54": 56.7,
+        "llama": 59.5,
+        "o3": 59.5,
+        "perplexity": 45.8
+      },
+      "top_signals": [
+        "dim_22: 0.6",
+        "dim_08: 0.54"
+      ],
+      "why_successful": "Strong Bundle Preference, Warranty Weight, Specificity Preference signals"
+    },
+    {
+      "url": "https://www.t-mobile.com/cell-phone/apple-iphone-15-pro-max",
+      "domain": "www.t-mobile.com",
+      "category": "telecom",
+      "universal_score": 68.6,
+      "model_scores": {},
+      "top_signals": [
+        "dim_08: 0.54",
+        "dim_14: 0.54"
+      ],
+      "why_successful": "Strong Bundle Preference, Warranty Weight, Specificity Preference signals"
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/hemnes-daybed-frame-with-3-drawers-white-30349329/",
+      "domain": "ikea.com",
+      "category": "home_goods",
+      "universal_score": 68.5,
+      "model_scores": {
+        "claude": 56.2,
+        "gemini": 60.8,
+        "gpt54": 57.0,
+        "llama": 59.7,
+        "o3": 61.3,
+        "perplexity": 52.9
+      },
+      "top_signals": [
+        "dim_22: 0.6",
+        "dim_08: 0.54"
+      ],
+      "why_successful": "Strong Bundle Preference, Novelty Seeking, Recommendation Revision signals"
+    },
+    {
+      "url": "https://casper.com/pillows/",
+      "domain": "casper.com",
+      "category": "home_goods",
+      "universal_score": 68.2,
+      "model_scores": {
+        "claude": 55.1,
+        "gemini": 62.0,
+        "gpt54": 57.1,
+        "llama": 60.9,
+        "o3": 60.1,
+        "perplexity": 55.4
+      },
+      "top_signals": [
+        "dim_18: 0.54",
+        "dim_22: 0.54"
+      ],
+      "why_successful": "Strong Specificity Preference, Recommendation Revision signals"
+    }
+  ],
+  "bottom_performers": [
+    {
+      "url": "https://bluebottlecoffee.com/us/eng/product/hayes-valley-espresso",
+      "domain": "bluebottlecoffee.com",
+      "category": "food_beverage",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://linear.app/features",
+      "domain": "linear.app",
+      "category": "software",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.paulaschoice.com/clinical-1pct-retinol-treatment/790.html",
+      "domain": "paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.westelm.com/products/mid-century-bed-acorn-h2545/",
+      "domain": "westelm.com",
+      "category": "home_goods",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.allmodern.com/furniture/pdp/adira-upholstered-sofa-a001065700.html",
+      "domain": "www.allmodern.com",
+      "category": "home_goods",
+      "universal_score": 40.2,
+      "model_scores": {},
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.allmodern.com/lighting/pdp/2-light-single-tier-chandelier-quln5165.html",
+      "domain": "allmodern.com",
+      "category": "home_goods",
+      "universal_score": 40.2,
+      "model_scores": {
+        "claude": 40.2,
+        "gemini": 40.6,
+        "gpt54": 40.2,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.paulaschoice.com/skin-perfecting-2-bha-liquid-exfoliant/201.html",
+      "domain": "www.paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.37,
+      "model_scores": {},
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://www.paulaschoice.com/skin-perfecting-2pct-bha-liquid-exfoliant/201.html",
+      "domain": "paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.4,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 41.0,
+        "gpt54": 40.0,
+        "llama": 40.5,
+        "o3": 40.4,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://store.google.com/product/pixel_buds_pro_2",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 40.5,
+      "model_scores": {
+        "claude": 41.0,
+        "gemini": 40.6,
+        "gpt54": 40.4,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    },
+    {
+      "url": "https://store.google.com/product/nest_hub_max",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 40.5,
+      "model_scores": {
+        "claude": 41.0,
+        "gemini": 40.6,
+        "gpt54": 40.4,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "missing_signals": [
+        "dim_01",
+        "dim_02",
+        "dim_03",
+        "dim_04",
+        "dim_05"
+      ],
+      "biggest_gaps": [
+        "third_party_authority: 0.6 gap",
+        "social_proof_sensitivity: 0.6 gap",
+        "platform_endorsement: 0.6 gap"
+      ]
+    }
+  ],
+  "all_pages": [
+    {
+      "url": "https://www.t-mobile.com/home-internet",
+      "domain": "t-mobile.com",
+      "category": "telecom",
+      "universal_score": 81.3,
+      "model_scores": {
+        "claude": 70.1,
+        "gemini": 71.0,
+        "gpt54": 72.2,
+        "llama": 72.8,
+        "o3": 74.1,
+        "perplexity": 71.0
+      },
+      "signal_count": 23,
+      "avg_signal_score": 0.36
+    },
+    {
+      "url": "https://www.razer.com/gaming-headsets/razer-blackshark-v2-pro",
+      "domain": "razer.com",
+      "category": "electronics",
+      "universal_score": 72.1,
+      "model_scores": {
+        "claude": 57.3,
+        "gemini": 63.8,
+        "gpt54": 65.0,
+        "llama": 65.6,
+        "o3": 68.2,
+        "perplexity": 50.3
+      },
+      "signal_count": 18,
+      "avg_signal_score": 0.31
+    },
+    {
+      "url": "https://soylent.com/products/soylent-drink-original",
+      "domain": "soylent.com",
+      "category": "food_beverage",
+      "universal_score": 70.2,
+      "model_scores": {},
+      "signal_count": 20,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.verizon.com/home/fios-fastest-internet/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 69.7,
+      "model_scores": {},
+      "signal_count": 19,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.verizon.com/plans/unlimited/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 69.0,
+      "model_scores": {},
+      "signal_count": 19,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 68.8,
+      "model_scores": {
+        "claude": 54.9,
+        "gemini": 66.5,
+        "gpt54": 56.7,
+        "llama": 59.5,
+        "o3": 59.5,
+        "perplexity": 45.8
+      },
+      "signal_count": 14,
+      "avg_signal_score": 0.38
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 68.8,
+      "model_scores": {
+        "claude": 54.9,
+        "gemini": 66.5,
+        "gpt54": 56.7,
+        "llama": 59.5,
+        "o3": 59.5,
+        "perplexity": 45.8
+      },
+      "signal_count": 14,
+      "avg_signal_score": 0.38
+    },
+    {
+      "url": "https://www.t-mobile.com/cell-phone/apple-iphone-15-pro-max",
+      "domain": "www.t-mobile.com",
+      "category": "telecom",
+      "universal_score": 68.6,
+      "model_scores": {},
+      "signal_count": 17,
+      "avg_signal_score": 0.32
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/hemnes-daybed-frame-with-3-drawers-white-30349329/",
+      "domain": "ikea.com",
+      "category": "home_goods",
+      "universal_score": 68.5,
+      "model_scores": {
+        "claude": 56.2,
+        "gemini": 60.8,
+        "gpt54": 57.0,
+        "llama": 59.7,
+        "o3": 61.3,
+        "perplexity": 52.9
+      },
+      "signal_count": 17,
+      "avg_signal_score": 0.31
+    },
+    {
+      "url": "https://casper.com/pillows/",
+      "domain": "casper.com",
+      "category": "home_goods",
+      "universal_score": 68.2,
+      "model_scores": {
+        "claude": 55.1,
+        "gemini": 62.0,
+        "gpt54": 57.1,
+        "llama": 60.9,
+        "o3": 60.1,
+        "perplexity": 55.4
+      },
+      "signal_count": 16,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.notion.so/pricing",
+      "domain": "notion.so",
+      "category": "software",
+      "universal_score": 67.9,
+      "model_scores": {
+        "claude": 55.0,
+        "gemini": 60.6,
+        "gpt54": 59.6,
+        "llama": 59.5,
+        "o3": 61.0,
+        "perplexity": 49.2
+      },
+      "signal_count": 17,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.t-mobile.com/cell-phone/samsung-galaxy-s24-ultra",
+      "domain": "t-mobile.com",
+      "category": "telecom",
+      "universal_score": 67.7,
+      "model_scores": {
+        "claude": 54.3,
+        "gemini": 64.5,
+        "gpt54": 57.1,
+        "llama": 59.1,
+        "o3": 57.3,
+        "perplexity": 47.8
+      },
+      "signal_count": 17,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.t-mobile.com/tablet/apple-ipad-pro-13-inch-m4",
+      "domain": "t-mobile.com",
+      "category": "telecom",
+      "universal_score": 67.3,
+      "model_scores": {
+        "claude": 54.5,
+        "gemini": 63.7,
+        "gpt54": 57.3,
+        "llama": 58.6,
+        "o3": 55.6,
+        "perplexity": 47.8
+      },
+      "signal_count": 17,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.verizon.com/plans/prepaid/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 66.6,
+      "model_scores": {},
+      "signal_count": 16,
+      "avg_signal_score": 0.29
+    },
+    {
+      "url": "https://www.razer.com/gaming-laptops/razer-blade-18",
+      "domain": "razer.com",
+      "category": "electronics",
+      "universal_score": 65.7,
+      "model_scores": {
+        "claude": 52.1,
+        "gemini": 60.6,
+        "gpt54": 55.4,
+        "llama": 58.2,
+        "o3": 56.7,
+        "perplexity": 49.2
+      },
+      "signal_count": 15,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.asus.com/us/displays-desktops/monitors/proart/proart-display-pa279cv/",
+      "domain": "www.asus.com",
+      "category": "electronics",
+      "universal_score": 65.4,
+      "model_scores": {},
+      "signal_count": 17,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.sketch.com/pricing/",
+      "domain": "www.sketch.com",
+      "category": "software",
+      "universal_score": 65.2,
+      "model_scores": {},
+      "signal_count": 18,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/alex-desk-white-80483438/",
+      "domain": "ikea.com",
+      "category": "home_goods",
+      "universal_score": 64.3,
+      "model_scores": {
+        "claude": 53.3,
+        "gemini": 57.1,
+        "gpt54": 55.8,
+        "llama": 56.7,
+        "o3": 57.7,
+        "perplexity": 49.9
+      },
+      "signal_count": 17,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.razer.com/gaming-mice/razer-viper-v3-pro",
+      "domain": "www.razer.com",
+      "category": "electronics",
+      "universal_score": 64.1,
+      "model_scores": {},
+      "signal_count": 14,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.verizon.com/deals/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 63.7,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.wix.com/studio",
+      "domain": "wix.com",
+      "category": "software",
+      "universal_score": 62.8,
+      "model_scores": {
+        "claude": 49.6,
+        "gemini": 56.9,
+        "gpt54": 51.5,
+        "llama": 53.5,
+        "o3": 56.3,
+        "perplexity": 43.4
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.razer.com/gaming-keyboards/razer-huntsman-v3-pro",
+      "domain": "razer.com",
+      "category": "electronics",
+      "universal_score": 62.6,
+      "model_scores": {
+        "claude": 56.3,
+        "gemini": 61.2,
+        "gpt54": 64.2,
+        "llama": 61.7,
+        "o3": 62.0,
+        "perplexity": 43.4
+      },
+      "signal_count": 16,
+      "avg_signal_score": 0.29
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-mac/mac-mini",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 62.2,
+      "model_scores": {
+        "claude": 50.4,
+        "gemini": 57.8,
+        "gpt54": 50.1,
+        "llama": 50.9,
+        "o3": 52.8,
+        "perplexity": 45.8
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-mac/mac-studio",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 62.2,
+      "model_scores": {
+        "claude": 50.4,
+        "gemini": 57.8,
+        "gpt54": 50.1,
+        "llama": 50.9,
+        "o3": 52.8,
+        "perplexity": 45.8
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-mac/macbook-pro",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 62.2,
+      "model_scores": {
+        "claude": 50.4,
+        "gemini": 57.8,
+        "gpt54": 50.1,
+        "llama": 50.9,
+        "o3": 52.8,
+        "perplexity": 45.8
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.att.com/internet/fiber/",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 61.9,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.att.com/internet/fiber/",
+      "domain": "att.com",
+      "category": "telecom",
+      "universal_score": 61.9,
+      "model_scores": {
+        "claude": 49.2,
+        "gemini": 57.7,
+        "gpt54": 47.4,
+        "llama": 50.2,
+        "o3": 49.9,
+        "perplexity": 55.7
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.netlify.com/pricing/",
+      "domain": "www.netlify.com",
+      "category": "software",
+      "universal_score": 61.77,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://casper.com/sheets/",
+      "domain": "casper.com",
+      "category": "home_goods",
+      "universal_score": 61.6,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://casper.com/bedding/",
+      "domain": "casper.com",
+      "category": "home_goods",
+      "universal_score": 61.5,
+      "model_scores": {
+        "claude": 48.5,
+        "gemini": 56.3,
+        "gpt54": 48.1,
+        "llama": 52.8,
+        "o3": 54.0,
+        "perplexity": 49.5
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.webflow.com/pricing",
+      "domain": "www.webflow.com",
+      "category": "software",
+      "universal_score": 61.46,
+      "model_scores": {},
+      "signal_count": 19,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-ipad/ipad-air",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 60.2,
+      "model_scores": {
+        "claude": 47.6,
+        "gemini": 54.5,
+        "gpt54": 48.1,
+        "llama": 50.1,
+        "o3": 50.2,
+        "perplexity": 46.1
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-ipad/ipad-pro",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 60.0,
+      "model_scores": {
+        "claude": 47.4,
+        "gemini": 55.5,
+        "gpt54": 48.1,
+        "llama": 50.1,
+        "o3": 50.1,
+        "perplexity": 41.5
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.tuftandneedle.com/mattress/mint/",
+      "domain": "tuftandneedle.com",
+      "category": "home_goods",
+      "universal_score": 59.5,
+      "model_scores": {
+        "claude": 51.6,
+        "gemini": 59.7,
+        "gpt54": 58.7,
+        "llama": 56.2,
+        "o3": 56.9,
+        "perplexity": 44.3
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.29
+    },
+    {
+      "url": "https://github.com/pricing",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 58.6,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.31
+    },
+    {
+      "url": "https://www.shopify.com/plus",
+      "domain": "shopify.com",
+      "category": "software",
+      "universal_score": 58.0,
+      "model_scores": {
+        "claude": 49.6,
+        "gemini": 53.4,
+        "gpt54": 49.4,
+        "llama": 50.2,
+        "o3": 50.6,
+        "perplexity": 47.8
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.shopify.com/plus",
+      "domain": "shopify.com",
+      "category": "software",
+      "universal_score": 58.0,
+      "model_scores": {
+        "claude": 49.6,
+        "gemini": 53.4,
+        "gpt54": 49.4,
+        "llama": 50.2,
+        "o3": 50.6,
+        "perplexity": 47.8
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://foursigmatic.com/products/mushroom-coffee-with-lions-mane-chaga",
+      "domain": "foursigmatic.com",
+      "category": "food_beverage",
+      "universal_score": 57.8,
+      "model_scores": {},
+      "signal_count": 16,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.wix.com/premium-purchase-plan/dynamo",
+      "domain": "www.wix.com",
+      "category": "software",
+      "universal_score": 57.66,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.shopify.com/pricing",
+      "domain": "www.shopify.com",
+      "category": "software",
+      "universal_score": 57.09,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.loom.com/pricing",
+      "domain": "www.loom.com",
+      "category": "software",
+      "universal_score": 57.0,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://asana.com/pricing",
+      "domain": "asana.com",
+      "category": "software",
+      "universal_score": 56.1,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.3
+    },
+    {
+      "url": "https://www.razer.com/gaming-laptops/razer-blade-16",
+      "domain": "razer.com",
+      "category": "electronics",
+      "universal_score": 55.8,
+      "model_scores": {
+        "claude": 51.8,
+        "gemini": 59.2,
+        "gpt54": 57.1,
+        "llama": 56.6,
+        "o3": 56.4,
+        "perplexity": 47.3
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.grammarly.com/business",
+      "domain": "grammarly.com",
+      "category": "software",
+      "universal_score": 55.4,
+      "model_scores": {
+        "claude": 48.3,
+        "gemini": 49.0,
+        "gpt54": 44.8,
+        "llama": 47.5,
+        "o3": 47.1,
+        "perplexity": 53.4
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.apple.com/airpods-pro/",
+      "domain": "apple.com",
+      "category": "electronics",
+      "universal_score": 55.2,
+      "model_scores": {
+        "claude": 46.0,
+        "gemini": 55.1,
+        "gpt54": 47.0,
+        "llama": 49.4,
+        "o3": 49.0,
+        "perplexity": 44.6
+      },
+      "signal_count": 11,
+      "avg_signal_score": 0.32
+    },
+    {
+      "url": "https://www.clickup.com/pricing",
+      "domain": "www.clickup.com",
+      "category": "software",
+      "universal_score": 55.05,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.lg.com/us/monitors/lg-27gp950-b-gaming-monitor",
+      "domain": "www.lg.com",
+      "category": "electronics",
+      "universal_score": 54.8,
+      "model_scores": {},
+      "signal_count": 14,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.typeform.com/pricing/",
+      "domain": "www.typeform.com",
+      "category": "software",
+      "universal_score": 54.62,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/kallax-shelf-unit-white-20275814/",
+      "domain": "www.ikea.com",
+      "category": "home_goods",
+      "universal_score": 53.9,
+      "model_scores": {},
+      "signal_count": 14,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.figma.com/pricing/",
+      "domain": "www.figma.com",
+      "category": "software",
+      "universal_score": 53.66,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.att.com/tv/",
+      "domain": "att.com",
+      "category": "telecom",
+      "universal_score": 53.0,
+      "model_scores": {
+        "claude": 49.3,
+        "gemini": 53.5,
+        "gpt54": 53.3,
+        "llama": 54.2,
+        "o3": 56.9,
+        "perplexity": 47.3
+      },
+      "signal_count": 11,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.olaplex.com/products/the-complete-hair-repair-system",
+      "domain": "olaplex.com",
+      "category": "personal_care",
+      "universal_score": 52.8,
+      "model_scores": {
+        "claude": 47.9,
+        "gemini": 52.3,
+        "gpt54": 49.6,
+        "llama": 50.0,
+        "o3": 50.5,
+        "perplexity": 55.0
+      },
+      "signal_count": 11,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.webflow.com/cms",
+      "domain": "webflow.com",
+      "category": "software",
+      "universal_score": 52.8,
+      "model_scores": {
+        "claude": 47.8,
+        "gemini": 51.9,
+        "gpt54": 47.2,
+        "llama": 50.7,
+        "o3": 51.8,
+        "perplexity": 49.2
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://vercel.com/pricing",
+      "domain": "vercel.com",
+      "category": "software",
+      "universal_score": 52.7,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.monday.com/pricing/",
+      "domain": "www.monday.com",
+      "category": "software",
+      "universal_score": 52.62,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://zapier.com/pricing",
+      "domain": "zapier.com",
+      "category": "software",
+      "universal_score": 52.6,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://counterculturecoffee.com/shop/coffee/big-trouble",
+      "domain": "counterculturecoffee.com",
+      "category": "food_beverage",
+      "universal_score": 52.4,
+      "model_scores": {
+        "claude": 49.9,
+        "gemini": 53.6,
+        "gpt54": 45.8,
+        "llama": 48.1,
+        "o3": 48.3,
+        "perplexity": 49.1
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.webflow.com/enterprise",
+      "domain": "webflow.com",
+      "category": "software",
+      "universal_score": 52.3,
+      "model_scores": {
+        "claude": 47.6,
+        "gemini": 55.2,
+        "gpt54": 47.9,
+        "llama": 51.7,
+        "o3": 50.0,
+        "perplexity": 44.9
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/microsoft-365/buy/microsoft-365",
+      "domain": "www.microsoft.com",
+      "category": "software",
+      "universal_score": 52.28,
+      "model_scores": {},
+      "signal_count": 18,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-mac/macbook-pro",
+      "domain": "www.apple.com",
+      "category": "electronics",
+      "universal_score": 52.17,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.miro.com/pricing/",
+      "domain": "www.miro.com",
+      "category": "software",
+      "universal_score": 51.83,
+      "model_scores": {},
+      "signal_count": 14,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.sundayriley.com/products/good-genes-lactic-acid-treatment",
+      "domain": "www.sundayriley.com",
+      "category": "personal_care",
+      "universal_score": 51.5,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.hulu.com/live-tv",
+      "domain": "hulu.com",
+      "category": "software",
+      "universal_score": 51.5,
+      "model_scores": {
+        "claude": 47.2,
+        "gemini": 52.9,
+        "gpt54": 53.2,
+        "llama": 53.8,
+        "o3": 53.5,
+        "perplexity": 51.9
+      },
+      "signal_count": 11,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.corsair.com/us/en/p/gaming-mice/ch-931a011-na/m75-air",
+      "domain": "corsair.com",
+      "category": "electronics",
+      "universal_score": 51.4,
+      "model_scores": {
+        "claude": 49.9,
+        "gemini": 51.7,
+        "gpt54": 53.8,
+        "llama": 52.2,
+        "o3": 52.2,
+        "perplexity": 46.1
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.tuftandneedle.com/bedding/sheets/",
+      "domain": "www.tuftandneedle.com",
+      "category": "home_goods",
+      "universal_score": 51.3,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.belkin.com/boost-charge-pro-3-in-1-wireless-charging-pad-with-magsafe/WIZ016ttWH.html",
+      "domain": "belkin.com",
+      "category": "electronics",
+      "universal_score": 51.1,
+      "model_scores": {
+        "claude": 48.9,
+        "gemini": 51.1,
+        "gpt54": 48.3,
+        "llama": 46.5,
+        "o3": 48.2,
+        "perplexity": 48.0
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.hulu.com/welcome",
+      "domain": "www.hulu.com",
+      "category": "software",
+      "universal_score": 51.1,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.olaplex.com/products/no-3-hair-perfector",
+      "domain": "olaplex.com",
+      "category": "personal_care",
+      "universal_score": 50.7,
+      "model_scores": {
+        "claude": 46.8,
+        "gemini": 54.1,
+        "gpt54": 50.9,
+        "llama": 53.5,
+        "o3": 50.9,
+        "perplexity": 44.2
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://counterculturecoffee.com/shop/coffee/hologram",
+      "domain": "counterculturecoffee.com",
+      "category": "food_beverage",
+      "universal_score": 50.7,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.belkin.com/3-in-1-wireless-charger-with-magsafe-15w/WIZ017ttBK.html",
+      "domain": "www.belkin.com",
+      "category": "electronics",
+      "universal_score": 50.7,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://www.clickup.com/features/ai",
+      "domain": "clickup.com",
+      "category": "software",
+      "universal_score": 50.6,
+      "model_scores": {
+        "claude": 48.6,
+        "gemini": 52.0,
+        "gpt54": 50.6,
+        "llama": 52.4,
+        "o3": 51.0,
+        "perplexity": 46.8
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.corsair.com/us/en/p/pc-cases/cc-9011255-ww/5000d-airflow",
+      "domain": "corsair.com",
+      "category": "electronics",
+      "universal_score": 50.6,
+      "model_scores": {
+        "claude": 50.1,
+        "gemini": 49.2,
+        "gpt54": 53.7,
+        "llama": 51.5,
+        "o3": 52.7,
+        "perplexity": 51.4
+      },
+      "signal_count": 14,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.drinkbai.com/products/costa-rica-clementine",
+      "domain": "drinkbai.com",
+      "category": "food_beverage",
+      "universal_score": 50.6,
+      "model_scores": {
+        "claude": 44.7,
+        "gemini": 52.9,
+        "gpt54": 47.8,
+        "llama": 47.5,
+        "o3": 49.4,
+        "perplexity": 44.6
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.parachutehome.com/products/percale-sheet-set",
+      "domain": "www.parachutehome.com",
+      "category": "home_goods",
+      "universal_score": 50.3,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.brooklinen.com/products/luxe-core-sheet-set",
+      "domain": "www.brooklinen.com",
+      "category": "home_goods",
+      "universal_score": 50.3,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.logitech.com/en-us/products/webcams/brio-4k-hdr-webcam.960-001105.html",
+      "domain": "logitech.com",
+      "category": "electronics",
+      "universal_score": 50.3,
+      "model_scores": {
+        "claude": 49.9,
+        "gemini": 50.3,
+        "gpt54": 49.2,
+        "llama": 52.4,
+        "o3": 50.4,
+        "perplexity": 51.5
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.monday.com/work-management",
+      "domain": "monday.com",
+      "category": "software",
+      "universal_score": 50.1,
+      "model_scores": {
+        "claude": 49.3,
+        "gemini": 51.2,
+        "gpt54": 49.1,
+        "llama": 50.7,
+        "o3": 51.2,
+        "perplexity": 59.2
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://1password.com/teams/pricing/",
+      "domain": "1password.com",
+      "category": "software",
+      "universal_score": 50.0,
+      "model_scores": {},
+      "signal_count": 15,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/surface",
+      "domain": "www.microsoft.com",
+      "category": "electronics",
+      "universal_score": 49.71,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.raycast.com/pro",
+      "domain": "raycast.com",
+      "category": "software",
+      "universal_score": 49.7,
+      "model_scores": {
+        "claude": 44.9,
+        "gemini": 52.4,
+        "gpt54": 46.6,
+        "llama": 46.6,
+        "o3": 48.4,
+        "perplexity": 42.4
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.salesforce.com/products/sales/",
+      "domain": "www.salesforce.com",
+      "category": "software",
+      "universal_score": 49.62,
+      "model_scores": {},
+      "signal_count": 13,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://www.corsair.com/us/en/p/gaming-headsets/ca-9011295-na/hs80-max",
+      "domain": "corsair.com",
+      "category": "electronics",
+      "universal_score": 49.4,
+      "model_scores": {
+        "claude": 48.1,
+        "gemini": 50.1,
+        "gpt54": 50.1,
+        "llama": 50.1,
+        "o3": 50.9,
+        "perplexity": 46.1
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.verizon.com/smartphones/apple-iphone-15-pro-max/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 49.3,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.corsair.com/us/en/p/gaming-keyboards/ch-9226765-na/k100-rgb-optical-mechanical-gaming-keyboard",
+      "domain": "www.corsair.com",
+      "category": "electronics",
+      "universal_score": 49.3,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.notion.so/product/ai",
+      "domain": "notion.so",
+      "category": "software",
+      "universal_score": 49.2,
+      "model_scores": {
+        "claude": 49.2,
+        "gemini": 50.7,
+        "gpt54": 48.7,
+        "llama": 50.2,
+        "o3": 47.5,
+        "perplexity": 43.9
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.verizon.com/5g/",
+      "domain": "verizon.com",
+      "category": "telecom",
+      "universal_score": 49.2,
+      "model_scores": {
+        "claude": 49.0,
+        "gemini": 50.9,
+        "gpt54": 49.9,
+        "llama": 49.6,
+        "o3": 48.1,
+        "perplexity": 44.3
+      },
+      "signal_count": 13,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.verizon.com/connected-smartwatches/apple-watch-ultra-2/",
+      "domain": "verizon.com",
+      "category": "telecom",
+      "universal_score": 49.1,
+      "model_scores": {
+        "claude": 48.5,
+        "gemini": 49.2,
+        "gpt54": 47.6,
+        "llama": 48.9,
+        "o3": 49.2,
+        "perplexity": 50.2
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://joybird.com/sofas/hughes-sofa/",
+      "domain": "joybird.com",
+      "category": "home_goods",
+      "universal_score": 49.1,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.apple.com/shop/buy-iphone/iphone-15-pro",
+      "domain": "www.apple.com",
+      "category": "electronics",
+      "universal_score": 49.03,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.logitech.com/en-us/products/mice/mx-master-3s.910-006556.html",
+      "domain": "www.logitech.com",
+      "category": "electronics",
+      "universal_score": 48.8,
+      "model_scores": {},
+      "signal_count": 7,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.dropbox.com/business",
+      "domain": "dropbox.com",
+      "category": "software",
+      "universal_score": 48.8,
+      "model_scores": {
+        "claude": 46.4,
+        "gemini": 48.7,
+        "gpt54": 44.8,
+        "llama": 45.7,
+        "o3": 48.0,
+        "perplexity": 44.9
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.olaplex.com/products/no-7-bonding-oil",
+      "domain": "olaplex.com",
+      "category": "personal_care",
+      "universal_score": 48.7,
+      "model_scores": {
+        "claude": 46.0,
+        "gemini": 50.0,
+        "gpt54": 49.2,
+        "llama": 49.4,
+        "o3": 48.5,
+        "perplexity": 48.8
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.verizon.com/smartphones/google-pixel-9-pro/",
+      "domain": "verizon.com",
+      "category": "telecom",
+      "universal_score": 48.7,
+      "model_scores": {
+        "claude": 48.2,
+        "gemini": 48.4,
+        "gpt54": 47.5,
+        "llama": 48.8,
+        "o3": 48.7,
+        "perplexity": 50.2
+      },
+      "signal_count": 12,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.verizon.com/smartphones/google-pixel-8-pro/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 48.7,
+      "model_scores": {},
+      "signal_count": 12,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.drinkbai.com/products/brasilia-blueberry",
+      "domain": "www.drinkbai.com",
+      "category": "food_beverage",
+      "universal_score": 48.7,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.grammarly.com/plans",
+      "domain": "www.grammarly.com",
+      "category": "software",
+      "universal_score": 48.63,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.sketch.com/apps/",
+      "domain": "sketch.com",
+      "category": "software",
+      "universal_score": 48.6,
+      "model_scores": {
+        "claude": 44.4,
+        "gemini": 48.1,
+        "gpt54": 46.1,
+        "llama": 47.4,
+        "o3": 48.7,
+        "perplexity": 41.9
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.sketch.com/features/",
+      "domain": "sketch.com",
+      "category": "software",
+      "universal_score": 48.6,
+      "model_scores": {
+        "claude": 44.4,
+        "gemini": 48.1,
+        "gpt54": 46.1,
+        "llama": 47.4,
+        "o3": 48.7,
+        "perplexity": 41.9
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.steelseries.com/gaming-headsets/arctis-nova-pro-wireless",
+      "domain": "www.steelseries.com",
+      "category": "electronics",
+      "universal_score": 48.4,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.24
+    },
+    {
+      "url": "https://1password.com/business/",
+      "domain": "1password.com",
+      "category": "software",
+      "universal_score": 48.4,
+      "model_scores": {
+        "claude": 47.2,
+        "gemini": 50.6,
+        "gpt54": 48.1,
+        "llama": 48.8,
+        "o3": 48.8,
+        "perplexity": 44.9
+      },
+      "signal_count": 11,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.airtable.com/product",
+      "domain": "airtable.com",
+      "category": "software",
+      "universal_score": 48.4,
+      "model_scores": {
+        "claude": 46.5,
+        "gemini": 51.8,
+        "gpt54": 49.0,
+        "llama": 48.6,
+        "o3": 48.4,
+        "perplexity": 44.9
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.amplitude.com/pricing",
+      "domain": "www.amplitude.com",
+      "category": "software",
+      "universal_score": 48.14,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.calendly.com/features",
+      "domain": "calendly.com",
+      "category": "software",
+      "universal_score": 47.8,
+      "model_scores": {
+        "claude": 46.1,
+        "gemini": 47.6,
+        "gpt54": 48.4,
+        "llama": 49.1,
+        "o3": 50.9,
+        "perplexity": 43.4
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.verizon.com/smartphones/samsung-galaxy-s24-ultra/",
+      "domain": "www.verizon.com",
+      "category": "telecom",
+      "universal_score": 47.5,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.audible.com/ep/memberbenefits",
+      "domain": "www.audible.com",
+      "category": "software",
+      "universal_score": 47.5,
+      "model_scores": {},
+      "signal_count": 10,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.att.com/plans/wireless/",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 47.3,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.raycast.com/pricing",
+      "domain": "www.raycast.com",
+      "category": "software",
+      "universal_score": 47.3,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://planetscale.com/pricing",
+      "domain": "planetscale.com",
+      "category": "software",
+      "universal_score": 47.16,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.olaplex.com/products/no-4-bond-maintenance-shampoo",
+      "domain": "www.olaplex.com",
+      "category": "personal_care",
+      "universal_score": 47.02,
+      "model_scores": {},
+      "signal_count": 11,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://vercel.com/enterprise",
+      "domain": "vercel.com",
+      "category": "software",
+      "universal_score": 47.0,
+      "model_scores": {
+        "claude": 46.5,
+        "gemini": 48.3,
+        "gpt54": 45.1,
+        "llama": 47.7,
+        "o3": 47.9,
+        "perplexity": 41.5
+      },
+      "signal_count": 10,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.dropbox.com/plans",
+      "domain": "www.dropbox.com",
+      "category": "software",
+      "universal_score": 46.9,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.logitech.com/en-us/products/keyboards/mx-keys-s.html",
+      "domain": "logitech.com",
+      "category": "electronics",
+      "universal_score": 46.8,
+      "model_scores": {
+        "claude": 44.3,
+        "gemini": 46.8,
+        "gpt54": 43.6,
+        "llama": 43.1,
+        "o3": 44.3,
+        "perplexity": 44.2
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.29
+    },
+    {
+      "url": "https://www.att.com/buy/phones/apple-iphone-15-pro-max.html",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 46.8,
+      "model_scores": {},
+      "signal_count": 7,
+      "avg_signal_score": 0.28
+    },
+    {
+      "url": "https://www.larabar.com/products/peanut-butter-chocolate-chip",
+      "domain": "larabar.com",
+      "category": "food_beverage",
+      "universal_score": 46.8,
+      "model_scores": {
+        "claude": 43.3,
+        "gemini": 48.5,
+        "gpt54": 42.6,
+        "llama": 45.0,
+        "o3": 45.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.23
+    },
+    {
+      "url": "https://www.logitech.com/en-us/products/keyboards/mx-keys-s-combo.920-012556.html",
+      "domain": "logitech.com",
+      "category": "electronics",
+      "universal_score": 46.8,
+      "model_scores": {
+        "claude": 45.2,
+        "gemini": 48.7,
+        "gpt54": 47.5,
+        "llama": 45.8,
+        "o3": 49.1,
+        "perplexity": 40.0
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.att.com/deals/",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 46.8,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.jabra.com/bluetooth-headsets/jabra-elite-10",
+      "domain": "jabra.com",
+      "category": "electronics",
+      "universal_score": 46.8,
+      "model_scores": {
+        "claude": 45.0,
+        "gemini": 49.2,
+        "gpt54": 47.1,
+        "llama": 48.3,
+        "o3": 46.0,
+        "perplexity": 41.5
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.typeform.com/product/",
+      "domain": "typeform.com",
+      "category": "software",
+      "universal_score": 46.5,
+      "model_scores": {
+        "claude": 44.7,
+        "gemini": 50.6,
+        "gpt54": 45.0,
+        "llama": 46.8,
+        "o3": 46.0,
+        "perplexity": 43.9
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.allbirds.com/products/mens-tree-runners",
+      "domain": "www.allbirds.com",
+      "category": "apparel",
+      "universal_score": 46.5,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.article.com/product/12809/timber-charme-tan-sofa",
+      "domain": "www.article.com",
+      "category": "home_goods",
+      "universal_score": 46.5,
+      "model_scores": {},
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.allbirds.com/products/mens-tree-runners",
+      "domain": "allbirds.com",
+      "category": "apparel",
+      "universal_score": 46.5,
+      "model_scores": {
+        "claude": 46.3,
+        "gemini": 51.0,
+        "gpt54": 45.8,
+        "llama": 43.8,
+        "o3": 45.0,
+        "perplexity": 42.4
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.framer.com/pricing/",
+      "domain": "www.framer.com",
+      "category": "software",
+      "universal_score": 46.3,
+      "model_scores": {},
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/billy-bookcase-white-00263850/",
+      "domain": "ikea.com",
+      "category": "home_goods",
+      "universal_score": 46.3,
+      "model_scores": {
+        "claude": 44.6,
+        "gemini": 44.8,
+        "gpt54": 47.7,
+        "llama": 48.3,
+        "o3": 48.0,
+        "perplexity": 49.9
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.stumptowncoffee.com/products/hair-bender",
+      "domain": "www.stumptowncoffee.com",
+      "category": "food_beverage",
+      "universal_score": 46.23,
+      "model_scores": {},
+      "signal_count": 8,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.allbirds.com/products/mens-wool-runners",
+      "domain": "allbirds.com",
+      "category": "apparel",
+      "universal_score": 46.1,
+      "model_scores": {
+        "claude": 46.8,
+        "gemini": 49.3,
+        "gpt54": 45.7,
+        "llama": 43.0,
+        "o3": 44.5,
+        "perplexity": 42.4
+      },
+      "signal_count": 9,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.amplitude.com/analytics",
+      "domain": "amplitude.com",
+      "category": "software",
+      "universal_score": 46.1,
+      "model_scores": {
+        "claude": 45.1,
+        "gemini": 46.5,
+        "gpt54": 45.4,
+        "llama": 45.1,
+        "o3": 48.0,
+        "perplexity": 48.0
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://www.stumptowncoffee.com/products/holler-mountain",
+      "domain": "stumptowncoffee.com",
+      "category": "food_beverage",
+      "universal_score": 46.0,
+      "model_scores": {
+        "claude": 44.1,
+        "gemini": 48.6,
+        "gpt54": 44.0,
+        "llama": 45.6,
+        "o3": 47.3,
+        "perplexity": 40.0
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://slack.com/features/channels",
+      "domain": "slack.com",
+      "category": "software",
+      "universal_score": 45.8,
+      "model_scores": {
+        "claude": 45.0,
+        "gemini": 48.5,
+        "gpt54": 45.1,
+        "llama": 45.1,
+        "o3": 46.0,
+        "perplexity": 43.4
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://slack.com/features/channels",
+      "domain": "slack.com",
+      "category": "software",
+      "universal_score": 45.8,
+      "model_scores": {
+        "claude": 45.0,
+        "gemini": 48.5,
+        "gpt54": 45.1,
+        "llama": 45.1,
+        "o3": 46.0,
+        "perplexity": 43.4
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.att.com/buy/phones/samsung-galaxy-s24-ultra.html",
+      "domain": "att.com",
+      "category": "telecom",
+      "universal_score": 45.7,
+      "model_scores": {
+        "claude": 43.9,
+        "gemini": 47.9,
+        "gpt54": 42.5,
+        "llama": 43.7,
+        "o3": 45.1,
+        "perplexity": 53.3
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.brooklinen.com/products/down-pillow",
+      "domain": "brooklinen.com",
+      "category": "home_goods",
+      "universal_score": 45.7,
+      "model_scores": {
+        "claude": 46.1,
+        "gemini": 45.7,
+        "gpt54": 44.2,
+        "llama": 46.3,
+        "o3": 46.1,
+        "perplexity": 51.1
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.att.com/buy/phones/samsung-galaxy-s24-ultra.html",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 45.65,
+      "model_scores": {},
+      "signal_count": 8,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.craft.do/pricing",
+      "domain": "www.craft.do",
+      "category": "software",
+      "universal_score": 45.5,
+      "model_scores": {},
+      "signal_count": 7,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.loom.com/ai",
+      "domain": "loom.com",
+      "category": "software",
+      "universal_score": 45.1,
+      "model_scores": {
+        "claude": 45.0,
+        "gemini": 47.6,
+        "gpt54": 42.5,
+        "llama": 43.9,
+        "o3": 43.4,
+        "perplexity": 41.5
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.26
+    },
+    {
+      "url": "https://www.figma.com/dev-mode/",
+      "domain": "figma.com",
+      "category": "software",
+      "universal_score": 45.0,
+      "model_scores": {
+        "claude": 44.3,
+        "gemini": 44.2,
+        "gpt54": 45.2,
+        "llama": 46.1,
+        "o3": 47.5,
+        "perplexity": 44.9
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.hp.com/us-en/shop/laptops",
+      "domain": "www.hp.com",
+      "category": "electronics",
+      "universal_score": 44.94,
+      "model_scores": {},
+      "signal_count": 8,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://zapier.com/apps",
+      "domain": "zapier.com",
+      "category": "software",
+      "universal_score": 44.9,
+      "model_scores": {
+        "claude": 44.5,
+        "gemini": 43.9,
+        "gpt54": 46.6,
+        "llama": 46.8,
+        "o3": 45.5,
+        "perplexity": 47.8
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://zoom.us/meetings",
+      "domain": "zoom.us",
+      "category": "software",
+      "universal_score": 44.8,
+      "model_scores": {
+        "claude": 44.3,
+        "gemini": 47.6,
+        "gpt54": 43.2,
+        "llama": 45.0,
+        "o3": 43.7,
+        "perplexity": 43.9
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.allbirds.com/products/womens-wool-runner-mizzles",
+      "domain": "allbirds.com",
+      "category": "apparel",
+      "universal_score": 44.8,
+      "model_scores": {
+        "claude": 45.0,
+        "gemini": 43.1,
+        "gpt54": 46.0,
+        "llama": 44.0,
+        "o3": 45.8,
+        "perplexity": 46.5
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.2
+    },
+    {
+      "url": "https://asana.com/product/goals",
+      "domain": "asana.com",
+      "category": "software",
+      "universal_score": 44.8,
+      "model_scores": {
+        "claude": 43.9,
+        "gemini": 47.1,
+        "gpt54": 44.7,
+        "llama": 44.3,
+        "o3": 44.5,
+        "perplexity": 40.0
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.att.com/buy/phones/google-pixel-8-pro.html",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 44.72,
+      "model_scores": {},
+      "signal_count": 7,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://joybird.com/sectionals/",
+      "domain": "joybird.com",
+      "category": "home_goods",
+      "universal_score": 44.6,
+      "model_scores": {
+        "claude": 44.4,
+        "gemini": 45.5,
+        "gpt54": 45.5,
+        "llama": 44.8,
+        "o3": 44.0,
+        "perplexity": 41.9
+      },
+      "signal_count": 8,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.spotify.com/us/family/",
+      "domain": "spotify.com",
+      "category": "software",
+      "universal_score": 44.3,
+      "model_scores": {
+        "claude": 44.2,
+        "gemini": 45.5,
+        "gpt54": 42.7,
+        "llama": 44.5,
+        "o3": 44.5,
+        "perplexity": 43.9
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.netlify.com/platform/",
+      "domain": "netlify.com",
+      "category": "software",
+      "universal_score": 44.3,
+      "model_scores": {
+        "claude": 42.0,
+        "gemini": 46.3,
+        "gpt54": 43.2,
+        "llama": 45.3,
+        "o3": 46.3,
+        "perplexity": 40.0
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.25
+    },
+    {
+      "url": "https://www.superhuman.com/",
+      "domain": "www.superhuman.com",
+      "category": "software",
+      "universal_score": 44.2,
+      "model_scores": {},
+      "signal_count": 6,
+      "avg_signal_score": 0.27
+    },
+    {
+      "url": "https://asana.com/product/portfolios",
+      "domain": "asana.com",
+      "category": "software",
+      "universal_score": 44.1,
+      "model_scores": {
+        "claude": 43.7,
+        "gemini": 45.1,
+        "gpt54": 44.9,
+        "llama": 42.9,
+        "o3": 44.5,
+        "perplexity": 40.0
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.notion.so/product",
+      "domain": "www.notion.so",
+      "category": "software",
+      "universal_score": 44.05,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.32
+    },
+    {
+      "url": "https://www.airtable.com/pricing",
+      "domain": "www.airtable.com",
+      "category": "software",
+      "universal_score": 44.04,
+      "model_scores": {},
+      "signal_count": 6,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.superhuman.com/pricing",
+      "domain": "superhuman.com",
+      "category": "software",
+      "universal_score": 44.0,
+      "model_scores": {
+        "claude": 43.9,
+        "gemini": 45.9,
+        "gpt54": 42.6,
+        "llama": 43.5,
+        "o3": 44.0,
+        "perplexity": 41.5
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.verizon.com/tablets/apple-ipad-pro/",
+      "domain": "verizon.com",
+      "category": "telecom",
+      "universal_score": 44.0,
+      "model_scores": {
+        "claude": 43.9,
+        "gemini": 44.0,
+        "gpt54": 45.0,
+        "llama": 44.0,
+        "o3": 44.3,
+        "perplexity": 40.0
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.21
+    },
+    {
+      "url": "https://www.calendly.com/pricing",
+      "domain": "www.calendly.com",
+      "category": "software",
+      "universal_score": 43.99,
+      "model_scores": {},
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.miro.com/online-whiteboard/",
+      "domain": "miro.com",
+      "category": "software",
+      "universal_score": 43.7,
+      "model_scores": {
+        "claude": 42.6,
+        "gemini": 46.3,
+        "gpt54": 43.1,
+        "llama": 43.6,
+        "o3": 44.0,
+        "perplexity": 41.9
+      },
+      "signal_count": 7,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.spotify.com/us/premium/",
+      "domain": "www.spotify.com",
+      "category": "software",
+      "universal_score": 43.35,
+      "model_scores": {},
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.asus.com/us/laptops/for-creators/proart-studiobook/",
+      "domain": "asus.com",
+      "category": "electronics",
+      "universal_score": 43.3,
+      "model_scores": {
+        "claude": 43.6,
+        "gemini": 45.0,
+        "gpt54": 43.1,
+        "llama": 42.5,
+        "o3": 41.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.tcl.com/us/en/products/home-theater/q-class/65-q6-4k-qled-smart-tv",
+      "domain": "www.tcl.com",
+      "category": "electronics",
+      "universal_score": 43.29,
+      "model_scores": {},
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.figma.com/figjam/",
+      "domain": "figma.com",
+      "category": "software",
+      "universal_score": 43.1,
+      "model_scores": {
+        "claude": 42.8,
+        "gemini": 45.2,
+        "gpt54": 41.6,
+        "llama": 42.9,
+        "o3": 43.0,
+        "perplexity": 41.5
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://spline.design/pricing",
+      "domain": "spline.design",
+      "category": "software",
+      "universal_score": 43.1,
+      "model_scores": {},
+      "signal_count": 5,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.loom.com/screen-recorder",
+      "domain": "loom.com",
+      "category": "software",
+      "universal_score": 43.0,
+      "model_scores": {
+        "claude": 41.5,
+        "gemini": 45.0,
+        "gpt54": 42.6,
+        "llama": 43.3,
+        "o3": 43.3,
+        "perplexity": 40.0
+      },
+      "signal_count": 6,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.allbirds.com/products/mens-wool-runner-mizzles",
+      "domain": "allbirds.com",
+      "category": "apparel",
+      "universal_score": 43.0,
+      "model_scores": {
+        "claude": 43.7,
+        "gemini": 42.4,
+        "gpt54": 44.1,
+        "llama": 42.1,
+        "o3": 43.4,
+        "perplexity": 41.9
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.craft.do/templates",
+      "domain": "craft.do",
+      "category": "software",
+      "universal_score": 43.0,
+      "model_scores": {
+        "claude": 42.2,
+        "gemini": 43.2,
+        "gpt54": 44.1,
+        "llama": 44.7,
+        "o3": 43.3,
+        "perplexity": 45.4
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.larabar.com/products",
+      "domain": "www.larabar.com",
+      "category": "food_beverage",
+      "universal_score": 42.99,
+      "model_scores": {},
+      "signal_count": 5,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://planetscale.com/features",
+      "domain": "planetscale.com",
+      "category": "software",
+      "universal_score": 42.9,
+      "model_scores": {
+        "claude": 42.8,
+        "gemini": 43.3,
+        "gpt54": 43.7,
+        "llama": 42.7,
+        "o3": 42.4,
+        "perplexity": 42.4
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.tcl.com/us/en/products/mobile/tcl-50-series",
+      "domain": "tcl.com",
+      "category": "electronics",
+      "universal_score": 42.9,
+      "model_scores": {
+        "claude": 43.3,
+        "gemini": 43.0,
+        "gpt54": 43.0,
+        "llama": 42.1,
+        "o3": 43.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.steelseries.com/gaming-mice/aerox-9-wireless",
+      "domain": "steelseries.com",
+      "category": "electronics",
+      "universal_score": 42.8,
+      "model_scores": {
+        "claude": 42.6,
+        "gemini": 44.9,
+        "gpt54": 41.5,
+        "llama": 42.0,
+        "o3": 41.5,
+        "perplexity": 44.2
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/malm-bed-frame-high-white-luroey-s59009556/",
+      "domain": "www.ikea.com",
+      "category": "home_goods",
+      "universal_score": 42.7,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/malm-bed-frame-high-white-luroey-s19175091/",
+      "domain": "ikea.com",
+      "category": "home_goods",
+      "universal_score": 42.7,
+      "model_scores": {
+        "claude": 41.2,
+        "gemini": 42.2,
+        "gpt54": 43.3,
+        "llama": 44.7,
+        "o3": 44.2,
+        "perplexity": 40.0
+      },
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.ikea.com/us/en/p/poaeng-armchair-birch-veneer-knisa-light-beige-s49336025/",
+      "domain": "www.ikea.com",
+      "category": "home_goods",
+      "universal_score": 42.7,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.madewell.com/the-curvy-perfect-vintage-jean-MD580.html",
+      "domain": "madewell.com",
+      "category": "apparel",
+      "universal_score": 42.6,
+      "model_scores": {
+        "claude": 43.9,
+        "gemini": 42.5,
+        "gpt54": 42.1,
+        "llama": 41.7,
+        "o3": 41.9,
+        "perplexity": 40.0
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.asus.com/us/motherboards-components/graphics-cards/rog-strix/",
+      "domain": "asus.com",
+      "category": "electronics",
+      "universal_score": 42.6,
+      "model_scores": {
+        "claude": 43.5,
+        "gemini": 43.0,
+        "gpt54": 41.9,
+        "llama": 41.8,
+        "o3": 41.9,
+        "perplexity": 40.0
+      },
+      "signal_count": 5,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.jabra.com/bluetooth-headsets/jabra-elite-85t",
+      "domain": "www.jabra.com",
+      "category": "electronics",
+      "universal_score": 42.5,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.22
+    },
+    {
+      "url": "https://linear.app/pricing",
+      "domain": "linear.app",
+      "category": "software",
+      "universal_score": 42.35,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://github.com/features/actions",
+      "domain": "github.com",
+      "category": "software",
+      "universal_score": 42.3,
+      "model_scores": {
+        "claude": 41.7,
+        "gemini": 43.2,
+        "gpt54": 41.4,
+        "llama": 42.4,
+        "o3": 43.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.madewell.com/the-perfect-vintage-jean-MD535.html",
+      "domain": "www.madewell.com",
+      "category": "apparel",
+      "universal_score": 42.0,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://zoom.us/pricing",
+      "domain": "zoom.us",
+      "category": "software",
+      "universal_score": 41.92,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.williams-sonoma.com/products/breville-barista-express-impress/",
+      "domain": "williams-sonoma.com",
+      "category": "home_goods",
+      "universal_score": 41.9,
+      "model_scores": {
+        "claude": 41.4,
+        "gemini": 43.1,
+        "gpt54": 41.3,
+        "llama": 41.5,
+        "o3": 42.2,
+        "perplexity": 40.0
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.williams-sonoma.com/products/breville-barista-express/",
+      "domain": "williams-sonoma.com",
+      "category": "home_goods",
+      "universal_score": 41.9,
+      "model_scores": {
+        "claude": 41.4,
+        "gemini": 43.1,
+        "gpt54": 41.3,
+        "llama": 41.5,
+        "o3": 42.2,
+        "perplexity": 40.0
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.williams-sonoma.com/products/zwilling-ja-henckels-pro-7-pc-self-sharpening-knife-block-set/",
+      "domain": "williams-sonoma.com",
+      "category": "home_goods",
+      "universal_score": 41.9,
+      "model_scores": {
+        "claude": 41.4,
+        "gemini": 43.1,
+        "gpt54": 41.3,
+        "llama": 41.5,
+        "o3": 42.2,
+        "perplexity": 40.0
+      },
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.williams-sonoma.com/products/kitchenaid-artisan-mini-stand-mixer/",
+      "domain": "www.williams-sonoma.com",
+      "category": "home_goods",
+      "universal_score": 41.86,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.williams-sonoma.com/products/all-clad-d5-brushed-stainless-steel-10-piece-set/",
+      "domain": "www.williams-sonoma.com",
+      "category": "home_goods",
+      "universal_score": 41.86,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.clif.com/products/clif-bar/chocolate-chip",
+      "domain": "clif.com",
+      "category": "food_beverage",
+      "universal_score": 41.6,
+      "model_scores": {
+        "claude": 42.5,
+        "gemini": 40.5,
+        "gpt54": 41.7,
+        "llama": 41.3,
+        "o3": 41.9,
+        "perplexity": 41.0
+      },
+      "signal_count": 3,
+      "avg_signal_score": 0.14
+    },
+    {
+      "url": "https://www.clif.com/products/clif-builders-protein-bar",
+      "domain": "clif.com",
+      "category": "food_beverage",
+      "universal_score": 41.6,
+      "model_scores": {
+        "claude": 42.5,
+        "gemini": 40.5,
+        "gpt54": 41.7,
+        "llama": 41.3,
+        "o3": 41.9,
+        "perplexity": 41.0
+      },
+      "signal_count": 3,
+      "avg_signal_score": 0.14
+    },
+    {
+      "url": "https://www.clif.com/products/clif-bar",
+      "domain": "www.clif.com",
+      "category": "food_beverage",
+      "universal_score": 41.6,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.14
+    },
+    {
+      "url": "https://www.framer.com/ai",
+      "domain": "framer.com",
+      "category": "software",
+      "universal_score": 41.6,
+      "model_scores": {
+        "claude": 40.5,
+        "gemini": 43.1,
+        "gpt54": 41.9,
+        "llama": 42.0,
+        "o3": 41.2,
+        "perplexity": 40.0
+      },
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.siggi.com/product/vanilla-0-nonfat-icelandic-yogurt/",
+      "domain": "siggi.com",
+      "category": "food_beverage",
+      "universal_score": 41.5,
+      "model_scores": {
+        "claude": 40.8,
+        "gemini": 42.3,
+        "gpt54": 41.7,
+        "llama": 41.9,
+        "o3": 41.3,
+        "perplexity": 40.0
+      },
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.siggi.com/product/plain-0-nonfat-icelandic-yogurt/",
+      "domain": "www.siggi.com",
+      "category": "food_beverage",
+      "universal_score": 41.48,
+      "model_scores": {},
+      "signal_count": 3,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.samsung.com/us/smartphones/galaxy-s24/",
+      "domain": "www.samsung.com",
+      "category": "electronics",
+      "universal_score": 41.42,
+      "model_scores": {},
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.samsung.com/us/smartphones/galaxy-s24/",
+      "domain": "samsung.com",
+      "category": "electronics",
+      "universal_score": 41.4,
+      "model_scores": {
+        "claude": 41.2,
+        "gemini": 41.0,
+        "gpt54": 41.8,
+        "llama": 41.9,
+        "o3": 42.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://store.google.com/product/pixel_8_pro",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 41.28,
+      "model_scores": {},
+      "signal_count": 4,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.overstock.com/Home-Garden/Bedding-Bath/32/dept.html",
+      "domain": "overstock.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.9,
+        "gemini": 41.4,
+        "gpt54": 41.1,
+        "llama": 40.7,
+        "o3": 40.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.potterybarn.com/products/reed-media-console/",
+      "domain": "potterybarn.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.3,
+        "gemini": 41.6,
+        "gpt54": 40.9,
+        "llama": 40.8,
+        "o3": 40.9,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.potterybarn.com/products/chesterfield-tufted-leather-sofa/",
+      "domain": "potterybarn.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.3,
+        "gemini": 41.6,
+        "gpt54": 40.9,
+        "llama": 40.8,
+        "o3": 40.9,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.cb2.com/go-cart-white-rolling-desk/s549689",
+      "domain": "cb2.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.9,
+        "gemini": 41.4,
+        "gpt54": 41.1,
+        "llama": 40.7,
+        "o3": 40.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.overstock.com/Home-Garden/Furniture/32/dept.html",
+      "domain": "www.overstock.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {},
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.cb2.com/lenox-dining-table/s675839",
+      "domain": "www.cb2.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {},
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.att.com/prepaid/",
+      "domain": "www.att.com",
+      "category": "telecom",
+      "universal_score": 41.2,
+      "model_scores": {},
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.cb2.com/sven-charme-chocolat-sofa/s382624",
+      "domain": "cb2.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.9,
+        "gemini": 41.4,
+        "gpt54": 41.1,
+        "llama": 40.7,
+        "o3": 40.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.potterybarn.com/products/pb-comfort-roll-arm-sofa/",
+      "domain": "potterybarn.com",
+      "category": "home_goods",
+      "universal_score": 41.2,
+      "model_scores": {
+        "claude": 41.3,
+        "gemini": 41.6,
+        "gpt54": 40.9,
+        "llama": 40.8,
+        "o3": 40.9,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.potterybarn.com/products/pearce-roll-arm-sofa/",
+      "domain": "www.potterybarn.com",
+      "category": "home_goods",
+      "universal_score": 41.15,
+      "model_scores": {},
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.audible.com/ep/gift-membership",
+      "domain": "audible.com",
+      "category": "software",
+      "universal_score": 41.1,
+      "model_scores": {
+        "claude": 40.7,
+        "gemini": 41.1,
+        "gpt54": 40.5,
+        "llama": 40.3,
+        "o3": 40.6,
+        "perplexity": 44.6
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.netflix.com/signup",
+      "domain": "www.netflix.com",
+      "category": "software",
+      "universal_score": 41.0,
+      "model_scores": {},
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://spline.design/ai",
+      "domain": "spline.design",
+      "category": "software",
+      "universal_score": 40.8,
+      "model_scores": {
+        "claude": 40.5,
+        "gemini": 42.2,
+        "gpt54": 40.6,
+        "llama": 40.3,
+        "o3": 40.5,
+        "perplexity": 40.0
+      },
+      "signal_count": 2,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://slack.com/pricing",
+      "domain": "slack.com",
+      "category": "software",
+      "universal_score": 40.59,
+      "model_scores": {},
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://store.google.com/product/pixel_buds_pro_2",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 40.5,
+      "model_scores": {
+        "claude": 41.0,
+        "gemini": 40.6,
+        "gpt54": 40.4,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://store.google.com/product/nest_hub_max",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 40.5,
+      "model_scores": {
+        "claude": 41.0,
+        "gemini": 40.6,
+        "gpt54": 40.4,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://store.google.com/product/pixel_watch_2",
+      "domain": "store.google.com",
+      "category": "electronics",
+      "universal_score": 40.5,
+      "model_scores": {
+        "claude": 41.0,
+        "gemini": 40.6,
+        "gpt54": 40.4,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.paulaschoice.com/skin-perfecting-2pct-bha-liquid-exfoliant/201.html",
+      "domain": "paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.4,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 41.0,
+        "gpt54": 40.0,
+        "llama": 40.5,
+        "o3": 40.4,
+        "perplexity": 40.0
+      },
+      "signal_count": 1,
+      "avg_signal_score": 0.12
+    },
+    {
+      "url": "https://www.paulaschoice.com/skin-perfecting-2-bha-liquid-exfoliant/201.html",
+      "domain": "www.paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.37,
+      "model_scores": {},
+      "signal_count": 1,
+      "avg_signal_score": 0.12
+    },
+    {
+      "url": "https://www.allmodern.com/furniture/pdp/adira-upholstered-sofa-a001065700.html",
+      "domain": "www.allmodern.com",
+      "category": "home_goods",
+      "universal_score": 40.2,
+      "model_scores": {},
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://www.allmodern.com/lighting/pdp/2-light-single-tier-chandelier-quln5165.html",
+      "domain": "allmodern.com",
+      "category": "home_goods",
+      "universal_score": 40.2,
+      "model_scores": {
+        "claude": 40.2,
+        "gemini": 40.6,
+        "gpt54": 40.2,
+        "llama": 40.1,
+        "o3": 40.1,
+        "perplexity": 40.0
+      },
+      "signal_count": 1,
+      "avg_signal_score": 0.18
+    },
+    {
+      "url": "https://bluebottlecoffee.com/us/eng/product/hayes-valley-espresso",
+      "domain": "bluebottlecoffee.com",
+      "category": "food_beverage",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 0,
+      "avg_signal_score": 0
+    },
+    {
+      "url": "https://linear.app/features",
+      "domain": "linear.app",
+      "category": "software",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 0,
+      "avg_signal_score": 0
+    },
+    {
+      "url": "https://www.paulaschoice.com/clinical-1pct-retinol-treatment/790.html",
+      "domain": "paulaschoice.com",
+      "category": "personal_care",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 0,
+      "avg_signal_score": 0
+    },
+    {
+      "url": "https://www.westelm.com/products/mid-century-bed-acorn-h2545/",
+      "domain": "westelm.com",
+      "category": "home_goods",
+      "universal_score": 40.0,
+      "model_scores": {
+        "claude": 40.0,
+        "gemini": 40.0,
+        "gpt54": 40.0,
+        "llama": 40.0,
+        "o3": 40.0,
+        "perplexity": 40.0
+      },
+      "signal_count": 0,
+      "avg_signal_score": 0
+    }
+  ]
+}

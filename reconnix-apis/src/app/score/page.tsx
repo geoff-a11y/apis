@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { MLScore, ProductCategory } from '@/lib/types';
 import { detectCategory } from '@/lib/category-data';
 import { generateModelDistribution } from '@/lib/model-weights';
@@ -9,6 +10,8 @@ import ScoreResult from '@/components/score/ScoreResult';
 import SignalInventory from '@/components/score/SignalInventory';
 import Recommendations from '@/components/score/Recommendations';
 import ModelScores from '@/components/score/ModelScores';
+import BenchmarkInsights from '@/components/score/BenchmarkInsights';
+import Link from 'next/link';
 
 // Progress stages for analysis
 const ANALYSIS_STAGES = [
@@ -18,7 +21,32 @@ const ANALYSIS_STAGES = [
   { key: 'generating', label: 'Generating custom recommendations with AI', duration: 20000 },
 ];
 
+// Wrapper component to handle Suspense boundary for useSearchParams
 export default function ScorePage() {
+  return (
+    <Suspense fallback={<ScorePageLoading />}>
+      <ScorePageInner />
+    </Suspense>
+  );
+}
+
+function ScorePageLoading() {
+  return (
+    <div className="space-y-8">
+      <section>
+        <h1 className="font-display text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+          Machine Likeability Score Calculator
+        </h1>
+        <p className="max-w-2xl" style={{ color: 'var(--color-text-mid)' }}>
+          Loading...
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function ScorePageInner() {
+  const searchParams = useSearchParams();
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<MLScore | null>(null);
@@ -26,15 +54,35 @@ export default function ScorePage() {
   const [category, setCategory] = useState<ProductCategory>('other');
   const [analysisStage, setAnalysisStage] = useState(0);
   const [progress, setProgress] = useState(0);
+  const hasAutoAnalyzed = useRef(false);
 
-  const isValidUrl = (urlString: string): boolean => {
+  const isValidUrl = useCallback((urlString: string): boolean => {
     try {
-      const url = new URL(urlString);
-      return url.protocol === 'http:' || url.protocol === 'https:';
+      const parsedUrl = new URL(urlString);
+      return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
     } catch {
       return false;
     }
-  };
+  }, []);
+
+  // Handle URL query parameter for direct links from benchmarks page
+  useEffect(() => {
+    const urlParam = searchParams.get('url');
+    if (urlParam && !hasAutoAnalyzed.current) {
+      setUrl(urlParam);
+      // Auto-analyze after a short delay to allow state to update
+      if (isValidUrl(urlParam)) {
+        hasAutoAnalyzed.current = true;
+        // Trigger analyze after component mounts fully
+        const timer = setTimeout(() => {
+          // Manually trigger the analyze function
+          document.getElementById('analyze-btn')?.click();
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [searchParams, isValidUrl]);
+
 
   const handleAnalyze = async (forceRefresh: boolean = false) => {
     if (!isValidUrl(url)) {
@@ -49,8 +97,8 @@ export default function ScorePage() {
     setProgress(0);
 
     // Simulate progress through stages while waiting for API
-    let stageInterval: NodeJS.Timeout;
-    let progressInterval: NodeJS.Timeout;
+    let stageInterval: NodeJS.Timeout | undefined;
+    let progressInterval: NodeJS.Timeout | undefined;
     let currentStage = 0;
 
     const advanceProgress = () => {
@@ -183,6 +231,7 @@ export default function ScorePage() {
               disabled={isLoading}
             />
             <button
+              id="analyze-btn"
               onClick={() => handleAnalyze(false)}
               className="btn-primary"
               disabled={isLoading || !url}
@@ -274,6 +323,13 @@ export default function ScorePage() {
             recommendations={result.recommendations}
           />
 
+          {/* Benchmark Comparison - How you compare to 213 analyzed pages */}
+          <BenchmarkInsights
+            universalScore={result.universal_score}
+            signals={result.signal_inventory}
+            category={category}
+          />
+
           {/* Deep Dive Section */}
           <section className="mt-12">
             <div className="flex items-center gap-4 mb-6">
@@ -309,10 +365,21 @@ export default function ScorePage() {
           <p className="text-center text-lg mb-2" style={{ color: 'var(--color-text)' }}>
             Enter a product URL above to get started
           </p>
-          <p className="text-center max-w-md" style={{ color: 'var(--color-text-soft)' }}>
+          <p className="text-center max-w-md mb-4" style={{ color: 'var(--color-text-soft)' }}>
             Find out how likely AI assistants like ChatGPT, Claude, and Gemini
             are to recommend your product to shoppers.
           </p>
+          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-mid)' }}>
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent)' }} />
+            <span>Compare against <strong>213 benchmarked product pages</strong></span>
+          </div>
+          <Link
+            href="/apis/benchmarks"
+            className="mt-4 text-sm hover:underline"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            Explore our benchmark database →
+          </Link>
         </section>
       )}
 
@@ -326,13 +393,33 @@ export default function ScorePage() {
           for product recommendations. These AI systems evaluate your product pages and decide
           whether to recommend you — or your competitors.
         </p>
-        <p style={{ color: 'var(--color-text-mid)' }}>
+        <p className="mb-4" style={{ color: 'var(--color-text-mid)' }}>
           Our score is based on <span className="font-medium">56,640 simulated purchase decisions</span> across
           6 leading AI models, identifying exactly what makes AI recommend one product over another.
-          <a href="/methodology" className="ml-1 hover:underline" style={{ color: 'var(--color-accent)' }}>
+          <Link href="/methodology" className="ml-1 hover:underline" style={{ color: 'var(--color-accent)' }}>
             Learn more →
-          </a>
+          </Link>
         </p>
+        <div
+          className="p-4 rounded-lg mt-4"
+          style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
+        >
+          <p className="text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+            Benchmark Insight
+          </p>
+          <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+            We've analyzed <strong>213 product pages</strong> across 7 categories. The average score is just <strong>49.6</strong> —
+            meaning most sites leave significant AI recommendation potential untapped. Top performers like T-Mobile (81.3)
+            and Razer (72.1) show what's possible with optimized signals.
+          </p>
+          <Link
+            href="/apis/benchmarks"
+            className="inline-block mt-3 text-sm hover:underline"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            View full benchmark analysis →
+          </Link>
+        </div>
       </section>
     </div>
   );

@@ -11,6 +11,7 @@ const navLinks = [
   { href: '/dimensions', label: 'Dimensions' },
   { href: '/compare', label: 'Compare' },
   { href: '/score', label: 'ML Score' },
+  { href: '/apis/benchmarks', label: 'Benchmarks' },
   { href: '/research', label: 'Research' },
 ];
 

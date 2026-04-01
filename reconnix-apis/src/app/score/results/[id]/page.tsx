@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { MLScore, ProductCategory } from '@/lib/types';
 import { detectCategory, CATEGORY_DATA } from '@/lib/category-data';
+import { generateModelDistribution } from '@/lib/model-weights';
+import ScoreHeroDashboard from '@/components/score/ScoreHeroDashboard';
 import ScoreResult from '@/components/score/ScoreResult';
 import SignalInventory from '@/components/score/SignalInventory';
 import SignalInteractions from '@/components/score/SignalInteractions';
 import Recommendations from '@/components/score/Recommendations';
-import ExecutiveSummary from '@/components/score/ExecutiveSummary';
 import ModelScores from '@/components/score/ModelScores';
-import CompetitiveBenchmark from '@/components/score/CompetitiveBenchmark';
+import BenchmarkInsights from '@/components/score/BenchmarkInsights';
 
 export default function ScoreResultPage() {
   const params = useParams();
@@ -21,37 +23,78 @@ export default function ScoreResultPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState<ProductCategory>('other');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Try to load from localStorage first
-    const storedData = localStorage.getItem(`score_${id}`);
-
-    if (storedData) {
+    const fetchScore = async () => {
+      // Try fetching from API first (persistent database storage)
       try {
-        const parsed: MLScore = JSON.parse(storedData);
-        setScore(parsed);
-        // Detect category from URL
-        const detectedCategory = detectCategory(parsed.url);
-        setCategory(detectedCategory);
-        setIsLoading(false);
+        const apiUrl = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
+        const response = await fetch(`${apiUrl}/api/v1/ml-score/score/${id}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          // Normalize API response
+          const normalized: MLScore = {
+            ...data,
+            recommendations: data.recommendations || [],
+            readability_score: data.readability_score ?? 0,
+            readability_flags: data.readability_flags || [],
+            extraction_quality: data.extraction_quality || 'partial',
+            signal_inventory: (data.signal_inventory || []).map((s: { dimension_id: string; score: number; zone_contributions?: unknown[] }) => ({
+              ...s,
+              zone_contributions: s.zone_contributions || [],
+            })),
+          };
+          setScore(normalized);
+          const detectedCategory = detectCategory(normalized.url);
+          setCategory(detectedCategory);
+          setIsLoading(false);
+          return;
+        }
       } catch (err) {
-        setError('Failed to parse stored score data');
+        console.warn('API fetch failed, trying localStorage:', err);
+      }
+
+      // Fall back to localStorage for backward compatibility
+      const storedData = localStorage.getItem(`score_${id}`);
+      if (storedData) {
+        try {
+          const parsed: MLScore = JSON.parse(storedData);
+          setScore(parsed);
+          const detectedCategory = detectCategory(parsed.url);
+          setCategory(detectedCategory);
+          setIsLoading(false);
+        } catch (err) {
+          setError('Failed to parse stored score data');
+          setIsLoading(false);
+        }
+      } else {
+        setError('Score result not found. This result may have expired or the ID is invalid.');
         setIsLoading(false);
       }
-    } else {
-      // In a production app, this would fetch from a database
-      setError('Score result not found. Results are stored locally and may have been cleared.');
-      setIsLoading(false);
-    }
+    };
+
+    fetchScore();
   }, [id]);
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse space-y-4 text-center">
-          <div className="w-16 h-16 bg-blue-light rounded-full mx-auto"></div>
-          <p className="text-text-mid">Loading score results...</p>
+        <div className="space-y-4 text-center">
+          <div className="w-16 h-16 rounded-full border-4 border-t-transparent animate-spin mx-auto" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }}></div>
+          <p style={{ color: 'var(--color-text-mid)' }}>Loading score results...</p>
         </div>
       </div>
     );
@@ -62,10 +105,10 @@ export default function ScoreResultPage() {
       <div className="space-y-8">
         <section className="card p-8 text-center">
           <div className="text-4xl mb-4">⚠️</div>
-          <h1 className="font-display text-2xl font-bold text-navy mb-2">
+          <h1 className="font-display text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
             Score Not Found
           </h1>
-          <p className="text-text-mid mb-6 max-w-md mx-auto">
+          <p className="mb-6 max-w-md mx-auto" style={{ color: 'var(--color-text-mid)' }}>
             {error || 'This score result could not be found. It may have been deleted or never existed.'}
           </p>
           <button
@@ -77,22 +120,19 @@ export default function ScoreResultPage() {
         </section>
 
         <section className="card p-6">
-          <h2 className="font-display text-xl font-semibold text-navy mb-4">
-            About Score Storage
+          <h2 className="font-display text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+            About Score Reports
           </h2>
-          <div className="text-text-mid text-sm space-y-2">
+          <div className="text-sm space-y-2" style={{ color: 'var(--color-text-mid)' }}>
             <p>
-              In this demo version, score results are stored locally in your browser's localStorage.
-              This means:
+              Score reports are stored in our database and can be accessed via their unique URL.
+              Reports remain available for sharing with team members or clients.
             </p>
-            <ul className="list-disc list-inside ml-4 space-y-1">
-              <li>Results are only accessible on this device and browser</li>
-              <li>Clearing browser data will delete stored scores</li>
-              <li>Scores are not shared between devices or browsers</li>
-            </ul>
             <p className="mt-4">
-              A production version would store results in a database, enabling persistent
-              sharing across devices.
+              If you need a fresh analysis, you can always{' '}
+              <Link href="/score" className="hover:underline" style={{ color: 'var(--color-accent)' }}>
+                score a new URL
+              </Link>.
             </p>
           </div>
         </section>
@@ -104,165 +144,167 @@ export default function ScoreResultPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header with back button and category selector */}
-      <section className="flex items-center justify-between gap-4">
-        <button
-          onClick={() => router.push('/score')}
-          className="flex items-center gap-2 text-text-mid hover:text-navy transition-colors"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      {/* Header with navigation and share */}
+      <section className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/score')}
+            className="flex items-center gap-2 transition-colors"
+            style={{ color: 'var(--color-text-mid)' }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Score Another URL
-        </button>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Score Another URL
+          </button>
 
-        {/* Category selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm" style={{ color: 'var(--color-text-soft)' }}>Category:</span>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as ProductCategory)}
-            className="px-3 py-1.5 rounded text-sm"
-            style={{
-              backgroundColor: 'var(--color-bg)',
-              color: 'var(--color-text)',
-              border: '1px solid var(--color-border)',
-            }}
-          >
-            {Object.entries(CATEGORY_DATA).map(([id, data]) => (
-              <option key={id} value={id}>
-                {data.display_name}
-              </option>
-            ))}
-          </select>
+          <span style={{ color: 'var(--color-border)' }}>|</span>
+
+          {/* Category selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm" style={{ color: 'var(--color-text-soft)' }}>Category:</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as ProductCategory)}
+              className="px-3 py-1.5 rounded text-sm"
+              style={{
+                backgroundColor: 'var(--color-bg)',
+                color: 'var(--color-text)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              {Object.entries(CATEGORY_DATA).map(([catId, data]) => (
+                <option key={catId} value={catId}>
+                  {data.display_name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      </section>
 
-      {/* 1. Executive Summary - Quick wins at the top */}
-      <ExecutiveSummary
-        recommendations={score.recommendations}
-        category={category}
-        universalScore={score.universal_score}
-      />
-
-      {/* 2. Competitive Benchmark - How you compare */}
-      <CompetitiveBenchmark
-        universalScore={score.universal_score}
-        category={category}
-      />
-
-      {/* 3. Model Scores - Per-model breakdown with use-case weighting */}
-      {score.model_distribution && Object.keys(score.model_distribution).length > 0 && (
-        <ModelScores
-          modelDistribution={score.model_distribution}
-          signalInventory={score.signal_inventory}
-        />
-      )}
-
-      {/* 4. Universal Score - Simplified gauge */}
-      <ScoreResult score={score} />
-
-      {/* 5. Recommendations - Enhanced with category context */}
-      <Recommendations
-        recommendations={score.recommendations}
-        category={category}
-      />
-
-      {/* Advanced sections toggle */}
-      <div className="flex justify-center">
+        {/* Share button */}
         <button
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+          onClick={handleCopyLink}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors"
           style={{
-            backgroundColor: 'var(--color-bg)',
-            color: 'var(--color-text-mid)',
+            backgroundColor: copied ? 'var(--color-score-high)' : 'var(--color-surface)',
+            color: copied ? 'white' : 'var(--color-text)',
             border: '1px solid var(--color-border)',
           }}
         >
-          <span>{showAdvanced ? '▼' : '▶'}</span>
-          <span>{showAdvanced ? 'Hide' : 'Show'} Detailed Signal Analysis</span>
-        </button>
-      </div>
-
-      {/* 6. Signal Inventory - Detailed breakdown (collapsible) */}
-      {showAdvanced && (
-        <>
-          <SignalInventory signals={score.signal_inventory} category={category} />
-
-          {/* 7. Signal Interactions - Optional advanced section */}
-          {score.signal_interactions && score.signal_interactions.length > 0 && (
-            <SignalInteractions
-              interactions={score.signal_interactions}
-              adjustment={score.interaction_adjustment ?? 0}
-            />
+          {copied ? (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Copied!
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share Report
+            </>
           )}
-        </>
-      )}
+        </button>
+      </section>
 
-      {/* 8. Methodology - Trust-building explanation */}
-      <section className="card p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <h2 className="font-display text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-          How Machine Likeability Scoring Works
-        </h2>
+      {/* Executive Dashboard - CMO-friendly overview */}
+      <ScoreHeroDashboard
+        score={score}
+        category={category}
+        recommendations={score.recommendations}
+      />
 
-        <div className="grid md:grid-cols-3 gap-6 mb-6">
-          <div className="text-center p-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}>
-              <span className="font-bold">1</span>
-            </div>
-            <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Extract Content</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We extract and parse all product content from the page, identifying title, description, features, reviews, and metadata.
-            </p>
-          </div>
+      {/* Benchmark Comparison - How you compare to 213 analyzed pages */}
+      <BenchmarkInsights
+        universalScore={score.universal_score}
+        signals={score.signal_inventory}
+        category={category}
+      />
 
-          <div className="text-center p-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}>
-              <span className="font-bold">2</span>
-            </div>
-            <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Detect Signals</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We measure the presence and intensity of each of the 26 content dimensions using NLP analysis calibrated against our research data.
-            </p>
-          </div>
-
-          <div className="text-center p-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}>
-              <span className="font-bold">3</span>
-            </div>
-            <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Predict Preference</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We apply the empirical effect sizes from our research to predict how each AI model would evaluate this content.
-            </p>
-          </div>
+      {/* Deep Dive Section */}
+      <section className="mt-12">
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+            Detailed Analysis
+          </h2>
+          <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
         </div>
 
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
-          <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>The Research Behind This</h3>
-          <p className="text-sm mb-3" style={{ color: 'var(--color-text-mid)' }}>
-            We analyzed how leading AI assistants (GPT-5, Claude, Gemini, and more) evaluate product pages.
-            Our research tested <strong>17,200+ controlled purchase scenarios</strong> across 6 AI models to identify
-            exactly what content signals make AI more likely to recommend products.
+        {/* Model breakdown with full details */}
+        <ModelScores
+          modelDistribution={score.model_distribution || generateModelDistribution(score.signal_inventory, score.universal_score)}
+          signalInventory={score.signal_inventory}
+        />
+
+        {/* Full recommendations with copy suggestions */}
+        <div id="recommendations">
+          <Recommendations recommendations={score.recommendations} category={category} />
+        </div>
+
+        {/* Signal inventory - all 26 dimensions */}
+        <SignalInventory signals={score.signal_inventory} />
+
+        {/* Signal interactions if present */}
+        {score.signal_interactions && score.signal_interactions.length > 0 && (
+          <SignalInteractions
+            interactions={score.signal_interactions}
+            adjustment={score.interaction_adjustment ?? 0}
+          />
+        )}
+
+        {/* Technical details */}
+        <ScoreResult score={score} />
+      </section>
+
+      {/* Methodology section */}
+      <section className="card p-6">
+        <h2 className="font-display text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+          Why This Matters
+        </h2>
+        <p className="mb-4" style={{ color: 'var(--color-text-mid)' }}>
+          Millions of consumers now ask AI assistants like ChatGPT, Claude, and Google Gemini
+          for product recommendations. These AI systems evaluate your product pages and decide
+          whether to recommend you — or your competitors.
+        </p>
+        <p className="mb-4" style={{ color: 'var(--color-text-mid)' }}>
+          Our score is based on <span className="font-medium">56,640 simulated purchase decisions</span> across
+          6 leading AI models, identifying exactly what makes AI recommend one product over another.
+          <Link href="/methodology" className="ml-1 hover:underline" style={{ color: 'var(--color-accent)' }}>
+            Learn more →
+          </Link>
+        </p>
+        <div
+          className="p-4 rounded-lg mt-4"
+          style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
+        >
+          <p className="text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+            Benchmark Insight
           </p>
-          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-mid)' }}>
-            <li>• 26 content dimensions identified and validated</li>
-            <li>• Peer-reviewed methodology (OSF pre-registered)</li>
-            <li>• Updated quarterly as AI models evolve</li>
-          </ul>
-          <p className="text-sm mt-3 font-medium" style={{ color: 'var(--color-text)' }}>
-            A higher score = more likely to be recommended when customers ask AI assistants questions like
-            "what's the best {categoryData.display_name.toLowerCase()} product?"
+          <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+            We've analyzed <strong>213 product pages</strong> across 7 categories. The average score is just <strong>49.6</strong> —
+            meaning most sites leave significant AI recommendation potential untapped. Top performers like T-Mobile (81.3)
+            and Razer (72.1) show what's possible with optimized signals.
           </p>
+          <Link
+            href="/apis/benchmarks"
+            className="inline-block mt-3 text-sm hover:underline"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            View full benchmark analysis →
+          </Link>
         </div>
       </section>
     </div>
