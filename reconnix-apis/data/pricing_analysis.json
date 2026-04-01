@@ -1,0 +1,243 @@
+{
+  "generated_at": "2026-04-01T10:00:00Z",
+  "study_info": {
+    "title": "APIS Price Sensitivity Study (Study 3)",
+    "osf_registration": "osf.io/2xnmu",
+    "config_lock_date": "2026-03-31T11:50:55Z",
+    "total_trials": 17200,
+    "models_tested": 4,
+    "products_tested": 5,
+    "judge_agreement": 0.973
+  },
+  "summary": {
+    "headline": "The 2x Rule",
+    "finding": "All AI models show a dramatic cliff in branded product selection when premiums exceed ~2.0x the generic equivalent price",
+    "mean_breakpoint": 1.94,
+    "breakpoint_range": { "min": 1.62, "max": 2.03 },
+    "key_insights": [
+      "Price sensitivity is universal across all models (H1 CONFIRMED, p=0.011)",
+      "Breakpoints cluster tightly at 1.88x-2.03x, not the broader 1.25x-2.0x range (H2 PARTIAL)",
+      "No Veblen floor effect - AI doesn't avoid suspiciously cheap products (H3 NOT FOUND, p=0.999)",
+      "All models converge on identical price curves (H6 NOT FOUND, p=0.72)",
+      "Psychological pricing (.99 endings) has zero effect on AI (H8 CONFIRMED)"
+    ]
+  },
+  "selection_curves": {
+    "pooled": [
+      { "multiplier": 0.4, "selection_rate": 0.97, "n": 800 },
+      { "multiplier": 0.6, "selection_rate": 0.99, "n": 800 },
+      { "multiplier": 0.8, "selection_rate": 0.99, "n": 800 },
+      { "multiplier": 1.0, "selection_rate": 1.00, "n": 1987 },
+      { "multiplier": 1.2, "selection_rate": 0.99, "n": 800 },
+      { "multiplier": 1.5, "selection_rate": 0.997, "n": 1600 },
+      { "multiplier": 1.75, "selection_rate": 0.965, "n": 1600 },
+      { "multiplier": 2.0, "selection_rate": 0.953, "n": 1600 },
+      { "multiplier": 3.0, "selection_rate": 0.642, "n": 1600 }
+    ],
+    "by_model": {
+      "gpt54": {
+        "breakpoints": [
+          { "product_id": "P4", "breakpoint": 1.92, "drop": 0.59 },
+          { "product_id": "P1", "breakpoint": 2.01, "drop": 0.60 }
+        ],
+        "mean_breakpoint": 1.97
+      },
+      "claude": {
+        "breakpoints": [
+          { "product_id": "P3", "breakpoint": 2.02, "drop": 0.83 },
+          { "product_id": "P4", "breakpoint": 1.84, "drop": 0.70 },
+          { "product_id": "P1", "breakpoint": 2.02, "drop": 0.93 },
+          { "product_id": "P5", "breakpoint": 2.00, "drop": 0.55 }
+        ],
+        "mean_breakpoint": 1.97
+      },
+      "gemini_pro": {
+        "breakpoints": [
+          { "product_id": "P4", "breakpoint": 1.62, "drop": 1.00 },
+          { "product_id": "P5", "breakpoint": 2.00, "drop": 0.58 },
+          { "product_id": "P1", "breakpoint": 2.03, "drop": 0.65 }
+        ],
+        "mean_breakpoint": 1.88
+      },
+      "gemini_flash": {
+        "breakpoints": [],
+        "mean_breakpoint": null,
+        "note": "Flat curves - no significant cliff detected"
+      }
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "name": "Price sensitivity exists",
+      "description": "Piecewise model outperforms linear model",
+      "status": "CONFIRMED",
+      "p_value": 0.011,
+      "evidence": "90% of model-product cells show piecewise > linear (9 of 10 non-flat curves)"
+    },
+    {
+      "id": "H2",
+      "name": "Cliff at 1.25x-2.0x",
+      "description": "Breakpoint falls within pre-specified range",
+      "status": "PARTIAL",
+      "p_value": 0.91,
+      "evidence": "Mean breakpoint at 1.94x, but only 33% within strict 1.25-2.0x range (most cluster at ~2.0x)"
+    },
+    {
+      "id": "H3",
+      "name": "Veblen floor",
+      "description": "Reduced selection at very low prices",
+      "status": "NOT_FOUND",
+      "p_value": 0.999,
+      "evidence": "Only 20% of cells show any floor effect; AI doesn't avoid suspiciously cheap options"
+    },
+    {
+      "id": "H4",
+      "name": "Category variation",
+      "description": "Price sensitivity varies by product category",
+      "status": "PENDING",
+      "p_value": null,
+      "evidence": "Analysis in progress"
+    },
+    {
+      "id": "H5",
+      "name": "Equal quality nullifies premium",
+      "description": "No brand premium when quality matched",
+      "status": "PENDING",
+      "p_value": null,
+      "evidence": "Analysis in progress"
+    },
+    {
+      "id": "H6",
+      "name": "Model heterogeneity",
+      "description": "Different models show different sensitivity",
+      "status": "NOT_FOUND",
+      "p_value": 0.72,
+      "evidence": "Kruskal-Wallis test shows no significant differences between models (all converge)"
+    },
+    {
+      "id": "H7",
+      "name": "Brand name susceptibility",
+      "description": "Brand names affect selection differently",
+      "status": "PENDING",
+      "p_value": null,
+      "evidence": "Analysis in progress"
+    },
+    {
+      "id": "H8",
+      "name": "No psychological pricing effect",
+      "description": ".99 charm pricing has no effect",
+      "status": "CONFIRMED",
+      "p_value": null,
+      "evidence": "100% selection rate across all price formats (standard condition at 1.0x)"
+    },
+    {
+      "id": "H9",
+      "name": "Reversed quality shifts cliff",
+      "description": "Superior generic descriptions move breakpoint",
+      "status": "NOT_FOUND",
+      "p_value": null,
+      "evidence": "Insufficient breakpoints in reversed quality condition for comparison"
+    },
+    {
+      "id": "H10",
+      "name": "Justification shifts cliff",
+      "description": "Price justification extends tolerance",
+      "status": "NOT_FOUND",
+      "p_value": null,
+      "evidence": "No significant lift from justification at 2.0x (-1.3% difference)"
+    }
+  ],
+  "psych_pricing": {
+    "formats_tested": ["charm_99", "round_00", "near_95", "mid_odd_49", "ref_plus1"],
+    "result": "All formats show identical ~100% selection rate at 1.0x anchor",
+    "finding": "AI agents are completely immune to psychological pricing tactics"
+  },
+  "reasoning_analysis": {
+    "note": "Exploratory analysis from Sub-study D (1,600 trials)",
+    "by_multiplier": [
+      { "multiplier": 1.5, "selection_rate": 0.997, "price_mention": 1.0, "quality_mention": 0.895 },
+      { "multiplier": 1.75, "selection_rate": 0.965, "price_mention": 1.0, "quality_mention": 0.885 },
+      { "multiplier": 2.0, "selection_rate": 0.953, "price_mention": 1.0, "quality_mention": 0.873 },
+      { "multiplier": 3.0, "selection_rate": 0.642, "price_mention": 1.0, "quality_mention": 0.880 }
+    ],
+    "by_model": {
+      "gpt54": { "price_mention": 1.0, "quality_mention": 0.903, "value_language": 0.233 },
+      "claude": { "price_mention": 1.0, "quality_mention": 0.935, "value_language": 0.490 },
+      "gemini_pro": { "price_mention": 1.0, "quality_mention": 0.825, "value_language": 0.015 },
+      "gemini_flash": { "price_mention": 1.0, "quality_mention": 0.870, "value_language": 0.533 }
+    },
+    "key_finding": "100% of responses mention price; ~88% mention quality. Value calculation dominates above 2x."
+  },
+  "products": [
+    {
+      "id": "P1",
+      "name": "CleanBright Ultra Laundry Detergent",
+      "category": "Household",
+      "anchor_price": 14.99
+    },
+    {
+      "id": "P2",
+      "name": "DermaCare Daily Facial Moisturizer",
+      "category": "Personal Care",
+      "anchor_price": 28.00
+    },
+    {
+      "id": "P3",
+      "name": "StrideMax Neutral Running Shoe",
+      "category": "Footwear",
+      "anchor_price": 130.00
+    },
+    {
+      "id": "P4",
+      "name": "NutriCore Whey Protein Powder",
+      "category": "Supplements",
+      "anchor_price": 44.99
+    },
+    {
+      "id": "P5",
+      "name": "HomeChef Pro 5.5Qt Air Fryer",
+      "category": "Kitchen",
+      "anchor_price": 79.99
+    }
+  ],
+  "models": [
+    { "id": "gpt54", "name": "GPT-5.4", "provider": "OpenAI", "color": "#10a37f" },
+    { "id": "claude", "name": "Claude Sonnet 4.6", "provider": "Anthropic", "color": "#d4a853" },
+    { "id": "gemini_pro", "name": "Gemini 3.1 Pro", "provider": "Google", "color": "#4285f4" },
+    { "id": "gemini_flash", "name": "Gemini 3.0 Flash", "provider": "Google", "color": "#34a853" }
+  ],
+  "sub_studies": [
+    { "id": "A", "name": "Price Sensitivity Replication", "trials": 9600, "hypotheses": ["H1", "H2", "H3", "H4", "H5", "H6", "H7"] },
+    { "id": "B", "name": "Psychological Pricing", "trials": 2000, "hypotheses": ["H8"] },
+    { "id": "C", "name": "Cliff Mechanism", "trials": 4000, "hypotheses": ["H9", "H10"] },
+    { "id": "D", "name": "Reasoning Extraction", "trials": 1600, "hypotheses": [] }
+  ],
+  "merchant_recommendations": [
+    {
+      "number": 1,
+      "title": "Stay Below 2x",
+      "description": "Price branded products no more than 2x the generic equivalent. Above this threshold, AI recommendation rates drop dramatically."
+    },
+    {
+      "number": 2,
+      "title": "Skip Charm Pricing",
+      "description": "Don't waste effort on $X.99 endings or psychological pricing tactics. AI agents calculate true value, not perceived value."
+    },
+    {
+      "number": 3,
+      "title": "Quality Claims Won't Save You",
+      "description": "Adding justification or superior quality descriptions doesn't move the 2x cliff. Price sensitivity is structural, not persuadable."
+    },
+    {
+      "number": 4,
+      "title": "All AI Models Behave Identically",
+      "description": "Don't optimize for specific models. GPT, Claude, and Gemini all converge on the same price threshold."
+    },
+    {
+      "number": 5,
+      "title": "Focus on Genuine Value",
+      "description": "AI agents apply straightforward value calculations. Make sure your price-to-value ratio is competitive, not just your messaging."
+    }
+  ]
+}

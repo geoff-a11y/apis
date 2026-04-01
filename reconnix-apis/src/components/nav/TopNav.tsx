@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/compare', label: 'Compare' },
   { href: '/score', label: 'ML Score' },
   { href: '/apis/benchmarks', label: 'Benchmarks' },
+  { href: '/apis/pricing', label: 'Pricing Study' },
   { href: '/research', label: 'Research' },
 ];
 
