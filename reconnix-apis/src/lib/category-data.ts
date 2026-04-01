@@ -2,6 +2,57 @@
 
 import { CategoryData, ProductCategory } from './types';
 
+/**
+ * Price threshold data from APIS Pricing Study (17,200 trials)
+ * Shows where AI models "cliff" - stop recommending branded products
+ */
+export const CATEGORY_PRICING_THRESHOLDS: Record<ProductCategory, {
+  cliff_multiplier: number;  // Price premium where selection drops significantly
+  description: string;
+  recommendation: string;
+}> = {
+  personal_care: {
+    cliff_multiplier: 1.5,
+    description: 'Personal care tolerates moderate premiums (up to 1.5x)',
+    recommendation: 'Keep premium under 50% vs generic alternatives',
+  },
+  electronics: {
+    cliff_multiplier: 1.5,
+    description: 'Electronics allow higher premiums due to brand trust',
+    recommendation: 'Premium up to 50% acceptable with strong specs/warranty',
+  },
+  food_beverage: {
+    cliff_multiplier: 1.2,
+    description: 'Food/supplements treated as commodities - early cliff',
+    recommendation: 'Keep pricing within 20% of generic alternatives',
+  },
+  home_goods: {
+    cliff_multiplier: 1.5,
+    description: 'Home goods allow moderate premiums',
+    recommendation: 'Premium up to 50% acceptable with warranty/returns',
+  },
+  apparel: {
+    cliff_multiplier: 1.2,
+    description: 'Apparel treated similarly to commodities',
+    recommendation: 'Focus on differentiation over premium pricing',
+  },
+  telecom: {
+    cliff_multiplier: 1.5,
+    description: 'Telecom allows premiums with clear value proposition',
+    recommendation: 'Justify premium with network/coverage claims',
+  },
+  health_wellness: {
+    cliff_multiplier: 1.2,
+    description: 'Supplements/wellness products cliff early',
+    recommendation: 'Keep pricing competitive; clinical backing helps justify premium',
+  },
+  other: {
+    cliff_multiplier: 1.3,
+    description: 'General products have moderate threshold',
+    recommendation: 'Stay within 30% of comparable alternatives',
+  },
+};
+
 export const CATEGORY_DATA: Record<ProductCategory, CategoryData> = {
   personal_care: {
     id: 'personal_care',
