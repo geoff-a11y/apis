@@ -26,7 +26,7 @@ export default function ScorePage() {
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (forceRefresh: boolean = false) => {
     if (!isValidUrl(url)) {
       setError('Please enter a valid URL starting with http:// or https://');
       return;
@@ -47,7 +47,7 @@ export default function ScorePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, force_refresh: forceRefresh }),
         signal: controller.signal,
       });
 
@@ -95,7 +95,13 @@ export default function ScorePage() {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isLoading) {
-      handleAnalyze();
+      handleAnalyze(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    if (!isLoading && url) {
+      handleAnalyze(true);
     }
   };
 
@@ -142,12 +148,22 @@ export default function ScorePage() {
               disabled={isLoading}
             />
             <button
-              onClick={handleAnalyze}
+              onClick={() => handleAnalyze(false)}
               className="btn-primary"
               disabled={isLoading || !url}
             >
               {isLoading ? 'Analyzing...' : 'Analyze'}
             </button>
+            {result && (
+              <button
+                onClick={handleRefresh}
+                className="btn-secondary"
+                disabled={isLoading}
+                title="Re-analyze with fresh data"
+              >
+                ↻
+              </button>
+            )}
           </div>
           {error && (
             <p className="text-score-low text-sm mt-2">
