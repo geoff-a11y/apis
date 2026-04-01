@@ -200,148 +200,114 @@ export default function Recommendations({ recommendations, category = 'other' }:
                 {/* Expanded Content */}
                 {isExpanded && (
                   <div className="px-5 pb-5 space-y-4">
-                    {/* Current State */}
-                    <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="w-2 h-2 rounded-full bg-red-400"></span>
-                        <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgb(248, 113, 113)' }}>
-                          Current State
-                        </span>
+                    {/* Action - What to do (AI-generated) */}
+                    {rec.action && (
+                      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <svg className="w-4 h-4" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-accent)' }}>
+                            What to Do
+                          </span>
+                          {hasAICopy && (
+                            <span className="px-1.5 py-0.5 text-[10px] rounded" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-mid)' }}>
+                              AI Generated
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                          {rec.action}
+                        </p>
                       </div>
-                      <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-                        {rec.current_state || (rec.current_signal < 0.2 ? 'Signal not detected on page' : `Signal detected at ${Math.round(rec.current_signal * 100)}% strength`)}
-                      </p>
-                    </div>
+                    )}
 
                     {/* Why This Matters - with quantified impact */}
                     <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--color-surface)' }}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-4 h-4" style={{ color: 'var(--color-text-mid)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-mid)' }}>
-                            Selection Rate Impact
+                            Why This Matters
                           </span>
                         </div>
-                        {/* Big impact number */}
-                        {SELECTION_IMPACTS[rec.dimension_id] && (
+                        {/* Impact badge */}
+                        {(rec.selection_impact_text || rec.selection_impact || SELECTION_IMPACTS[rec.dimension_id]) && (
                           <div
                             className="px-3 py-1 rounded-full text-sm font-bold"
                             style={{
-                              backgroundColor: SELECTION_IMPACTS[rec.dimension_id].direction === 'positive'
-                                ? 'rgba(239, 68, 68, 0.15)'
-                                : 'rgba(16, 185, 129, 0.15)',
-                              color: SELECTION_IMPACTS[rec.dimension_id].direction === 'positive'
-                                ? 'rgb(248, 113, 113)'
-                                : 'rgb(52, 211, 153)'
+                              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                              color: 'rgb(52, 211, 153)'
                             }}
                           >
-                            {SELECTION_IMPACTS[rec.dimension_id].direction === 'positive'
-                              ? `-${SELECTION_IMPACTS[rec.dimension_id].percentage}% without this`
-                              : `${SELECTION_IMPACTS[rec.dimension_id].impact} selection rate`}
+                            {rec.selection_impact_text || rec.selection_impact || `+${SELECTION_IMPACTS[rec.dimension_id]?.percentage}% selection rate`}
                           </div>
                         )}
                       </div>
                       <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-                        {rec.why_change || rec.research_basis || (
+                        {rec.why_matters || rec.why_change || rec.research_basis || (
                           SELECTION_IMPACTS[rec.dimension_id]
-                            ? `Missing this signal costs you ${Math.abs(SELECTION_IMPACTS[rec.dimension_id].percentage)}% of potential AI recommendations. Based on 56,640 simulated purchase decisions across 6 leading AI models.`
+                            ? `Products with this signal are ${Math.abs(SELECTION_IMPACTS[rec.dimension_id].percentage)}% more likely to be recommended by AI. Based on 56,640 simulated purchase decisions across 6 leading AI models.`
                             : `This signal has a ${(rec.predicted_delta ?? 0).toFixed(1)} point impact on AI recommendation likelihood.`
                         )}
                       </p>
                     </div>
 
-                    {/* Suggested Copy - The Main Event */}
-                    <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                          <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgb(52, 211, 153)' }}>
-                            Suggested Copy
-                          </span>
-                          {hasAICopy && (
-                            <span className="px-1.5 py-0.5 text-[10px] rounded" style={{ backgroundColor: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>
-                              AI Generated
+                    {/* Suggested Copy - only if we have AI-generated copy */}
+                    {(rec.suggested_copy || rec.copy_suggestion) && (
+                      <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgb(52, 211, 153)' }}>
+                              Suggested Copy
                             </span>
-                          )}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopy(rec.suggested_copy || rec.copy_suggestion, index);
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors"
+                            style={{
+                              backgroundColor: copiedIndex === index ? 'rgb(16, 185, 129)' : 'var(--color-surface)',
+                              color: copiedIndex === index ? 'white' : 'var(--color-text)',
+                              border: '1px solid var(--color-border)'
+                            }}
+                          >
+                            {copiedIndex === index ? (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                              </>
+                            )}
+                          </button>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopy(rec.suggested_copy || rec.copy_suggestion, index);
-                          }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors"
-                          style={{
-                            backgroundColor: copiedIndex === index ? 'rgb(16, 185, 129)' : 'var(--color-surface)',
-                            color: copiedIndex === index ? 'white' : 'var(--color-text)',
-                            border: '1px solid var(--color-border)'
-                          }}
-                        >
-                          {copiedIndex === index ? (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              Copy
-                            </>
-                          )}
-                        </button>
+                        <div className="p-3 rounded-md" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+                          &ldquo;{rec.suggested_copy || rec.copy_suggestion}&rdquo;
+                        </div>
                       </div>
-                      <div className="p-3 rounded-md font-medium" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
-                        &ldquo;{rec.suggested_copy || rec.copy_suggestion}&rdquo;
-                      </div>
-                    </div>
+                    )}
 
-                    {/* Placement Guidance */}
-                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                    {/* Placement Guidance - simplified */}
+                    <div className="flex items-center gap-3 pt-2">
                       <span className="text-xs font-medium" style={{ color: 'var(--color-text-mid)' }}>
                         Where to add:
                       </span>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-2.5 py-1 text-xs rounded-md" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}>
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
-                          {rec.placement || (rec.zone === 'title' ? 'Product title' : rec.zone === 'bullets' ? 'First bullet point' : 'Product description')}
-                        </span>
-                        <span className="px-2.5 py-1 text-xs rounded-md" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-soft)' }}>
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
-                          {rec.zone === 'title' ? 'First bullet' : 'Key features section'}
-                        </span>
-                        <span className="px-2.5 py-1 text-xs rounded-md" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-soft)' }}>
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5"></span>
-                          Avoid: Footer, below fold
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Score Progress */}
-                    <div className="pt-2">
-                      <div className="flex justify-between text-xs mb-1.5" style={{ color: 'var(--color-text-soft)' }}>
-                        <span>Current: {Math.round(rec.current_signal * 100)}%</span>
-                        <span>Target: {Math.round(rec.target_signal * 100)}%</span>
-                      </div>
-                      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-border)' }}>
-                        <div className="h-full rounded-full relative overflow-hidden" style={{ width: `${rec.target_signal * 100}%` }}>
-                          <div
-                            className="absolute inset-y-0 left-0 bg-score-mid"
-                            style={{ width: `${(rec.current_signal / rec.target_signal) * 100}%` }}
-                          />
-                          <div
-                            className="absolute inset-y-0 bg-emerald-500/30"
-                            style={{
-                              left: `${(rec.current_signal / rec.target_signal) * 100}%`,
-                              right: 0
-                            }}
-                          />
-                        </div>
-                      </div>
+                      <span className="px-2.5 py-1 text-xs rounded-md" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}>
+                        {rec.placement || (rec.zone === 'title' ? 'Product title' : rec.zone === 'bullets' ? 'First bullet point' : 'Product description')}
+                      </span>
                     </div>
                   </div>
                 )}

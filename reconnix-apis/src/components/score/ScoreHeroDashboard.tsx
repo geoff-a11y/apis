@@ -237,7 +237,7 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
         borderBottom: '1px solid var(--color-border)'
       }}>
         {/* URL and share */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
               AI Visibility Score
@@ -265,6 +265,13 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
           </button>
         </div>
 
+        {/* Product description */}
+        {score.product_description && (
+          <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--color-text-mid)' }}>
+            {score.product_description}
+          </p>
+        )}
+
         {/* Main score display */}
         <div className="flex items-center gap-8 mb-6">
           {/* Big score number */}
@@ -291,12 +298,21 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
             >
               {verdict.label}
             </div>
-            <p className="text-lg" style={{ color: 'var(--color-text)' }}>
-              {verdict.description}
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-mid)' }}>
-              Better than {percentileRank}% of {categoryData.display_name.toLowerCase()} products
-            </p>
+            {/* Show AI summary if available, otherwise static verdict */}
+            {score.score_summary ? (
+              <p className="text-base leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                {score.score_summary}
+              </p>
+            ) : (
+              <>
+                <p className="text-lg" style={{ color: 'var(--color-text)' }}>
+                  {verdict.description}
+                </p>
+                <p className="text-sm mt-1" style={{ color: 'var(--color-text-mid)' }}>
+                  Better than {percentileRank}% of {categoryData.display_name.toLowerCase()} products
+                </p>
+              </>
+            )}
           </div>
         </div>
 
@@ -476,8 +492,7 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
                       {ACTION_PHRASES[rec.dimension_id] || rec.dimension_id}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                      {(rec.suggested_copy || rec.copy_suggestion)?.slice(0, 80) || FALLBACK_DESCRIPTIONS[rec.dimension_id] || 'Add this signal to improve AI recommendations'}
-                      {(rec.suggested_copy || rec.copy_suggestion) && (rec.suggested_copy || rec.copy_suggestion).length > 80 ? '...' : ''}
+                      {FALLBACK_DESCRIPTIONS[rec.dimension_id] || 'Add this signal to improve AI recommendations'}
                     </p>
                   </div>
 

@@ -120,6 +120,9 @@ export interface MLScore {
   client_score?: number;         // if distribution provided
   model_distribution?: Record<string, number>;
   model_tips?: Record<string, string[]>;  // Per-model improvement tips from AI
+  product_title?: string;        // Product title from page
+  product_description?: string;  // Brief description for hero section
+  score_summary?: string;        // AI-generated 2-3 sentence summary
   signal_inventory: SignalPresence[];
   signal_interactions?: SignalInteraction[];  // Detected signal combinations
   interaction_adjustment?: number;            // Score adjustment from interactions
@@ -128,6 +131,9 @@ export interface MLScore {
   recommendations: Recommendation[];
   platform?: 'web' | 'amazon' | 'walmart' | 'google_shopping';
   extraction_quality: 'full' | 'partial' | 'minimal';
+  category?: string;             // Detected product category
+  category_percentile?: number;  // Percentile within category
+  category_average?: number;     // Average score in category
 }
 
 export interface Recommendation {
@@ -142,9 +148,13 @@ export interface Recommendation {
   priority: 'high' | 'medium' | 'low';
   // AI-generated copy fields
   current_state?: string;         // What's currently on the page (or "Not present")
+  action?: string;                // One sentence: what to do for this product
   why_change?: string;            // Why this matters for AI recommendations
+  why_matters?: string;           // Alternative field name for why_change
   suggested_copy?: string;        // Specific copy to add
   placement?: string;             // Where to add it (e.g., "Add to product description")
+  selection_impact?: string;      // e.g., "+38%" or "-13%"
+  selection_impact_text?: string; // e.g., "38% more likely to be selected"
   research_basis?: string;        // Research backing for this recommendation
   ai_generated?: boolean;         // Whether this was AI-generated
   model?: string;                 // Which model generated it
