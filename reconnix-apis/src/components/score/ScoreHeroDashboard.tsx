@@ -1,6 +1,6 @@
 'use client';
 
-import { MLScore, ProductCategory, Recommendation } from '@/lib/types';
+import { MLScore, ProductCategory, Recommendation, SignalPresence } from '@/lib/types';
 import { CATEGORY_DATA, getPercentileRank } from '@/lib/category-data';
 
 interface ScoreHeroDashboardProps {
@@ -18,6 +18,71 @@ const MODEL_LABELS: Record<string, string> = {
   o3: 'OpenAI o3',
   llama: 'Llama',
 };
+
+// Selection rate impacts from APIS research (56,640 purchase decisions)
+const SELECTION_IMPACTS: Record<string, { impact: number; text: string }> = {
+  dim_01: { impact: 42, text: '42% more likely to be selected' },
+  dim_02: { impact: 38, text: '38% more likely to be selected' },
+  dim_03: { impact: 25, text: '25% more likely to be selected' },
+  dim_04: { impact: -13, text: '13% less likely (scarcity penalty)' },
+  dim_05: { impact: 18, text: '18% more likely to be selected' },
+  dim_06: { impact: 28, text: '28% more likely to be selected' },
+  dim_07: { impact: 35, text: '35% more likely to be selected' },
+  dim_08: { impact: 15, text: '15% more likely to be selected' },
+  dim_09: { impact: 22, text: '22% more likely to be selected' },
+  dim_10: { impact: 19, text: '19% more likely to be selected' },
+  dim_11: { impact: 16, text: '16% more likely to be selected' },
+  dim_12: { impact: 24, text: '24% more likely to be selected' },
+  dim_13: { impact: 31, text: '31% more likely to be selected' },
+  dim_14: { impact: 20, text: '20% more likely to be selected' },
+  dim_15: { impact: 18, text: '18% more likely to be selected' },
+  dim_17: { impact: 21, text: '21% more likely to be selected' },
+  dim_18: { impact: 27, text: '27% more likely to be selected' },
+};
+
+// Calculate aggregate selection rate impact from missing signals
+function calculateSelectionRateImpact(signals: SignalPresence[]): {
+  totalLost: number;
+  topMissing: Array<{ dimId: string; impact: number; name: string }>;
+} {
+  const missing: Array<{ dimId: string; impact: number; name: string }> = [];
+
+  for (const signal of signals) {
+    const impactData = SELECTION_IMPACTS[signal.dimension_id];
+    if (impactData && signal.score < 0.3 && impactData.impact > 0) {
+      missing.push({
+        dimId: signal.dimension_id,
+        impact: impactData.impact,
+        name: signal.dimension_id, // Will be mapped to display name
+      });
+    }
+  }
+
+  // Sort by impact, get top 3
+  missing.sort((a, b) => b.impact - a.impact);
+
+  // Calculate total (not simply additive - use diminishing returns)
+  // Each missing signal contributes less than its full impact
+  let totalLost = 0;
+  for (let i = 0; i < missing.length; i++) {
+    const diminishingFactor = 1 / (1 + i * 0.3); // First full, then 77%, 63%, etc.
+    totalLost += missing[i].impact * diminishingFactor;
+  }
+
+  return {
+    totalLost: Math.round(totalLost),
+    topMissing: missing.slice(0, 3),
+  };
+}
+
+// Calculate competitive displacement probability
+function calculateDisplacementProbability(yourScore: number, categoryAvg: number, categoryStd: number = 15): number {
+  // Using normal distribution approximation
+  const zScore = (yourScore - categoryAvg) / categoryStd;
+  // Approximate CDF
+  const probability = 0.5 * (1 + Math.tanh(zScore * 0.8));
+  return Math.round(probability * 100);
+}
 
 // Short action phrases
 const ACTION_PHRASES: Record<string, string> = {
@@ -57,6 +122,26 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
   const top3 = [...recommendations]
     .sort((a, b) => b.predicted_delta - a.predicted_delta)
     .slice(0, 3);
+
+  // Calculate actionable metrics
+  const selectionImpact = calculateSelectionRateImpact(score.signal_inventory);
+  const displacementProb = calculateDisplacementProbability(
+    score.universal_score,
+    categoryData.benchmarks.average
+  );
+
+  // Models that would never recommend (score < 40)
+  const invisibleModels = score.model_distribution
+    ? Object.entries(score.model_distribution)
+        .filter(([, modelScore]) => modelScore < 40)
+        .map(([key]) => MODEL_LABELS[key] || key)
+    : [];
+
+  // Expected uplift if all recommendations implemented
+  const expectedUplift = Math.min(
+    100,
+    score.universal_score + recommendations.reduce((sum, r) => sum + r.predicted_delta, 0)
+  );
 
   // Score verdict in plain English
   const getVerdict = (s: number): { label: string; description: string } => {
@@ -213,6 +298,61 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Actionable Metrics Panel */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6" style={{ borderBottom: '1px solid var(--color-border)' }}>
+        {/* Selection Rate Impact */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+            Selection Rate Lost
+          </p>
+          <div className="text-2xl font-bold" style={{ color: 'var(--color-score-low)' }}>
+            -{selectionImpact.totalLost}%
+          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+            from missing signals
+          </p>
+        </div>
+
+        {/* Competitive Displacement */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+            Win Rate vs Avg
+          </p>
+          <div className="text-2xl font-bold" style={{ color: displacementProb >= 50 ? 'var(--color-score-high)' : 'var(--color-score-mid)' }}>
+            {displacementProb}%
+          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+            chance vs competitor
+          </p>
+        </div>
+
+        {/* Models You're Invisible To */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+            Invisible To
+          </p>
+          <div className="text-2xl font-bold" style={{ color: invisibleModels.length > 0 ? 'var(--color-score-low)' : 'var(--color-score-high)' }}>
+            {invisibleModels.length > 0 ? invisibleModels.length : '0'}
+          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+            {invisibleModels.length > 0 ? invisibleModels.slice(0, 2).join(', ') : 'All models see you'}
+          </p>
+        </div>
+
+        {/* Expected Uplift */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+            Potential Score
+          </p>
+          <div className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
+            {Math.round(expectedUplift)}
+          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+            if all fixes applied
+          </p>
         </div>
       </div>
 

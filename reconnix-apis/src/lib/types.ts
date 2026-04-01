@@ -131,6 +131,7 @@ export interface MLScore {
 
 export interface Recommendation {
   dimension_id: string;
+  dimension_name?: string;
   current_signal: number;
   target_signal: number;
   gap: number;
@@ -138,6 +139,14 @@ export interface Recommendation {
   copy_suggestion: string;
   zone: string;
   priority: 'high' | 'medium' | 'low';
+  // AI-generated copy fields
+  current_state?: string;         // What's currently on the page (or "Not present")
+  why_change?: string;            // Why this matters for AI recommendations
+  suggested_copy?: string;        // Specific copy to add
+  placement?: string;             // Where to add it (e.g., "Add to product description")
+  research_basis?: string;        // Research backing for this recommendation
+  ai_generated?: boolean;         // Whether this was AI-generated
+  model?: string;                 // Which model generated it
 }
 
 export interface GlobalStats {
