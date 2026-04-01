@@ -80,11 +80,11 @@ export default function ExecutiveSummary({
 
   // Get top 5 recommendations sorted by predicted_delta
   const topRecommendations = [...recommendations]
-    .sort((a, b) => b.predicted_delta - a.predicted_delta)
+    .sort((a, b) => (b.predicted_delta ?? 0) - (a.predicted_delta ?? 0))
     .slice(0, 5);
 
   const totalPotentialImpact = topRecommendations.reduce(
-    (sum, rec) => sum + rec.predicted_delta,
+    (sum, rec) => sum + (rec.predicted_delta ?? 0),
     0
   );
 
@@ -177,7 +177,7 @@ export default function ExecutiveSummary({
             </div>
             <div className="text-right flex-shrink-0">
               <span className="font-mono font-medium" style={{ color: 'var(--color-accent)' }}>
-                +{rec.predicted_delta.toFixed(1)}
+                +{(rec.predicted_delta ?? 0).toFixed(1)}
               </span>
               <span className="text-xs block" style={{ color: 'var(--color-text-soft)' }}>points</span>
             </div>

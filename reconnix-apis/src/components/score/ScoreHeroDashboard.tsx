@@ -456,7 +456,7 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
                   {/* Impact */}
                   <div className="text-right flex-shrink-0">
                     <div className="font-mono font-bold" style={{ color: 'var(--color-accent)' }}>
-                      +{rec.predicted_delta.toFixed(0)} pts
+                      +{(rec.predicted_delta ?? 0).toFixed(0)} pts
                     </div>
                     <div className="text-xs" style={{ color: difficulty.color }}>
                       {difficulty.label}

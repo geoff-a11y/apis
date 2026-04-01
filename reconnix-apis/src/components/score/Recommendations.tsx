@@ -173,7 +173,7 @@ export default function Recommendations({ recommendations, category = 'other' }:
                         <span className={styles.text}>{rec.priority.toUpperCase()} PRIORITY</span>
                         <span>•</span>
                         <span className="font-medium" style={{ color: 'var(--color-accent)' }}>
-                          +{rec.predicted_delta.toFixed(1)} points potential
+                          +{(rec.predicted_delta ?? 0).toFixed(1)} points potential
                         </span>
                       </div>
                     </div>
@@ -243,7 +243,7 @@ export default function Recommendations({ recommendations, category = 'other' }:
                         {rec.why_change || rec.research_basis || (
                           SELECTION_IMPACTS[rec.dimension_id]
                             ? `Missing this signal costs you ${Math.abs(SELECTION_IMPACTS[rec.dimension_id].percentage)}% of potential AI recommendations. Based on 56,640 simulated purchase decisions across 6 leading AI models.`
-                            : `This signal has a ${rec.predicted_delta.toFixed(1)} point impact on AI recommendation likelihood.`
+                            : `This signal has a ${(rec.predicted_delta ?? 0).toFixed(1)} point impact on AI recommendation likelihood.`
                         )}
                       </p>
                     </div>
@@ -365,7 +365,7 @@ export default function Recommendations({ recommendations, category = 'other' }:
             </div>
             <div>
               <div className="text-3xl font-bold" style={{ color: 'var(--color-accent)' }}>
-                +{recommendations.reduce((sum, r) => sum + r.predicted_delta, 0).toFixed(0)}
+                +{recommendations.reduce((sum, r) => sum + (r.predicted_delta ?? 0), 0).toFixed(0)}
               </div>
               <div className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Points Potential</div>
             </div>

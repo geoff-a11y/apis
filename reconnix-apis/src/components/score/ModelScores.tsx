@@ -123,7 +123,7 @@ export default function ModelScores({ modelDistribution, signalInventory }: Mode
                 {/* Weight */}
                 <div className="w-16 text-right flex-shrink-0">
                   <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                    {contrib.weight.toFixed(0)}%
+                    {(contrib.weight ?? 0).toFixed(0)}%
                   </span>
                 </div>
 
@@ -144,7 +144,7 @@ export default function ModelScores({ modelDistribution, signalInventory }: Mode
                 {/* Contribution value */}
                 <div className="w-12 text-right flex-shrink-0">
                   <span className="font-mono text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                    {contrib.contribution.toFixed(1)}
+                    {(contrib.contribution ?? 0).toFixed(1)}
                   </span>
                 </div>
 

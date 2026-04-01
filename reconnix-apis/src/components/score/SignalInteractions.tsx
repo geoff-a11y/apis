@@ -44,8 +44,9 @@ export default function SignalInteractions({ interactions, adjustment }: SignalI
   };
 
   const formatBonus = (bonus: number): string => {
-    if (bonus >= 0) return `+${bonus.toFixed(2)}`;
-    return bonus.toFixed(2);
+    const safeBonus = bonus ?? 0;
+    if (safeBonus >= 0) return `+${safeBonus.toFixed(2)}`;
+    return safeBonus.toFixed(2);
   };
 
   return (
@@ -65,7 +66,7 @@ export default function SignalInteractions({ interactions, adjustment }: SignalI
             className="font-mono text-xl font-bold"
             style={{ color: adjustment >= 0 ? 'var(--color-score-high)' : 'var(--color-score-low)' }}
           >
-            {adjustment >= 0 ? '+' : ''}{adjustment.toFixed(1)} pts
+            {adjustment >= 0 ? '+' : ''}{(adjustment ?? 0).toFixed(1)} pts
           </div>
         </div>
       </div>
@@ -133,12 +134,12 @@ export default function SignalInteractions({ interactions, adjustment }: SignalI
                 <div>
                   <span className="block" style={{ color: 'var(--color-text-soft)' }}>Individual</span>
                   <span className="font-mono">
-                    {Object.values(interaction.individual_effects).map(e => e.toFixed(3)).join(' + ')}
+                    {Object.values(interaction.individual_effects || {}).map(e => (e ?? 0).toFixed(3)).join(' + ')}
                   </span>
                 </div>
                 <div>
                   <span className="block" style={{ color: 'var(--color-text-soft)' }}>Combined</span>
-                  <span className="font-mono">{interaction.combined_effect.toFixed(3)}</span>
+                  <span className="font-mono">{(interaction.combined_effect ?? 0).toFixed(3)}</span>
                 </div>
                 <div>
                   <span className="block" style={{ color: 'var(--color-text-soft)' }}>Bonus</span>

@@ -249,7 +249,7 @@ export default function SignalInventory({ signals, category = 'other' }: SignalI
                     <div key={`${signal.dimension_id}-${contrib.zone}`} className="text-sm">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium capitalize" style={{ color: 'var(--color-text-mid)' }}>{contrib.zone}</span>
-                        <span className="font-mono" style={{ color: 'var(--color-text)' }}>{contrib.score.toFixed(2)}</span>
+                        <span className="font-mono" style={{ color: 'var(--color-text)' }}>{(contrib.score ?? 0).toFixed(2)}</span>
                       </div>
                       {contrib.evidence && (
                         <div className="text-xs pl-3" style={{ color: 'var(--color-text-soft)', borderLeft: '2px solid var(--color-border)' }}>

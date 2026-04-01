@@ -37,10 +37,10 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
     const benchmarkDim = dimensions.find(d => d.dimension_id === signal.dimension_id);
     if (!benchmarkDim) return null;
 
-    const yourScore = signal.score;
-    const benchmarkAvg = benchmarkDim.avg_score;
+    const yourScore = signal.score ?? 0;
+    const benchmarkAvg = benchmarkDim.avg_score ?? 0;
     const difference = yourScore - benchmarkAvg;
-    const presenceRate = benchmarkDim.presence_rate;
+    const presenceRate = benchmarkDim.presence_rate ?? 0;
 
     return {
       dimension_id: signal.dimension_id,
