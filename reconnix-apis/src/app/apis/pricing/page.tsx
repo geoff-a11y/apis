@@ -250,63 +250,132 @@ export default function PricingStudyPage() {
           Different product categories trigger price sensitivity at different thresholds.
           Commodities cliff earlier (1.2x) while electronics tolerate higher premiums (1.5x).
         </p>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={categoryCliffs.map(c => ({
-                product: c.product.split(':')[1].trim(),
-                cliff: c.cliff_point,
-                category: c.category,
-                drop: Math.round(c.drop_size * 100),
-              }))}
-              layout="vertical"
-              margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={true} vertical={false} />
-              <XAxis
-                type="number"
-                domain={[1, 1.8]}
-                tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
-                axisLine={{ stroke: 'var(--color-border)' }}
-                tickFormatter={(value) => `${value}x`}
-              />
-              <YAxis
-                type="category"
-                dataKey="product"
-                tick={{ fill: 'var(--color-text-mid)', fontSize: 11 }}
-                axisLine={{ stroke: 'var(--color-border)' }}
-                width={110}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: '8px',
-                }}
-                formatter={(value: number, name: string) => [`${value}x cliff`, name]}
-              />
-              <Bar dataKey="cliff" radius={[0, 4, 4, 0]} fill="var(--color-accent)">
-                {categoryCliffs.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.cliff_point <= 1.2 ? 'var(--color-score-low)' : 'var(--color-score-medium)'}
+
+        {/* Two charts side by side */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* Cliff Point Chart */}
+          <div>
+            <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+              Price Cliff Point by Category
+            </h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={categoryCliffs.map(c => ({
+                    product: c.product.split(':')[1]?.trim() || c.product,
+                    cliff: c.cliff_point,
+                    category: c.category,
+                    drop: Math.round(c.drop_size * 100),
+                  }))}
+                  layout="vertical"
+                  margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={true} vertical={false} />
+                  <XAxis
+                    type="number"
+                    domain={[1, 1.6]}
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    tickFormatter={(value) => `${value}x`}
                   />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                  <YAxis
+                    type="category"
+                    dataKey="product"
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 11 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    width={95}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(value: number) => [`${value}x`, 'Cliff point']}
+                  />
+                  <Bar dataKey="cliff" radius={[0, 4, 4, 0]} name="Cliff Point">
+                    {categoryCliffs.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.cliff_point <= 1.2 ? '#ef4444' : entry.cliff_point <= 1.3 ? '#f59e0b' : '#22c55e'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Drop Size Chart */}
+          <div>
+            <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+              Selection Drop at Cliff (%)
+            </h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={categoryCliffs.map(c => ({
+                    product: c.product.split(':')[1]?.trim() || c.product,
+                    drop: Math.round(c.drop_size * 100),
+                    category: c.category,
+                  }))}
+                  layout="vertical"
+                  margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={true} vertical={false} />
+                  <XAxis
+                    type="number"
+                    domain={[0, 50]}
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="product"
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 11 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    width={95}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(value: number) => [`${value}%`, 'Selection drop']}
+                  />
+                  <Bar dataKey="drop" radius={[0, 4, 4, 0]} fill="var(--color-accent)" name="Drop Size" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-            <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-score-low)' }}>Commodities (1.2x cliff)</p>
-            <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
-              Detergent, protein powder, running shoes — strict value calculation
+
+        {/* Category analysis cards */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', borderLeft: '4px solid #ef4444' }}>
+            <p className="text-sm font-medium mb-1" style={{ color: '#ef4444' }}>Commodities — 1.2x cliff</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--color-text-soft)' }}>
+              Detergent, protein powder, running shoes
+            </p>
+            <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
+              <strong>47% average drop</strong> — AI applies strict value calculation to commodity goods
             </p>
           </div>
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-            <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-score-medium)' }}>Electronics/Personal Care (1.5x cliff)</p>
-            <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
-              Air fryer, moisturizer — more tolerance for premium positioning
+          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', borderLeft: '4px solid #22c55e' }}>
+            <p className="text-sm font-medium mb-1" style={{ color: '#22c55e' }}>Premium Tolerant — 1.5x cliff</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--color-text-soft)' }}>
+              Air fryer, moisturizer
+            </p>
+            <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
+              <strong>29% average drop</strong> — Brand equity provides more protection in electronics/skincare
+            </p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-accent)' }}>Implication</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
+              Commodity brands must price within 20% of generic. Electronics/skincare can stretch to 50% premium before losing AI recommendations.
             </p>
           </div>
         </div>
@@ -318,28 +387,98 @@ export default function PricingStudyPage() {
           Position Bias: First Listed Wins
         </h2>
         <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          Being listed first in AI comparisons provides a measurable selection advantage.
+          Being listed first in AI comparisons provides a measurable selection advantage — the primacy effect.
         </p>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-score-high)' }}>
-              {Math.round(positionBias.branded_first_selection * 100)}%
-            </p>
-            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Branded First</p>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Position comparison chart */}
+          <div>
+            <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+              Brand Selection by List Position
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    {
+                      position: 'First Position',
+                      rate: Math.round(positionBias.branded_first_selection * 100),
+                      label: 'Brand listed first'
+                    },
+                    {
+                      position: 'Second Position',
+                      rate: Math.round(positionBias.branded_second_selection * 100),
+                      label: 'Brand listed second'
+                    },
+                  ]}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <XAxis
+                    dataKey="position"
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(value: number) => [`${value}%`, 'Selection rate']}
+                  />
+                  <Bar dataKey="rate" radius={[4, 4, 0, 0]} name="Selection Rate">
+                    <Cell fill="#22c55e" />
+                    <Cell fill="var(--color-text-muted)" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text-mid)' }}>
-              {Math.round(positionBias.branded_second_selection * 100)}%
-            </p>
-            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Branded Second</p>
-          </div>
-          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
-            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-accent)' }}>
-              +{positionBias.difference_pp}pp
-            </p>
-            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Primacy Effect</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--color-text-soft)' }}>
-              p&lt;0.0001
+
+          {/* Stats and analysis */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <p className="text-3xl font-bold mb-1" style={{ color: '#22c55e' }}>
+                  {Math.round(positionBias.branded_first_selection * 100)}%
+                </p>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Listed First</p>
+              </div>
+              <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <p className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                  {Math.round(positionBias.branded_second_selection * 100)}%
+                </p>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Listed Second</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
+              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--color-accent)' }}>
+                +{positionBias.difference_pp}pp
+              </p>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Primacy Advantage</p>
+            </div>
+
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>Chi-square</span>
+                <span className="font-mono text-sm" style={{ color: 'var(--color-text)' }}>{positionBias.chi_square}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: 'var(--color-text-mid)' }}>p-value</span>
+                <span className="font-mono text-sm font-medium" style={{ color: '#22c55e' }}>&lt;0.0001</span>
+              </div>
+            </div>
+
+            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+              <strong>Implication:</strong> {positionBias.finding}. Optimize your structured data and third-party listings to appear first in AI-generated comparisons.
             </p>
           </div>
         </div>
