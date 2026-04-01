@@ -44,35 +44,42 @@ const SELECTION_IMPACTS: Record<string, { impact: number; text: string }> = {
   dim_26: { impact: 13, text: '+13% selection rate when present' },
 };
 
-// Dimension display names
-const DIMENSION_NAMES: Record<string, string> = {
-  dim_01: 'Third-Party Authority',
-  dim_02: 'Social Proof',
-  dim_03: 'Platform Endorsement',
-  dim_04: 'Scarcity Signaling',
-  dim_05: 'Price Anchoring',
-  dim_06: 'Brand Heritage',
-  dim_07: 'Risk-Free Trial',
-  dim_08: 'Bundle Value',
-  dim_09: 'Sustainability',
-  dim_10: 'Privacy Protection',
-  dim_11: 'Local Sourcing',
-  dim_12: 'Innovation',
-  dim_13: 'Established Track Record',
-  dim_14: 'Warranty',
-  dim_15: 'Returns Policy',
-  dim_16: 'Negative Review Handling',
-  dim_17: 'Recency',
-  dim_18: 'Specificity',
-  dim_19: 'Comparison Framing',
-  dim_20: 'Information Depth',
-  dim_21: 'Appropriate Caveats',
-  dim_22: 'Tradeoff Clarity',
-  dim_23: 'Honest Limitations',
-  dim_24: 'Ethical Practices',
-  dim_25: 'Default Options',
-  dim_26: 'Loss Framing',
+// Dimension display names and descriptions
+const DIMENSION_INFO: Record<string, { name: string; description: string }> = {
+  dim_01: { name: 'Third-Party Authority', description: 'Expert endorsements, certifications, and awards from recognized authorities' },
+  dim_02: { name: 'Social Proof', description: 'Customer reviews, ratings, and testimonials that demonstrate popularity' },
+  dim_03: { name: 'Platform Endorsement', description: 'Platform badges like "Best Seller" or "Editor\'s Choice" that signal quality' },
+  dim_04: { name: 'Scarcity Signaling', description: 'Limited availability or urgency messaging (can negatively impact AI selection)' },
+  dim_05: { name: 'Price Anchoring', description: 'Showing savings, discounts, or "compare at" pricing to demonstrate value' },
+  dim_06: { name: 'Brand Heritage', description: 'Brand history, heritage statements, and "established since" messaging' },
+  dim_07: { name: 'Risk-Free Trial', description: 'Free trials, samples, or money-back guarantee offers' },
+  dim_08: { name: 'Bundle Value', description: 'Product bundles, accessories, and "frequently bought together" suggestions' },
+  dim_09: { name: 'Sustainability', description: 'Environmental certifications, sustainable materials, and eco-friendly claims' },
+  dim_10: { name: 'Privacy Protection', description: 'Data protection statements, security badges, and privacy policies' },
+  dim_11: { name: 'Local Sourcing', description: 'Local manufacturing, national sourcing, or "Made in [Country]" claims' },
+  dim_12: { name: 'Innovation', description: 'New technology, patents, innovative features, and "first-of-its-kind" claims' },
+  dim_13: { name: 'Established Track Record', description: 'Reliability track record, longevity claims, and "trusted for years" messaging' },
+  dim_14: { name: 'Warranty', description: 'Warranty terms, guarantees, and protection plan availability' },
+  dim_15: { name: 'Returns Policy', description: 'Return policy clarity, free returns, and hassle-free refund messaging' },
+  dim_16: { name: 'Negative Review Handling', description: 'How negative reviews are addressed or acknowledged on the page' },
+  dim_17: { name: 'Recency', description: 'Recent updates, new versions, or "updated for [year]" messaging' },
+  dim_18: { name: 'Specificity', description: 'Precise specifications, exact measurements, and detailed technical data' },
+  dim_19: { name: 'Comparison Framing', description: 'Direct comparisons to competitors or alternative products' },
+  dim_20: { name: 'Information Depth', description: 'Easy access to full specs, documentation, and detailed information' },
+  dim_21: { name: 'Appropriate Caveats', description: 'Appropriate caveats like "results may vary" that add credibility' },
+  dim_22: { name: 'Tradeoff Clarity', description: 'Clear explanations of pros/cons and value-for-money tradeoffs' },
+  dim_23: { name: 'Honest Limitations', description: 'Honest limitations and "not suitable for" disclaimers' },
+  dim_24: { name: 'Ethical Practices', description: 'Ethical sourcing, fair trade, and responsible business practices' },
+  dim_25: { name: 'Default Options', description: 'How default options and pre-selected choices are presented' },
+  dim_26: { name: 'Loss Framing', description: 'Messaging about what customers might miss without the product' },
 };
+
+// Helper for ordinal suffixes (1st, 2nd, 3rd, 4th, etc.)
+function getOrdinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 
 export default function BenchmarkInsights({ universalScore, signals, category }: BenchmarkInsightsProps) {
   const summary = getBenchmarkSummary();
@@ -87,22 +94,17 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
     .map(signal => {
       const benchmarkDim = dimensions.find(d => d.dimension_id === signal.dimension_id);
       const impactData = SELECTION_IMPACTS[signal.dimension_id];
+      const dimInfo = DIMENSION_INFO[signal.dimension_id];
       const benchmarkAvg = benchmarkDim?.avg_score ?? 0.5;
-
-      // Get evidence from zone contributions
-      const evidence = signal.zone_contributions
-        ?.filter(zc => zc.evidence && zc.evidence.trim().length > 0)
-        .map(zc => zc.evidence)
-        .slice(0, 2) || [];
 
       return {
         dimension_id: signal.dimension_id,
-        dimension_name: DIMENSION_NAMES[signal.dimension_id] || benchmarkDim?.dimension_name || signal.dimension_id,
+        dimension_name: dimInfo?.name || benchmarkDim?.dimension_name || signal.dimension_id,
+        description: dimInfo?.description || '',
         score: signal.score ?? 0,
         scorePercent: Math.round((signal.score ?? 0) * 100),
         impact: impactData?.impact ?? 0,
         impactText: impactData?.text ?? '',
-        evidence,
         benchmarkAvg,
         benchmarkPercent: Math.round(benchmarkAvg * 100),
         vsAvg: ((signal.score ?? 0) - benchmarkAvg) * 100,
@@ -214,19 +216,12 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
               />
             </div>
 
-            {/* Evidence and benchmark */}
+            {/* Description and benchmark */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                {signal.evidence.length > 0 ? (
-                  <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
-                    <span style={{ color: 'var(--color-score-high)' }}>Detected:</span>{' '}
-                    &ldquo;{signal.evidence[0].slice(0, 80)}{signal.evidence[0].length > 80 ? '...' : ''}&rdquo;
-                  </p>
-                ) : (
-                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
-                    {signal.score < 0.3 ? 'No signal detected on page' : 'Weak signal presence'}
-                  </p>
-                )}
+                <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
+                  {signal.description}
+                </p>
               </div>
               <div className="flex-shrink-0 text-right">
                 <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
@@ -258,7 +253,7 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
               Your Percentile
             </p>
             <p className="text-xl font-bold" style={{ color: getScoreColor(universalScore / 100) }}>
-              {percentile}th
+              {getOrdinal(percentile)}
             </p>
           </div>
           <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>

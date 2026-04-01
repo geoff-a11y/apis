@@ -8,6 +8,13 @@ interface CompetitiveBenchmarkProps {
   category: ProductCategory;
 }
 
+// Helper for ordinal suffixes (1st, 2nd, 3rd, 4th, etc.)
+function getOrdinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 export default function CompetitiveBenchmark({ universalScore, category }: CompetitiveBenchmarkProps) {
   const categoryData = CATEGORY_DATA[category];
   const percentileRank = getPercentileRank(universalScore, category);
@@ -109,7 +116,7 @@ export default function CompetitiveBenchmark({ universalScore, category }: Compe
             {getPercentileLabel(percentileRank)}
           </p>
           <p className="text-xs mt-1" style={{ color: 'var(--color-text-soft)' }}>
-            {percentileRank}th percentile
+            {getOrdinal(percentileRank)} percentile
           </p>
         </div>
 
