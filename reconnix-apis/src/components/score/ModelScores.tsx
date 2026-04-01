@@ -161,8 +161,8 @@ export default function ModelScores({ modelDistribution, signalInventory }: Mode
                 </div>
               </div>
 
-              {/* Expanded model personality */}
-              {expandedModel === contrib.modelId && MODEL_PERSONALITIES[contrib.modelId] && (
+              {/* Model personality - always expanded */}
+              {MODEL_PERSONALITIES[contrib.modelId] && (
                 <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
                   <p className="text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
                     {MODEL_PERSONALITIES[contrib.modelId].summary}

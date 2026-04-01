@@ -16,6 +16,36 @@ interface BenchmarkInsightsProps {
   category?: string;
 }
 
+// One-sentence explanations for each dimension
+const DIMENSION_EXPLANATIONS: Record<string, string> = {
+  dim_01: 'Expert endorsements, certifications, and awards from recognized authorities.',
+  dim_02: 'Customer reviews, ratings, and testimonials that demonstrate popularity.',
+  dim_03: 'Platform badges like "Best Seller" or "Amazon\'s Choice" that signal quality.',
+  dim_04: 'Limited availability, countdown timers, or "while supplies last" messaging.',
+  dim_05: 'Showing savings, discounts, or "compare at" pricing to demonstrate value.',
+  dim_06: 'Brand history, heritage statements, and "established since" messaging.',
+  dim_07: 'Free trials, samples, or money-back guarantee offers.',
+  dim_08: 'Product bundles, accessories, and "frequently bought together" suggestions.',
+  dim_09: 'Environmental certifications, sustainable materials, and eco-friendly claims.',
+  dim_10: 'Data protection statements, security badges, and privacy policies.',
+  dim_11: 'Local manufacturing, national sourcing, or "Made in [Country]" claims.',
+  dim_12: 'New technology, patents, innovative features, and "first-of-its-kind" claims.',
+  dim_13: 'Reliability track record, longevity claims, and "trusted for years" messaging.',
+  dim_14: 'Warranty terms, guarantees, and protection plan availability.',
+  dim_15: 'Return policy clarity, free returns, and hassle-free refund messaging.',
+  dim_16: 'How negative reviews are addressed or acknowledged on the page.',
+  dim_17: 'Recent updates, new versions, or "updated for [year]" messaging.',
+  dim_18: 'Precise specifications, exact measurements, and detailed technical data.',
+  dim_19: 'Direct comparisons to competitors or alternative products.',
+  dim_20: 'Easy access to full specs, documentation, and detailed information.',
+  dim_21: 'Appropriate caveats like "results may vary" that add credibility.',
+  dim_22: 'Clear explanations of pros/cons and value-for-money tradeoffs.',
+  dim_23: 'Honest limitations and "not suitable for" disclaimers.',
+  dim_24: 'Ethical sourcing, fair trade, and responsible business practices.',
+  dim_25: 'How default options and pre-selected choices are presented.',
+  dim_26: 'Messaging about what customers might miss without the product.',
+};
+
 export default function BenchmarkInsights({ universalScore, signals, category }: BenchmarkInsightsProps) {
   const summary = getBenchmarkSummary();
   const categories = getBenchmarkCategories();
@@ -174,35 +204,21 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
           {signalComparisons.slice(0, 8).map(signal => {
             if (!signal) return null;
             const presencePercent = Math.round(signal.presenceRate * 100);
+            // Convert score (0-1) to signal strength indicator
+            const yourStrength = signal.yourScore >= 0.7 ? 'Strong' : signal.yourScore >= 0.3 ? 'Weak' : 'Missing';
+            const avgStrength = signal.benchmarkAvg >= 0.7 ? 'Strong' : signal.benchmarkAvg >= 0.3 ? 'Weak' : 'Missing';
             return (
               <div
                 key={signal.dimension_id}
-                className="flex items-center gap-3 p-3 rounded-lg"
+                className="p-3 rounded-lg"
                 style={{ backgroundColor: 'var(--color-bg)' }}
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
                     {formatDimensionName(signal.dimension_name)}
                   </p>
-                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
-                    Present on {presencePercent}% of pages
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="text-center">
-                    <p className="font-mono font-bold" style={{ color: getScoreColor(signal.yourScore * 100) }}>
-                      {(signal.yourScore * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>You</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-mono" style={{ color: 'var(--color-text-mid)' }}>
-                      {(signal.benchmarkAvg * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>Avg</p>
-                  </div>
                   <div
-                    className="w-16 text-center text-xs font-medium px-2 py-1 rounded"
+                    className="text-xs font-medium px-2 py-0.5 rounded"
                     style={{
                       backgroundColor: signal.isAboveAverage
                         ? 'var(--color-score-high)'
@@ -212,8 +228,33 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
                       color: 'white'
                     }}
                   >
-                    {signal.isAboveAverage ? 'Above' : signal.isBelowAverage ? 'Below' : 'Average'}
+                    {signal.isAboveAverage ? 'Above Avg' : signal.isBelowAverage ? 'Below Avg' : 'On Par'}
                   </div>
+                </div>
+                <p className="text-xs mb-2" style={{ color: 'var(--color-text-soft)' }}>
+                  {DIMENSION_EXPLANATIONS[signal.dimension_id] || `Signal present on ${presencePercent}% of pages`}
+                </p>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-1">
+                    <span style={{ color: 'var(--color-text-soft)' }}>Your page:</span>
+                    <span
+                      className="font-medium"
+                      style={{ color: getScoreColor(signal.yourScore * 100) }}
+                    >
+                      {yourStrength}
+                    </span>
+                  </div>
+                  <span style={{ color: 'var(--color-border)' }}>•</span>
+                  <div className="flex items-center gap-1">
+                    <span style={{ color: 'var(--color-text-soft)' }}>Benchmark avg:</span>
+                    <span style={{ color: 'var(--color-text-mid)' }}>
+                      {avgStrength}
+                    </span>
+                  </div>
+                  <span style={{ color: 'var(--color-border)' }}>•</span>
+                  <span style={{ color: 'var(--color-text-soft)' }}>
+                    {presencePercent}% of pages have this
+                  </span>
                 </div>
               </div>
             );
@@ -228,10 +269,15 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
         </h3>
         <div className="grid md:grid-cols-3 gap-3">
           {topPerformers.slice(0, 3).map((performer, idx) => (
-            <div
+            <Link
               key={performer.url}
-              className="p-3 rounded-lg"
-              style={{ backgroundColor: 'var(--color-bg)' }}
+              href={`/score?url=${encodeURIComponent(performer.url)}`}
+              className="p-3 rounded-lg transition-all hover:ring-2 hover:ring-offset-2"
+              style={{
+                backgroundColor: 'var(--color-bg)',
+                ['--tw-ring-color' as string]: 'var(--color-accent)',
+                ['--tw-ring-offset-color' as string]: 'var(--color-surface)'
+              }}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span
@@ -257,7 +303,10 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
                   return dim ? formatDimensionName(dim.dimension_name) : dimId;
                 }).join(', ')}
               </p>
-            </div>
+              <p className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--color-accent)' }}>
+                View report <span>→</span>
+              </p>
+            </Link>
           ))}
         </div>
         <div className="mt-4 text-center">

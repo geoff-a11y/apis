@@ -114,6 +114,36 @@ const ACTION_PHRASES: Record<string, string> = {
   dim_26: 'Use loss framing',
 };
 
+// Fallback descriptions when LLM copy isn't available
+const FALLBACK_DESCRIPTIONS: Record<string, string> = {
+  dim_01: 'Add expert endorsements, certifications, or awards to build trust',
+  dim_02: 'Feature customer ratings and testimonials prominently on the page',
+  dim_03: 'Display platform badges like "Best Seller" or "Editor\'s Choice"',
+  dim_04: 'Add stock status or limited availability messaging',
+  dim_05: 'Show "was/now" pricing or competitor price comparisons',
+  dim_06: 'Mention brand history, heritage, or "established since" credentials',
+  dim_07: 'Offer a free trial, sample, or money-back guarantee',
+  dim_08: 'Suggest complementary products or create bundled offers',
+  dim_09: 'Highlight eco-friendly materials or sustainability certifications',
+  dim_10: 'Add security badges and clear privacy policy statements',
+  dim_11: 'Mention local manufacturing or country of origin',
+  dim_12: 'Emphasize patents, new technology, or innovative features',
+  dim_13: 'Showcase reliability data, durability tests, or longevity claims',
+  dim_14: 'Display warranty terms prominently near the buy button',
+  dim_15: 'Make return policy easy to find with clear timeframes',
+  dim_16: 'Show how negative feedback has been addressed',
+  dim_17: 'Add recent dates, version numbers, or "updated for [year]"',
+  dim_18: 'Include exact measurements, specifications, and technical details',
+  dim_19: 'Add comparison tables showing advantages over alternatives',
+  dim_20: 'Make full specifications and documentation easily accessible',
+  dim_21: 'Add appropriate caveats like "results may vary"',
+  dim_22: 'Explain pros and cons to help buyers make informed decisions',
+  dim_23: 'Include honest disclaimers about limitations',
+  dim_24: 'Highlight fair trade, ethical sourcing, or responsible practices',
+  dim_25: 'Review which options are pre-selected and why',
+  dim_26: 'Frame what customers miss by not purchasing',
+};
+
 export default function ScoreHeroDashboard({ score, category, recommendations }: ScoreHeroDashboardProps) {
   const categoryData = CATEGORY_DATA[category];
   const percentileRank = getPercentileRank(score.universal_score, category);
@@ -134,32 +164,30 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
     : [];
 
   // Expected uplift if all recommendations implemented
-  const expectedUplift = Math.min(
-    100,
-    score.universal_score + recommendations.reduce((sum, r) => sum + r.predicted_delta, 0)
-  );
+  const totalDelta = recommendations.reduce((sum, r) => sum + (r.predicted_delta ?? 0), 0);
+  const expectedUplift = Math.min(100, score.universal_score + totalDelta);
 
   // Score verdict in plain English
   const getVerdict = (s: number): { label: string; description: string } => {
     if (s >= 80) return {
       label: 'Excellent',
-      description: 'AI assistants will strongly favor your product'
+      description: 'Strong signal coverage boosts selection likelihood'
     };
     if (s >= 65) return {
       label: 'Good',
-      description: 'AI assistants will likely recommend your product'
+      description: 'Above-average signals support selection likelihood'
     };
     if (s >= 50) return {
       label: 'Fair',
-      description: 'AI assistants may recommend your product sometimes'
+      description: 'Average signal coverage with room to improve'
     };
     if (s >= 35) return {
       label: 'Needs Work',
-      description: 'AI assistants are unlikely to recommend your product'
+      description: 'Missing key signals that penalize selection likelihood'
     };
     return {
       label: 'Critical',
-      description: 'AI assistants will rarely recommend your product'
+      description: 'Major signal gaps significantly penalize selection'
     };
   };
 
@@ -448,8 +476,8 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
                       {ACTION_PHRASES[rec.dimension_id] || rec.dimension_id}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                      {rec.copy_suggestion?.slice(0, 60) || 'Improve this signal to boost your score'}
-                      {rec.copy_suggestion && rec.copy_suggestion.length > 60 ? '...' : ''}
+                      {(rec.suggested_copy || rec.copy_suggestion)?.slice(0, 80) || FALLBACK_DESCRIPTIONS[rec.dimension_id] || 'Add this signal to improve AI recommendations'}
+                      {(rec.suggested_copy || rec.copy_suggestion) && (rec.suggested_copy || rec.copy_suggestion).length > 80 ? '...' : ''}
                     </p>
                   </div>
 
