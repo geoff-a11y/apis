@@ -66,7 +66,8 @@ const SELECTION_IMPACTS: Record<string, { impact: string; direction: 'positive' 
 
 export default function Recommendations({ recommendations, category = 'other' }: RecommendationsProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0); // First one expanded by default
+  // All recommendations expanded by default
+  const [collapsedIndices, setCollapsedIndices] = useState<Set<number>>(new Set());
 
   const categoryData = CATEGORY_DATA[category];
 
@@ -136,7 +137,7 @@ export default function Recommendations({ recommendations, category = 'other' }:
         <div className="space-y-4">
           {sortedRecommendations.map((rec, index) => {
             const styles = getPriorityStyles(rec.priority);
-            const isExpanded = expandedIndex === index;
+            const isExpanded = !collapsedIndices.has(index);
             const hasAICopy = isAIGenerated(rec);
 
             return (
@@ -147,7 +148,15 @@ export default function Recommendations({ recommendations, category = 'other' }:
               >
                 {/* Clickable Header */}
                 <button
-                  onClick={() => setExpandedIndex(isExpanded ? null : index)}
+                  onClick={() => {
+                    const newCollapsed = new Set(collapsedIndices);
+                    if (isExpanded) {
+                      newCollapsed.add(index);
+                    } else {
+                      newCollapsed.delete(index);
+                    }
+                    setCollapsedIndices(newCollapsed);
+                  }}
                   className="w-full p-5 text-left flex items-start justify-between gap-4"
                 >
                   <div className="flex items-start gap-4 flex-1">

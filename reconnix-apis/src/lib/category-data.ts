@@ -198,6 +198,43 @@ export const CATEGORY_DATA: Record<ProductCategory, CategoryData> = {
     competitors: ['Nike', 'Allbirds', 'Everlane', 'Patagonia', 'Lululemon'],
   },
 
+  telecom: {
+    id: 'telecom',
+    display_name: 'Telecom & Mobile',
+    keywords: ['phone', 'mobile', 'cellular', 'wireless', '5g', '4g', 'lte', 'plan', 'unlimited', 'data', 'minutes', 'iphone', 'android', 'samsung', 'galaxy', 'ipad', 'carrier', 'network', 'prepaid', 'postpaid', 'sim', 'esim', 'trade-in', 'upgrade', 'att', 'verizon', 't-mobile'],
+    important_dimensions: ['dim_05', 'dim_19', 'dim_15', 'dim_07', 'dim_14'],
+    dimension_weights: {
+      dim_05: 1.4,  // Price comparison - competitive plans
+      dim_19: 1.3,  // Comparative claims - vs competitors
+      dim_15: 1.3,  // Returns - trial periods
+      dim_07: 1.2,  // Risk-free trial
+      dim_14: 1.2,  // Warranty - device protection
+    },
+    benchmarks: {
+      average: 55,
+      top_performer: 82,
+      percentiles: { 25: 40, 50: 55, 75: 68, 90: 80 },
+    },
+    copy_examples: {
+      dim_05: [
+        'Save $200 on iPhone with eligible trade-in',
+        'Unlimited data for $45/mo vs. $65/mo at competitors',
+        'Compare plans: AT&T vs. Verizon vs. T-Mobile',
+      ],
+      dim_19: [
+        'Fastest 5G network in more cities than Verizon',
+        'Better coverage than T-Mobile in rural areas',
+        'Ranked #1 in network reliability by J.D. Power',
+      ],
+      dim_15: [
+        '30-day risk-free trial - return if not satisfied',
+        'Cancel anytime, no early termination fees',
+        'Free device returns within 14 days',
+      ],
+    },
+    competitors: ['AT&T', 'Verizon', 'T-Mobile', 'Xfinity', 'Mint Mobile'],
+  },
+
   health_wellness: {
     id: 'health_wellness',
     display_name: 'Health & Wellness',

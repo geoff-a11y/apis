@@ -10,12 +10,22 @@ import SignalInventory from '@/components/score/SignalInventory';
 import Recommendations from '@/components/score/Recommendations';
 import ModelScores from '@/components/score/ModelScores';
 
+// Progress stages for analysis
+const ANALYSIS_STAGES = [
+  { key: 'fetching', label: 'Fetching page content', duration: 5000 },
+  { key: 'extracting', label: 'Extracting product signals', duration: 8000 },
+  { key: 'scoring', label: 'Calculating ML Score', duration: 10000 },
+  { key: 'generating', label: 'Generating custom recommendations with AI', duration: 20000 },
+];
+
 export default function ScorePage() {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<MLScore | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState<ProductCategory>('other');
+  const [analysisStage, setAnalysisStage] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -35,12 +45,34 @@ export default function ScorePage() {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setAnalysisStage(0);
+    setProgress(0);
+
+    // Simulate progress through stages while waiting for API
+    let stageInterval: NodeJS.Timeout;
+    let progressInterval: NodeJS.Timeout;
+    let currentStage = 0;
+
+    const advanceProgress = () => {
+      stageInterval = setInterval(() => {
+        if (currentStage < ANALYSIS_STAGES.length - 1) {
+          currentStage++;
+          setAnalysisStage(currentStage);
+        }
+      }, 8000); // Advance stage every 8 seconds
+
+      progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 1, 95)); // Cap at 95% until complete
+      }, 500);
+    };
+
+    advanceProgress();
 
     try {
       // Use agentonomics ML Score API
       const apiUrl = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 second timeout for Opus
 
       const response = await fetch(`${apiUrl}/api/v1/ml-score/score`, {
         method: 'POST',
@@ -81,14 +113,17 @@ export default function ScorePage() {
         localStorage.setItem(`score_${data.id}`, JSON.stringify(data));
       }
 
+      setProgress(100);
       setResult(data);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        setError('Request timed out. The page may be too large or slow to load.');
+        setError('Request timed out. The page may be too large or slow to load. Please try again.');
       } else {
         setError(err instanceof Error ? err.message : 'An error occurred while scoring the URL');
       }
     } finally {
+      clearInterval(stageInterval);
+      clearInterval(progressInterval);
       setIsLoading(false);
     }
   };
@@ -173,13 +208,58 @@ export default function ScorePage() {
         </div>
       </section>
 
-      {/* Loading state */}
+      {/* Loading state with progress */}
       {isLoading && (
-        <section className="card p-8 min-h-[400px] flex flex-col items-center justify-center">
-          <div className="animate-pulse space-y-4 text-center">
-            <div className="w-16 h-16 rounded-full mx-auto" style={{ backgroundColor: 'var(--color-accent-soft)' }}></div>
-            <p style={{ color: 'var(--color-text-mid)' }}>Analyzing page content...</p>
-            <p className="text-sm" style={{ color: 'var(--color-text-soft)' }}>This may take 10-30 seconds</p>
+        <section className="card p-8 min-h-[400px]">
+          <div className="max-w-md mx-auto space-y-6">
+            {/* Animated loader */}
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }}></div>
+            </div>
+
+            {/* Current stage */}
+            <div className="text-center">
+              <p className="text-lg font-medium mb-1" style={{ color: 'var(--color-text)' }}>
+                {ANALYSIS_STAGES[analysisStage]?.label || 'Analyzing...'}
+              </p>
+              <p className="text-sm" style={{ color: 'var(--color-text-soft)' }}>
+                This takes 30-60 seconds to generate custom recommendations
+              </p>
+            </div>
+
+            {/* Progress bar */}
+            <div className="space-y-2">
+              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-border)' }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500 ease-out"
+                  style={{
+                    width: `${progress}%`,
+                    backgroundColor: 'var(--color-accent)'
+                  }}
+                />
+              </div>
+              <p className="text-xs text-center" style={{ color: 'var(--color-text-soft)' }}>
+                {progress}% complete
+              </p>
+            </div>
+
+            {/* Stage indicators */}
+            <div className="flex justify-between text-xs pt-4" style={{ color: 'var(--color-text-soft)' }}>
+              {ANALYSIS_STAGES.map((stage, idx) => (
+                <div
+                  key={stage.key}
+                  className={`flex flex-col items-center gap-1 ${idx <= analysisStage ? 'opacity-100' : 'opacity-40'}`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{
+                      backgroundColor: idx <= analysisStage ? 'var(--color-accent)' : 'var(--color-border)'
+                    }}
+                  />
+                  <span className="text-center max-w-[60px]">{stage.key.charAt(0).toUpperCase() + stage.key.slice(1)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}

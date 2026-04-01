@@ -189,6 +189,7 @@ export type ProductCategory =
   | 'home_goods'
   | 'apparel'
   | 'health_wellness'
+  | 'telecom'
   | 'other';
 
 export type UseCase =

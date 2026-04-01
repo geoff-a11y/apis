@@ -125,10 +125,6 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
 
   // Calculate actionable metrics
   const selectionImpact = calculateSelectionRateImpact(score.signal_inventory);
-  const displacementProb = calculateDisplacementProbability(
-    score.universal_score,
-    categoryData.benchmarks.average
-  );
 
   // Models that would never recommend (score < 40)
   const invisibleModels = score.model_distribution
@@ -301,59 +297,56 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
         </div>
       </div>
 
-      {/* Actionable Metrics Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6" style={{ borderBottom: '1px solid var(--color-border)' }}>
-        {/* Selection Rate Impact */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
-            Selection Rate Lost
+      {/* Key Metrics - Only show meaningful data */}
+      <div className="flex flex-wrap gap-4 p-6" style={{ borderBottom: '1px solid var(--color-border)' }}>
+        {/* Current vs Potential - always meaningful */}
+        <div className="flex-1 min-w-[200px] p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
+            Score Opportunity
           </p>
-          <div className="text-2xl font-bold" style={{ color: 'var(--color-score-low)' }}>
-            -{selectionImpact.totalLost}%
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold" style={{ color: getScoreColor(score.universal_score) }}>
+              {Math.round(score.universal_score)}
+            </span>
+            <span style={{ color: 'var(--color-text-soft)' }}>→</span>
+            <span className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
+              {Math.round(expectedUplift)}
+            </span>
           </div>
           <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            from missing signals
+            +{Math.round(expectedUplift - score.universal_score)} pts potential with fixes
           </p>
         </div>
 
-        {/* Competitive Displacement */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
-            Win Rate vs Avg
-          </p>
-          <div className="text-2xl font-bold" style={{ color: displacementProb >= 50 ? 'var(--color-score-high)' : 'var(--color-score-mid)' }}>
-            {displacementProb}%
+        {/* Models with weak scores - only show if there are issues */}
+        {invisibleModels.length > 0 && (
+          <div className="flex-1 min-w-[200px] p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
+              Weak Visibility
+            </p>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-score-low)' }}>
+              {invisibleModels.length} model{invisibleModels.length > 1 ? 's' : ''}
+            </div>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+              {invisibleModels.slice(0, 3).join(', ')} score below 40
+            </p>
           </div>
-          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            chance vs competitor
-          </p>
-        </div>
+        )}
 
-        {/* Models You're Invisible To */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
-            Invisible To
-          </p>
-          <div className="text-2xl font-bold" style={{ color: invisibleModels.length > 0 ? 'var(--color-score-low)' : 'var(--color-score-high)' }}>
-            {invisibleModels.length > 0 ? invisibleModels.length : '0'}
+        {/* Missing high-impact signals - only show if there are gaps */}
+        {selectionImpact.topMissing.length > 0 && (
+          <div className="flex-1 min-w-[200px] p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
+              Key Gaps
+            </p>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-score-mid)' }}>
+              {selectionImpact.topMissing.length} signal{selectionImpact.topMissing.length > 1 ? 's' : ''}
+            </div>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
+              high-impact signals missing
+            </p>
           </div>
-          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            {invisibleModels.length > 0 ? invisibleModels.slice(0, 2).join(', ') : 'All models see you'}
-          </p>
-        </div>
-
-        {/* Expected Uplift */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
-            Potential Score
-          </p>
-          <div className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
-            {Math.round(expectedUplift)}
-          </div>
-          <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            if all fixes applied
-          </p>
-        </div>
+        )}
       </div>
 
       {/* Competitive Position - Simple slider */}
