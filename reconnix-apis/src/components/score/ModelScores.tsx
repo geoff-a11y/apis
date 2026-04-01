@@ -8,6 +8,7 @@ import { MODEL_PERSONALITIES, analyzeDivergence } from '@/lib/model-personalitie
 interface ModelScoresProps {
   modelDistribution: Record<string, number>;
   signalInventory?: SignalPresence[];
+  modelTips?: Record<string, string[]>;  // AI-generated per-assessment tips
 }
 
 const MODEL_COLORS: Record<string, string> = {
@@ -19,7 +20,7 @@ const MODEL_COLORS: Record<string, string> = {
   sonar: '#20808D',
 };
 
-export default function ModelScores({ modelDistribution, signalInventory }: ModelScoresProps) {
+export default function ModelScores({ modelDistribution, signalInventory, modelTips }: ModelScoresProps) {
   const [selectedUseCase, setSelectedUseCase] = useState<UseCase>('b2c_consumer');
   const [showPersonalities, setShowPersonalities] = useState(false);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
@@ -177,9 +178,16 @@ export default function ModelScores({ modelDistribution, signalInventory }: Mode
                       </ul>
                     </div>
                     <div>
-                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-mid)' }}>To improve this score:</p>
+                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-mid)' }}>
+                        To improve this score:
+                        {modelTips?.[contrib.modelId] && (
+                          <span className="ml-1 px-1.5 py-0.5 text-[10px] rounded" style={{ backgroundColor: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>
+                            AI
+                          </span>
+                        )}
+                      </p>
                       <ul className="text-xs space-y-1" style={{ color: 'var(--color-text-soft)' }}>
-                        {MODEL_PERSONALITIES[contrib.modelId].improvement_tips.slice(0, 2).map((t, i) => (
+                        {(modelTips?.[contrib.modelId] || MODEL_PERSONALITIES[contrib.modelId]?.improvement_tips || []).slice(0, 2).map((t, i) => (
                           <li key={i}>• {t}</li>
                         ))}
                       </ul>
@@ -279,7 +287,7 @@ export default function ModelScores({ modelDistribution, signalInventory }: Mode
             <span>💡</span>
             <p className="text-sm" style={{ color: 'var(--color-text)' }}>
               <strong>Tip:</strong> To boost your {MODEL_PERSONALITIES[extremes.lowest.modelId]?.name || 'lowest'} score without hurting others,{' '}
-              {MODEL_PERSONALITIES[extremes.lowest.modelId]?.improvement_tips[0]?.toLowerCase() || 'address the signals this model values most'}.
+              {(modelTips?.[extremes.lowest.modelId]?.[0] || MODEL_PERSONALITIES[extremes.lowest.modelId]?.improvement_tips[0])?.toLowerCase() || 'address the signals this model values most'}.
             </p>
           </div>
         </div>

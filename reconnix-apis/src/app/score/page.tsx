@@ -356,6 +356,7 @@ function ScorePageInner() {
             <ModelScores
               modelDistribution={result.model_distribution || generateModelDistribution(result.signal_inventory, result.universal_score)}
               signalInventory={result.signal_inventory}
+              modelTips={result.model_tips}
             />
 
             {/* Full recommendations with copy suggestions */}

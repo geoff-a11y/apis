@@ -119,6 +119,7 @@ export interface MLScore {
   universal_score: number;       // 0-100
   client_score?: number;         // if distribution provided
   model_distribution?: Record<string, number>;
+  model_tips?: Record<string, string[]>;  // Per-model improvement tips from AI
   signal_inventory: SignalPresence[];
   signal_interactions?: SignalInteraction[];  // Detected signal combinations
   interaction_adjustment?: number;            // Score adjustment from interactions

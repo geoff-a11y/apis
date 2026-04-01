@@ -112,14 +112,19 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
     })
     .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)); // Sort by impact magnitude
 
-  // Split into strong, weak, and missing signals
-  const strongSignals = enrichedSignals.filter(s => s.score >= 0.6);
-  const weakSignals = enrichedSignals.filter(s => s.score >= 0.3 && s.score < 0.6);
-  const missingSignals = enrichedSignals.filter(s => s.score < 0.3);
+  // Split into detected vs missing signals (binary)
+  // A signal is "detected" if score > 0, "missing" if score = 0
+  const detectedSignals = enrichedSignals.filter(s => s.score > 0);
+  const missingSignals = enrichedSignals.filter(s => s.score === 0);
+
+  // Calculate total potential impact from missing high-value signals
+  const potentialImpact = missingSignals
+    .filter(s => s.impact > 0)
+    .reduce((sum, s) => sum + s.impact, 0);
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.6) return 'var(--color-score-high)';
-    if (score >= 0.3) return 'var(--color-score-mid)';
+    if (score >= 0.4) return 'var(--color-score-high)';
+    if (score >= 0.05) return 'var(--color-score-mid)';
     return 'var(--color-score-low)';
   };
 
@@ -149,16 +154,16 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-high)', color: 'white' }}>
-          <p className="text-2xl font-bold">{strongSignals.length}</p>
-          <p className="text-xs opacity-90">Strong Signals</p>
-        </div>
-        <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-mid)', color: 'white' }}>
-          <p className="text-2xl font-bold">{weakSignals.length}</p>
-          <p className="text-xs opacity-90">Weak Signals</p>
+          <p className="text-2xl font-bold">{detectedSignals.length}</p>
+          <p className="text-xs opacity-90">Signals Detected</p>
         </div>
         <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-low)', color: 'white' }}>
           <p className="text-2xl font-bold">{missingSignals.length}</p>
-          <p className="text-xs opacity-90">Missing Signals</p>
+          <p className="text-xs opacity-90">Signals Missing</p>
+        </div>
+        <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}>
+          <p className="text-2xl font-bold">+{potentialImpact}%</p>
+          <p className="text-xs opacity-90">Potential Impact</p>
         </div>
       </div>
 
