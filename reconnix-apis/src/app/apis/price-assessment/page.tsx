@@ -35,6 +35,12 @@ interface CompetitorInfo {
   source_model: string;
 }
 
+interface ModelError {
+  model_id: string;
+  model_name: string;
+  error: string;
+}
+
 interface PriceAssessment {
   product: ProductInfo;
   assessed_at: string;
@@ -51,6 +57,7 @@ interface PriceAssessment {
   recommendation: string;
   risk_level: string;
   suggested_price_range: { conservative: number; moderate: number; aggressive: number };
+  model_errors?: ModelError[];
 }
 
 interface WhatIfResult {
@@ -439,6 +446,28 @@ function PriceAssessmentInner() {
             <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
               <p style={{ color: 'var(--color-text)' }}>{result.recommendation}</p>
             </div>
+
+            {/* Model Errors */}
+            {result.model_errors && result.model_errors.length > 0 && (
+              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#eab308">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-sm font-medium" style={{ color: '#eab308' }}>
+                    Some AI models couldn&apos;t be queried
+                  </span>
+                </div>
+                <ul className="text-xs space-y-1" style={{ color: 'var(--color-text-mid)' }}>
+                  {result.model_errors.map((err, i) => (
+                    <li key={i}>{err.model_name}: {err.error}</li>
+                  ))}
+                </ul>
+                <p className="text-xs mt-2" style={{ color: 'var(--color-text-mid)' }}>
+                  Results are based on {result.model_anchors.length} of 4 AI models.
+                </p>
+              </div>
+            )}
           </section>
 
           {/* Model Anchors */}
