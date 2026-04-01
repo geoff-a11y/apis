@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import {
   LineChart,
@@ -14,41 +13,49 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Cell,
+  Legend,
 } from 'recharts';
 import {
   getStudyInfo,
   getSummary,
-  getPooledSelectionCurve,
   getModels,
   getAllModelBreakpoints,
   getHypothesisResults,
   getPsychPricingResults,
-  getReasoningAnalysis,
   getMerchantRecommendations,
-  getModelBreakpointChartData,
+  rawPricingData,
 } from '@/lib/pricing-data';
 
 export default function PricingStudyPage() {
   const studyInfo = getStudyInfo();
   const summary = getSummary();
-  const selectionCurve = getPooledSelectionCurve();
   const models = getModels();
   const modelBreakpoints = getAllModelBreakpoints();
   const hypotheses = getHypothesisResults();
   const psychPricing = getPsychPricingResults();
-  const reasoningAnalysis = getReasoningAnalysis();
   const recommendations = getMerchantRecommendations();
-  const breakpointChartData = getModelBreakpointChartData();
+  const categoryCliffs = rawPricingData.category_cliffs;
+  const modelDivergence = rawPricingData.model_divergence;
+  const positionBias = rawPricingData.position_bias;
 
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
-
-  // Format selection curve for chart
-  const curveData = selectionCurve.map(point => ({
-    multiplier: `${point.multiplier}x`,
-    rawMultiplier: point.multiplier,
-    selectionRate: Math.round(point.selection_rate * 100),
-    n: point.n,
-  }));
+  // Build multi-model chart data
+  const multipliers = [0.4, 0.6, 0.8, 1.0, 1.2, 1.5, 1.75, 2.0, 3.0];
+  const multiModelData = multipliers.map(mult => {
+    const point: Record<string, number | string> = {
+      multiplier: `${mult}x`,
+      rawMultiplier: mult,
+    };
+    models.forEach(model => {
+      const curve = modelBreakpoints[model.id]?.curve;
+      if (curve) {
+        const dataPoint = curve.find((c: { multiplier: number }) => c.multiplier === mult);
+        if (dataPoint) {
+          point[model.id] = Math.round(dataPoint.selection_rate * 100);
+        }
+      }
+    });
+    return point;
+  });
 
   // Get status badge style
   const getStatusStyle = (status: string) => {
@@ -78,13 +85,25 @@ export default function PricingStudyPage() {
         <p className="text-xl max-w-3xl mx-auto mb-6" style={{ color: 'var(--color-text-mid)' }}>
           {summary.finding}
         </p>
-        <div className="flex justify-center items-baseline gap-2">
-          <span className="font-display text-7xl font-bold" style={{ color: 'var(--color-accent)' }}>
-            {summary.mean_breakpoint}x
-          </span>
-          <span className="text-xl" style={{ color: 'var(--color-text-soft)' }}>
-            average breakpoint
-          </span>
+        <div className="flex flex-wrap justify-center items-center gap-8">
+          <div className="text-center">
+            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-accent)' }}>
+              38.6pp
+            </span>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>spread at 3x premium</p>
+          </div>
+          <div className="text-center">
+            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-score-high)' }}>
+              59.4%
+            </span>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>Gemini Flash at 3x</p>
+          </div>
+          <div className="text-center">
+            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-score-low)' }}>
+              20.8%
+            </span>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>Claude at 3x</p>
+          </div>
         </div>
       </section>
 
@@ -106,18 +125,18 @@ export default function PricingStudyPage() {
         ))}
       </section>
 
-      {/* The Price Cliff Chart */}
+      {/* The Price Cliff Chart - Multi-model */}
       <section className="card p-6">
         <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-          The Price Cliff
+          Model Divergence at High Premiums
         </h2>
         <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          AI selection rate drops dramatically when branded products exceed 2x the generic price.
-          All models tested show near-identical behavior.
+          Models show similar behavior up to 1.5x, then diverge dramatically. Gemini Flash maintains brand preference
+          even at extreme premiums, while Claude drops to 20.8% at 3x.
         </p>
-        <div className="h-80">
+        <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={curveData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <LineChart data={multiModelData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis
                 dataKey="multiplier"
@@ -129,7 +148,7 @@ export default function PricingStudyPage() {
                 tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
                 axisLine={{ stroke: 'var(--color-border)' }}
                 tickFormatter={(value) => `${value}%`}
-                label={{ value: 'Selection Rate', angle: -90, position: 'insideLeft', fill: 'var(--color-text-mid)' }}
+                label={{ value: 'Brand Selection Rate', angle: -90, position: 'insideLeft', fill: 'var(--color-text-mid)' }}
               />
               <Tooltip
                 contentStyle={{
@@ -137,63 +156,126 @@ export default function PricingStudyPage() {
                   border: '1px solid var(--color-border)',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number, name: string) => [`${value}%`, 'Selection Rate']}
+                formatter={(value: number, name: string) => {
+                  const model = models.find(m => m.id === name);
+                  return [`${value}%`, model?.name || name];
+                }}
                 labelFormatter={(label) => `Price: ${label} of generic`}
+              />
+              <Legend
+                formatter={(value) => {
+                  const model = models.find(m => m.id === value);
+                  return model?.name || value;
+                }}
               />
               <ReferenceLine
                 x="2.0x"
-                stroke="var(--color-score-low)"
+                stroke="var(--color-text-soft)"
                 strokeDasharray="5 5"
-                label={{ value: '2x Cliff', fill: 'var(--color-score-low)', fontSize: 12, position: 'top' }}
               />
-              <Line
-                type="monotone"
-                dataKey="selectionRate"
-                stroke="var(--color-accent)"
-                strokeWidth={3}
-                dot={{ fill: 'var(--color-accent)', strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 8, fill: 'var(--color-accent)' }}
-              />
+              {models.map((model) => (
+                <Line
+                  key={model.id}
+                  type="monotone"
+                  dataKey={model.id}
+                  stroke={model.color}
+                  strokeWidth={2}
+                  dot={{ fill: model.color, strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, fill: model.color }}
+                />
+              ))}
             </LineChart>
           </ResponsiveContainer>
         </div>
         <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
           <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-            <strong>Key insight:</strong> At 1.5x price, AI still recommends the branded product 99.7% of the time.
-            At 3x price, this drops to just 64.2%. The cliff occurs right around the 2x mark.
+            <strong>Key finding:</strong> At 3x premium, selection rates range from 20.8% (Claude) to 59.4% (Gemini Flash) —
+            a 38.6 percentage point spread (p&lt;0.0001). Model-specific optimization may be necessary.
           </p>
         </div>
       </section>
 
-      {/* Model Breakpoints */}
+      {/* Model Personality Profiles */}
       <section className="card p-6">
         <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-          Model Consensus
+          Model Personality Profiles
         </h2>
         <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          All AI models converge on nearly identical price thresholds (p=0.72, no significant difference).
+          Each AI model exhibits distinct price sensitivity patterns. Selection rates at 3x premium reveal dramatic differences.
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          {models.map((model) => {
+            const data = modelBreakpoints[model.id];
+            const selectionAt3x = modelDivergence.at_3x[model.id as keyof typeof modelDivergence.at_3x];
+            return (
+              <div
+                key={model.id}
+                className="p-5 rounded-lg"
+                style={{ backgroundColor: 'var(--color-bg)', borderLeft: `4px solid ${model.color}` }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{model.name}</p>
+                    <p className="text-sm font-medium" style={{ color: model.color }}>
+                      "{data?.profile || 'Unknown'}"
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold" style={{ color: model.color }}>
+                      {selectionAt3x !== undefined ? `${Math.round(selectionAt3x * 100)}%` : 'N/A'}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>at 3x premium</p>
+                  </div>
+                </div>
+                <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                  {data?.description || 'No description available'}
+                </p>
+                {data?.mean_breakpoint && (
+                  <p className="text-xs mt-2" style={{ color: 'var(--color-text-soft)' }}>
+                    Cliff at {data.mean_breakpoint}x
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Category-Specific Cliffs */}
+      <section className="card p-6">
+        <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+          Category-Specific Price Thresholds
+        </h2>
+        <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
+          Different product categories trigger price sensitivity at different thresholds.
+          Commodities cliff earlier (1.2x) while electronics tolerate higher premiums (1.5x).
         </p>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={breakpointChartData}
+              data={categoryCliffs.map(c => ({
+                product: c.product.split(':')[1].trim(),
+                cliff: c.cliff_point,
+                category: c.category,
+                drop: Math.round(c.drop_size * 100),
+              }))}
               layout="vertical"
-              margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={true} vertical={false} />
               <XAxis
                 type="number"
-                domain={[1.5, 2.2]}
+                domain={[1, 1.8]}
                 tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
                 axisLine={{ stroke: 'var(--color-border)' }}
                 tickFormatter={(value) => `${value}x`}
               />
               <YAxis
                 type="category"
-                dataKey="model"
-                tick={{ fill: 'var(--color-text-mid)', fontSize: 12 }}
+                dataKey="product"
+                tick={{ fill: 'var(--color-text-mid)', fontSize: 11 }}
                 axisLine={{ stroke: 'var(--color-border)' }}
-                width={90}
+                width={110}
               />
               <Tooltip
                 contentStyle={{
@@ -201,41 +283,65 @@ export default function PricingStudyPage() {
                   border: '1px solid var(--color-border)',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [`${value}x`, 'Breakpoint']}
+                formatter={(value: number, name: string) => [`${value}x cliff`, name]}
               />
-              <ReferenceLine
-                x={summary.mean_breakpoint}
-                stroke="var(--color-text-soft)"
-                strokeDasharray="5 5"
-                label={{ value: `Mean: ${summary.mean_breakpoint}x`, fill: 'var(--color-text-soft)', fontSize: 11, position: 'top' }}
-              />
-              <Bar dataKey="breakpoint" radius={[0, 4, 4, 0]}>
-                {breakpointChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+              <Bar dataKey="cliff" radius={[0, 4, 4, 0]} fill="var(--color-accent)">
+                {categoryCliffs.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.cliff_point <= 1.2 ? 'var(--color-score-low)' : 'var(--color-score-medium)'}
+                  />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {models.map((model) => {
-            const data = modelBreakpoints[model.id];
-            return (
-              <div
-                key={model.id}
-                className="p-3 rounded-lg text-center"
-                style={{ backgroundColor: 'var(--color-bg)', borderLeft: `3px solid ${model.color}` }}
-              >
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{model.name}</p>
-                <p className="text-lg font-bold" style={{ color: model.color }}>
-                  {data?.mean_breakpoint ? `${data.mean_breakpoint}x` : 'N/A'}
-                </p>
-                {data?.note && (
-                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>{data.note}</p>
-                )}
-              </div>
-            );
-          })}
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-score-low)' }}>Commodities (1.2x cliff)</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+              Detergent, protein powder, running shoes — strict value calculation
+            </p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-score-medium)' }}>Electronics/Personal Care (1.5x cliff)</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+              Air fryer, moisturizer — more tolerance for premium positioning
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Position Bias */}
+      <section className="card p-6">
+        <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+          Position Bias: First Listed Wins
+        </h2>
+        <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
+          Being listed first in AI comparisons provides a measurable selection advantage.
+        </p>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-score-high)' }}>
+              {Math.round(positionBias.branded_first_selection * 100)}%
+            </p>
+            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Branded First</p>
+          </div>
+          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text-mid)' }}>
+              {Math.round(positionBias.branded_second_selection * 100)}%
+            </p>
+            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Branded Second</p>
+          </div>
+          <div className="p-6 rounded-lg text-center" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
+            <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-accent)' }}>
+              +{positionBias.difference_pp}pp
+            </p>
+            <p className="font-medium" style={{ color: 'var(--color-text)' }}>Primacy Effect</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-soft)' }}>
+              p&lt;0.0001
+            </p>
+          </div>
         </div>
       </section>
 
@@ -297,62 +403,6 @@ export default function PricingStudyPage() {
         </div>
       </section>
 
-      {/* Reasoning Analysis */}
-      <section className="card p-6">
-        <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-          How AI Reasons About Price
-        </h2>
-        <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          Analysis of 1,600 reasoning traces reveals how AI evaluates price-value tradeoffs.
-        </p>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>By Price Point</h3>
-            <div className="space-y-2">
-              {reasoningAnalysis.by_multiplier.map((point) => (
-                <div key={point.multiplier} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-                  <span className="font-medium" style={{ color: 'var(--color-text)' }}>{point.multiplier}x</span>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span style={{ color: 'var(--color-text-mid)' }}>
-                      {Math.round(point.selection_rate * 100)}% select branded
-                    </span>
-                    <span className="px-2 py-1 rounded" style={{
-                      backgroundColor: point.quality_mention > 0.9 ? 'var(--color-score-high)' : 'var(--color-score-medium)',
-                      color: 'white',
-                      fontSize: '11px'
-                    }}>
-                      {Math.round(point.quality_mention * 100)}% mention quality
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>By Model</h3>
-            <div className="space-y-2">
-              {models.map((model) => {
-                const reasoning = reasoningAnalysis.by_model[model.id];
-                if (!reasoning) return null;
-                return (
-                  <div key={model.id} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', borderLeft: `3px solid ${model.color}` }}>
-                    <span className="font-medium" style={{ color: 'var(--color-text)' }}>{model.name}</span>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-mid)' }}>
-                        {Math.round(reasoning.value_language * 100)}% value language
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="mt-4 text-sm" style={{ color: 'var(--color-text-soft)' }}>
-              {reasoningAnalysis.key_finding}
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Hypothesis Testing Summary */}
       <section className="card p-6">
         <div className="flex items-center justify-between mb-4">
@@ -394,7 +444,7 @@ export default function PricingStudyPage() {
                     </span>
                   </td>
                   <td className="py-3 px-2 font-mono text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                    {h.p_value !== null ? h.p_value.toFixed(3) : '—'}
+                    {h.p_value !== null ? (h.p_value < 0.001 ? '<0.001' : h.p_value.toFixed(3)) : '—'}
                   </td>
                 </tr>
               ))}

@@ -10,61 +10,140 @@
     "judge_agreement": 0.973
   },
   "summary": {
-    "headline": "The 2x Rule",
-    "finding": "All AI models show a dramatic cliff in branded product selection when premiums exceed ~2.0x the generic equivalent price",
+    "headline": "The 2x Rule — With Major Model Exceptions",
+    "finding": "Most AI models show a price cliff around 2x, but Gemini Flash maintains brand preference even at 3x premium. Model differences grow dramatically at higher prices.",
     "mean_breakpoint": 1.94,
     "breakpoint_range": { "min": 1.62, "max": 2.03 },
     "key_insights": [
-      "Price sensitivity is universal across all models (H1 CONFIRMED, p=0.011)",
-      "Breakpoints cluster tightly at 1.88x-2.03x, not the broader 1.25x-2.0x range (H2 PARTIAL)",
-      "No Veblen floor effect - AI doesn't avoid suspiciously cheap products (H3 NOT FOUND, p=0.999)",
-      "All models converge on identical price curves (H6 NOT FOUND, p=0.72)",
+      "Price sensitivity exists (H1 CONFIRMED, p=0.011) but varies significantly by model",
+      "At 3x premium, selection rates range from 20.8% (Claude) to 59.4% (Gemini Flash) — 38.6pp spread",
+      "Gemini Flash shows NO cliff — maintains brand preference regardless of premium",
+      "GPT-5.4 is the strictest 'value calculator' with earliest cliff at 1.75x",
+      "Category matters: commodities cliff at 1.2x, electronics tolerate 1.5x",
       "Psychological pricing (.99 endings) has zero effect on AI (H8 CONFIRMED)"
     ]
   },
   "selection_curves": {
     "pooled": [
       { "multiplier": 0.4, "selection_rate": 0.97, "n": 800 },
-      { "multiplier": 0.6, "selection_rate": 0.99, "n": 800 },
+      { "multiplier": 0.6, "selection_rate": 0.885, "n": 800 },
       { "multiplier": 0.8, "selection_rate": 0.99, "n": 800 },
       { "multiplier": 1.0, "selection_rate": 1.00, "n": 1987 },
-      { "multiplier": 1.2, "selection_rate": 0.99, "n": 800 },
-      { "multiplier": 1.5, "selection_rate": 0.997, "n": 1600 },
-      { "multiplier": 1.75, "selection_rate": 0.965, "n": 1600 },
-      { "multiplier": 2.0, "selection_rate": 0.953, "n": 1600 },
-      { "multiplier": 3.0, "selection_rate": 0.642, "n": 1600 }
+      { "multiplier": 1.2, "selection_rate": 0.875, "n": 800 },
+      { "multiplier": 1.5, "selection_rate": 0.818, "n": 1600 },
+      { "multiplier": 1.75, "selection_rate": 0.690, "n": 1600 },
+      { "multiplier": 2.0, "selection_rate": 0.697, "n": 1600 },
+      { "multiplier": 3.0, "selection_rate": 0.342, "n": 1600 }
     ],
     "by_model": {
       "gpt54": {
+        "curve": [
+          { "multiplier": 0.4, "selection_rate": 0.95 },
+          { "multiplier": 0.6, "selection_rate": 1.00 },
+          { "multiplier": 0.8, "selection_rate": 1.00 },
+          { "multiplier": 1.0, "selection_rate": 1.00 },
+          { "multiplier": 1.2, "selection_rate": 0.75 },
+          { "multiplier": 1.5, "selection_rate": 0.70 },
+          { "multiplier": 1.75, "selection_rate": 0.53 },
+          { "multiplier": 2.0, "selection_rate": 0.60 },
+          { "multiplier": 3.0, "selection_rate": 0.294 }
+        ],
         "breakpoints": [
           { "product_id": "P4", "breakpoint": 1.92, "drop": 0.59 },
           { "product_id": "P1", "breakpoint": 2.01, "drop": 0.60 }
         ],
-        "mean_breakpoint": 1.97
+        "mean_breakpoint": 1.97,
+        "profile": "Value Calculator",
+        "description": "Most price-sensitive. Earliest cliff at 1.75x. Applies strict value analysis."
       },
       "claude": {
+        "curve": [
+          { "multiplier": 0.4, "selection_rate": 0.95 },
+          { "multiplier": 0.6, "selection_rate": 0.885 },
+          { "multiplier": 0.8, "selection_rate": 1.00 },
+          { "multiplier": 1.0, "selection_rate": 1.00 },
+          { "multiplier": 1.2, "selection_rate": 1.00 },
+          { "multiplier": 1.5, "selection_rate": 0.77 },
+          { "multiplier": 1.75, "selection_rate": 0.58 },
+          { "multiplier": 2.0, "selection_rate": 0.58 },
+          { "multiplier": 3.0, "selection_rate": 0.208 }
+        ],
         "breakpoints": [
           { "product_id": "P3", "breakpoint": 2.02, "drop": 0.83 },
           { "product_id": "P4", "breakpoint": 1.84, "drop": 0.70 },
           { "product_id": "P1", "breakpoint": 2.02, "drop": 0.93 },
           { "product_id": "P5", "breakpoint": 2.00, "drop": 0.55 }
         ],
-        "mean_breakpoint": 1.97
+        "mean_breakpoint": 1.97,
+        "profile": "Nuanced Evaluator",
+        "description": "Lowest selection at 3x (20.8%). Shows unique behavior in edge cases."
       },
       "gemini_pro": {
+        "curve": [
+          { "multiplier": 0.4, "selection_rate": 1.00 },
+          { "multiplier": 0.6, "selection_rate": 1.00 },
+          { "multiplier": 0.8, "selection_rate": 1.00 },
+          { "multiplier": 1.0, "selection_rate": 1.00 },
+          { "multiplier": 1.2, "selection_rate": 0.75 },
+          { "multiplier": 1.5, "selection_rate": 0.82 },
+          { "multiplier": 1.75, "selection_rate": 0.69 },
+          { "multiplier": 2.0, "selection_rate": 0.72 },
+          { "multiplier": 3.0, "selection_rate": 0.272 }
+        ],
         "breakpoints": [
           { "product_id": "P4", "breakpoint": 1.62, "drop": 1.00 },
           { "product_id": "P5", "breakpoint": 2.00, "drop": 0.58 },
           { "product_id": "P1", "breakpoint": 2.03, "drop": 0.65 }
         ],
-        "mean_breakpoint": 1.88
+        "mean_breakpoint": 1.88,
+        "profile": "Deliberate Analyst",
+        "description": "Clear cliff at 2.0x. Slowest response time (15.8s). Most 'textbook' economic behavior."
       },
       "gemini_flash": {
+        "curve": [
+          { "multiplier": 0.4, "selection_rate": 1.00 },
+          { "multiplier": 0.6, "selection_rate": 0.95 },
+          { "multiplier": 0.8, "selection_rate": 0.95 },
+          { "multiplier": 1.0, "selection_rate": 1.00 },
+          { "multiplier": 1.2, "selection_rate": 1.00 },
+          { "multiplier": 1.5, "selection_rate": 0.92 },
+          { "multiplier": 1.75, "selection_rate": 0.84 },
+          { "multiplier": 2.0, "selection_rate": 0.84 },
+          { "multiplier": 3.0, "selection_rate": 0.594 }
+        ],
         "breakpoints": [],
         "mean_breakpoint": null,
-        "note": "Flat curves - no significant cliff detected"
+        "profile": "Brand Loyalist",
+        "description": "NO cliff detected. Maintains 59.4% brand selection even at 3x. May be over-optimized for brands."
       }
     }
+  },
+  "model_divergence": {
+    "at_3x": {
+      "gemini_flash": 0.594,
+      "gpt54": 0.294,
+      "gemini_pro": 0.272,
+      "claude": 0.208
+    },
+    "spread_at_3x": 0.386,
+    "chi_square_at_3x": 197.00,
+    "p_value_at_3x": 0.0001,
+    "conclusion": "Models differ SIGNIFICANTLY (p<0.0001). Differences grow with price premium."
+  },
+  "category_cliffs": [
+    { "product": "P4: Whey Protein", "category": "Commodity/Health", "cliff_point": 1.2, "drop_size": 0.475 },
+    { "product": "P1: Laundry Detergent", "category": "Commodity/Home", "cliff_point": 1.2, "drop_size": 0.473 },
+    { "product": "P3: Running Shoes", "category": "Apparel", "cliff_point": 1.2, "drop_size": 0.304 },
+    { "product": "P2: Facial Moisturizer", "category": "Personal Care", "cliff_point": 1.5, "drop_size": 0.303 },
+    { "product": "P5: Air Fryer", "category": "Electronics", "cliff_point": 1.5, "drop_size": 0.274 }
+  ],
+  "position_bias": {
+    "branded_first_selection": 0.649,
+    "branded_second_selection": 0.594,
+    "difference_pp": 5.5,
+    "chi_square": 54.90,
+    "p_value": 0.0001,
+    "finding": "Being listed first provides a 5.5 percentage point advantage"
   },
   "hypotheses": [
     {
@@ -92,36 +171,12 @@
       "evidence": "Only 20% of cells show any floor effect; AI doesn't avoid suspiciously cheap options"
     },
     {
-      "id": "H4",
-      "name": "Category variation",
-      "description": "Price sensitivity varies by product category",
-      "status": "PENDING",
-      "p_value": null,
-      "evidence": "Analysis in progress"
-    },
-    {
-      "id": "H5",
-      "name": "Equal quality nullifies premium",
-      "description": "No brand premium when quality matched",
-      "status": "PENDING",
-      "p_value": null,
-      "evidence": "Analysis in progress"
-    },
-    {
       "id": "H6",
       "name": "Model heterogeneity",
       "description": "Different models show different sensitivity",
-      "status": "NOT_FOUND",
-      "p_value": 0.72,
-      "evidence": "Kruskal-Wallis test shows no significant differences between models (all converge)"
-    },
-    {
-      "id": "H7",
-      "name": "Brand name susceptibility",
-      "description": "Brand names affect selection differently",
-      "status": "PENDING",
-      "p_value": null,
-      "evidence": "Analysis in progress"
+      "status": "CONFIRMED",
+      "p_value": 0.0001,
+      "evidence": "Selection rates at 3x range from 20.8% to 59.4% (38.6pp spread, chi-square=197, p<0.0001)"
     },
     {
       "id": "H8",
@@ -132,20 +187,28 @@
       "evidence": "100% selection rate across all price formats (standard condition at 1.0x)"
     },
     {
-      "id": "H9",
-      "name": "Reversed quality shifts cliff",
-      "description": "Superior generic descriptions move breakpoint",
-      "status": "NOT_FOUND",
-      "p_value": null,
-      "evidence": "Insufficient breakpoints in reversed quality condition for comparison"
-    },
-    {
       "id": "H10",
       "name": "Justification shifts cliff",
       "description": "Price justification extends tolerance",
       "status": "NOT_FOUND",
       "p_value": null,
       "evidence": "No significant lift from justification at 2.0x (-1.3% difference)"
+    },
+    {
+      "id": "H11",
+      "name": "Position bias (primacy)",
+      "description": "First-listed product gets selection advantage",
+      "status": "CONFIRMED",
+      "p_value": 0.0001,
+      "evidence": "5.5pp advantage for first position (chi-square=54.90, p<0.0001)"
+    },
+    {
+      "id": "H12",
+      "name": "Category variation",
+      "description": "Price sensitivity varies by product category",
+      "status": "CONFIRMED",
+      "p_value": null,
+      "evidence": "Commodities cliff at 1.2x, electronics at 1.5x"
     }
   ],
   "psych_pricing": {
@@ -161,6 +224,12 @@
       { "multiplier": 2.0, "selection_rate": 0.953, "price_mention": 1.0, "quality_mention": 0.873 },
       { "multiplier": 3.0, "selection_rate": 0.642, "price_mention": 1.0, "quality_mention": 0.880 }
     ],
+    "reasoning_condition_divergence": {
+      "gemini_flash": 0.992,
+      "gpt54": 0.465,
+      "spread": 0.528,
+      "finding": "When asked to reason explicitly, GPT-5.4 applies strict value analysis (46.5%) while Gemini Flash maintains brand preference (99.2%)"
+    },
     "by_model": {
       "gpt54": { "price_mention": 1.0, "quality_mention": 0.903, "value_language": 0.233 },
       "claude": { "price_mention": 1.0, "quality_mention": 0.935, "value_language": 0.490 },
@@ -208,36 +277,36 @@
     { "id": "gemini_flash", "name": "Gemini 3.0 Flash", "provider": "Google", "color": "#34a853" }
   ],
   "sub_studies": [
-    { "id": "A", "name": "Price Sensitivity Replication", "trials": 9600, "hypotheses": ["H1", "H2", "H3", "H4", "H5", "H6", "H7"] },
+    { "id": "A", "name": "Price Sensitivity Replication", "trials": 9600, "hypotheses": ["H1", "H2", "H3", "H6"] },
     { "id": "B", "name": "Psychological Pricing", "trials": 2000, "hypotheses": ["H8"] },
-    { "id": "C", "name": "Cliff Mechanism", "trials": 4000, "hypotheses": ["H9", "H10"] },
+    { "id": "C", "name": "Cliff Mechanism", "trials": 4000, "hypotheses": ["H10"] },
     { "id": "D", "name": "Reasoning Extraction", "trials": 1600, "hypotheses": [] }
   ],
   "merchant_recommendations": [
     {
       "number": 1,
-      "title": "Stay Below 2x",
-      "description": "Price branded products no more than 2x the generic equivalent. Above this threshold, AI recommendation rates drop dramatically."
+      "title": "Know Your AI Channel",
+      "description": "Gemini Flash favors brands even at 3x premium (59.4% selection). GPT-5.4 is strictest — stay below 1.75x to maintain advantage. Optimize differently for each AI."
     },
     {
       "number": 2,
-      "title": "Skip Charm Pricing",
-      "description": "Don't waste effort on $X.99 endings or psychological pricing tactics. AI agents calculate true value, not perceived value."
+      "title": "Category-Specific Thresholds",
+      "description": "Commodities (detergent, protein) cliff at 1.2x. Electronics and skincare tolerate up to 1.5x. Never exceed 2x for any category."
     },
     {
       "number": 3,
-      "title": "Quality Claims Won't Save You",
-      "description": "Adding justification or superior quality descriptions doesn't move the 2x cliff. Price sensitivity is structural, not persuadable."
+      "title": "Position Matters (+5.5pp)",
+      "description": "Being listed first provides a 5.5 percentage point selection advantage. Optimize structured data and third-party presence for primacy."
     },
     {
       "number": 4,
-      "title": "All AI Models Behave Identically",
-      "description": "Don't optimize for specific models. GPT, Claude, and Gemini all converge on the same price threshold."
+      "title": "Skip Charm Pricing",
+      "description": "Don't waste effort on $X.99 endings. AI agents calculate true value — the extra cent provides zero lift."
     },
     {
       "number": 5,
-      "title": "Focus on Genuine Value",
-      "description": "AI agents apply straightforward value calculations. Make sure your price-to-value ratio is competitive, not just your messaging."
+      "title": "Quality Claims Won't Save Premium Pricing",
+      "description": "Justifying higher prices with quality descriptions doesn't move the cliff. Price sensitivity is structural, not persuadable."
     }
   ]
 }

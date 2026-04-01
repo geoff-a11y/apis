@@ -3,7 +3,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   getConfirmatoryModels,
@@ -126,22 +125,13 @@ export default function ModelsPage() {
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Image
-                  src={model.logo}
-                  alt={model.provider}
-                  width={32}
-                  height={32}
-                  className="rounded"
-                />
-                <div>
-                  <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
-                    {model.name}
-                  </h3>
-                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
-                    {model.provider}
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                  {model.name}
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                  {model.provider}
+                </p>
               </div>
               <span
                 className="badge text-xs"

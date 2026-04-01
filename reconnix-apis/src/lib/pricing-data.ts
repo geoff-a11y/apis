@@ -23,10 +23,18 @@ export interface ModelBreakpoint {
   drop: number;
 }
 
+export interface CurvePoint {
+  multiplier: number;
+  selection_rate: number;
+}
+
 export interface ModelBreakpoints {
   breakpoints: ModelBreakpoint[];
   mean_breakpoint: number | null;
   note?: string;
+  curve?: CurvePoint[];
+  profile?: string;
+  description?: string;
 }
 
 export interface HypothesisResult {
