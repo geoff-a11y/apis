@@ -119,12 +119,19 @@ export default function PriceAssessmentPage() {
 }
 
 function PriceAssessmentInner() {
+  // Input mode state
+  const [inputMode, setInputMode] = useState<'manual' | 'url'>('manual');
+  const [productUrl, setProductUrl] = useState('');
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
+
   // Form state
   const [productName, setProductName] = useState('');
   const [brand, setBrand] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('default');
   const [segment, setSegment] = useState('b2c');
+  const [description, setDescription] = useState('');
 
   // Analysis state
   const [isLoading, setIsLoading] = useState(false);
@@ -134,6 +141,55 @@ function PriceAssessmentInner() {
 
   // What-if state
   const [whatIfPrices, setWhatIfPrices] = useState('');
+
+  // Handle URL extraction
+  const handleExtract = useCallback(async () => {
+    if (!productUrl) {
+      setExtractError('Please enter a product page URL');
+      return;
+    }
+
+    // Validate URL format
+    try {
+      new URL(productUrl);
+    } catch {
+      setExtractError('Please enter a valid URL (e.g., https://example.com/product)');
+      return;
+    }
+
+    setIsExtracting(true);
+    setExtractError(null);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
+      const response = await fetch(`${apiUrl}/api/v1/price-assessment/extract`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: productUrl }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || data.detail || 'Failed to extract product information');
+      }
+
+      // Populate form fields with extracted data
+      if (data.product) {
+        setProductName(data.product.name || '');
+        setBrand(data.product.brand || '');
+        setPrice(data.product.price?.toString() || '');
+        setCategory(data.product.category || 'default');
+        setDescription(data.product.description || '');
+        // Switch to manual mode to show populated form
+        setInputMode('manual');
+      }
+    } catch (err) {
+      setExtractError(err instanceof Error ? err.message : 'Failed to extract product information');
+    } finally {
+      setIsExtracting(false);
+    }
+  }, [productUrl]);
 
   const handleAnalyze = useCallback(async () => {
     if (!productName || !price) {
@@ -265,9 +321,78 @@ function PriceAssessmentInner() {
 
       {/* Input Form */}
       <section className="rounded-xl p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border)' }}>
-        <h2 className="font-semibold text-lg mb-4" style={{ color: 'var(--color-text)' }}>Product Details</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-lg" style={{ color: 'var(--color-text)' }}>Product Details</h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
+          {/* Input Mode Toggle */}
+          <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
+            <button
+              onClick={() => setInputMode('url')}
+              className="px-3 py-1.5 text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: inputMode === 'url' ? 'var(--color-accent)' : 'transparent',
+                color: inputMode === 'url' ? 'var(--color-bg)' : 'var(--color-text-mid)',
+              }}
+            >
+              From URL
+            </button>
+            <button
+              onClick={() => setInputMode('manual')}
+              className="px-3 py-1.5 text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: inputMode === 'manual' ? 'var(--color-accent)' : 'transparent',
+                color: inputMode === 'manual' ? 'var(--color-bg)' : 'var(--color-text-mid)',
+              }}
+            >
+              Manual Entry
+            </button>
+          </div>
+        </div>
+
+        {/* URL Extraction Mode */}
+        {inputMode === 'url' && (
+          <div className="mb-6">
+            <label className="block text-sm mb-1" style={{ color: 'var(--color-text-mid)' }}>
+              Product Page URL
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={productUrl}
+                onChange={(e) => setProductUrl(e.target.value)}
+                placeholder="https://example.com/product/..."
+                className="flex-1 px-3 py-2 rounded-lg text-sm"
+                style={{
+                  backgroundColor: 'var(--color-bg-elevated)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                }}
+              />
+              <button
+                onClick={handleExtract}
+                disabled={isExtracting || !productUrl}
+                className="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-accent)',
+                  color: 'var(--color-bg)',
+                }}
+              >
+                {isExtracting ? 'Extracting...' : 'Extract'}
+              </button>
+            </div>
+            {extractError && (
+              <div className="mt-2 text-sm" style={{ color: '#ef4444' }}>
+                {extractError}
+              </div>
+            )}
+            <p className="mt-2 text-xs" style={{ color: 'var(--color-text-mid)' }}>
+              Paste a product page URL and we&apos;ll extract the product name, brand, and price automatically.
+            </p>
+          </div>
+        )}
+
+        {/* Manual Entry Mode */}
+        <div className="grid md:grid-cols-2 gap-4" style={{ display: inputMode === 'manual' ? 'grid' : 'none' }}>
           <div>
             <label className="block text-sm mb-1" style={{ color: 'var(--color-text-mid)' }}>
               Product Name *
@@ -365,19 +490,22 @@ function PriceAssessmentInner() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <button
-            onClick={handleAnalyze}
-            disabled={isLoading || !productName || !price}
-            className="px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: 'var(--color-accent)',
-              color: 'var(--color-bg)',
-            }}
-          >
-            {isLoading ? 'Analyzing...' : 'Analyze Price'}
-          </button>
-        </div>
+        {/* Analyze Button - shown in manual mode when form has data */}
+        {inputMode === 'manual' && (
+          <div className="mt-6">
+            <button
+              onClick={handleAnalyze}
+              disabled={isLoading || !productName || !price}
+              className="px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-accent)',
+                color: 'var(--color-bg)',
+              }}
+            >
+              {isLoading ? 'Analyzing...' : 'Analyze Price'}
+            </button>
+          </div>
+        )}
 
         {error && (
           <div className="mt-4 p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
