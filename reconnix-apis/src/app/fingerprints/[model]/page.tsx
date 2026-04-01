@@ -12,7 +12,35 @@ import {
   getDimension,
   getTopDimensionsForModel,
 } from '@/lib/data';
+import { getAllModelBreakpoints, rawPricingData } from '@/lib/pricing-data';
 import FingerprintRadar from '@/components/charts/FingerprintRadar';
+
+// Map main study model IDs to pricing study model IDs
+const pricingModelMap: Record<string, string> = {
+  'gpt54': 'gpt54',
+  'claude': 'claude',
+  'gemini': 'gemini_pro',
+};
+
+// Get pricing data for a model (if available)
+function getPricingForModel(modelId: string) {
+  const pricingId = pricingModelMap[modelId];
+  if (!pricingId) return null;
+
+  const breakpoints = getAllModelBreakpoints();
+  const modelData = breakpoints[pricingId];
+  const divergence = rawPricingData.model_divergence.at_3x as Record<string, number>;
+
+  if (!modelData) return null;
+
+  return {
+    profile: modelData.profile,
+    description: modelData.description,
+    meanBreakpoint: modelData.mean_breakpoint,
+    selectionAt3x: divergence[pricingId],
+    curve: modelData.curve || [],
+  };
+}
 
 interface PageProps {
   params: Promise<{
@@ -418,6 +446,97 @@ export default async function FingerprintDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Price Sensitivity (if available) */}
+      {(() => {
+        const pricing = getPricingForModel(model.id);
+        if (!pricing) return null;
+
+        return (
+          <section className="card p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+                Price Sensitivity Profile
+              </h2>
+              <Link
+                href="/apis/pricing"
+                className="text-sm hover:underline"
+                style={{ color: 'var(--color-accent)' }}
+              >
+                Full pricing study →
+              </Link>
+            </div>
+            <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
+              From our pricing study (17,200 trials): how {model.name} responds to price premiums
+              when choosing between branded and generic products.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Profile Info */}
+              <div className="space-y-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', borderLeft: `4px solid ${modelColor}` }}>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-lg font-semibold" style={{ color: modelColor }}>
+                      &ldquo;{pricing.profile}&rdquo;
+                    </span>
+                  </div>
+                  <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                    {pricing.description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <p
+                      className="text-3xl font-bold mb-1"
+                      style={{ color: pricing.selectionAt3x > 0.4 ? 'var(--color-score-high)' : pricing.selectionAt3x > 0.25 ? 'var(--color-score-medium)' : 'var(--color-score-low)' }}
+                    >
+                      {Math.round(pricing.selectionAt3x * 100)}%
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>Selection at 3x premium</p>
+                  </div>
+                  {pricing.meanBreakpoint && (
+                    <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <p className="text-3xl font-bold mb-1" style={{ color: 'var(--color-accent)' }}>
+                        {pricing.meanBreakpoint}x
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>Price cliff point</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Selection Curve */}
+              <div>
+                <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+                  Selection Rate by Price Multiplier
+                </h3>
+                <div className="space-y-2">
+                  {pricing.curve.map((point: { multiplier: number; selection_rate: number }) => (
+                    <div key={point.multiplier} className="flex items-center gap-3">
+                      <span className="font-mono text-xs w-12" style={{ color: 'var(--color-text-soft)' }}>
+                        {point.multiplier}x
+                      </span>
+                      <div className="flex-1 h-6 rounded" style={{ backgroundColor: 'var(--color-surface-2)' }}>
+                        <div
+                          className="h-full rounded transition-all"
+                          style={{
+                            width: `${point.selection_rate * 100}%`,
+                            backgroundColor: point.selection_rate > 0.7 ? '#22c55e' : point.selection_rate > 0.4 ? '#f59e0b' : '#ef4444',
+                          }}
+                        />
+                      </div>
+                      <span className="font-mono text-xs w-12 text-right" style={{ color: 'var(--color-text-mid)' }}>
+                        {Math.round(point.selection_rate * 100)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Compare with other models */}
       <section className="card p-8" style={{ backgroundColor: 'var(--color-accent-soft)', borderColor: 'var(--color-accent)' }}>

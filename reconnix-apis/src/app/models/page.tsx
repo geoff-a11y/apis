@@ -10,6 +10,33 @@ import {
   getDimensions,
   getFingerprint,
 } from '@/lib/data';
+import { getAllModelBreakpoints, rawPricingData } from '@/lib/pricing-data';
+
+// Map main study model IDs to pricing study model IDs
+const pricingModelMap: Record<string, string> = {
+  'gpt54': 'gpt54',
+  'claude': 'claude',
+  'gemini': 'gemini_pro',
+};
+
+// Get pricing data for a model (if available)
+function getPricingForModel(modelId: string) {
+  const pricingId = pricingModelMap[modelId];
+  if (!pricingId) return null;
+
+  const breakpoints = getAllModelBreakpoints();
+  const modelData = breakpoints[pricingId];
+  const divergence = rawPricingData.model_divergence.at_3x as Record<string, number>;
+
+  if (!modelData) return null;
+
+  return {
+    profile: modelData.profile,
+    description: modelData.description,
+    meanBreakpoint: modelData.mean_breakpoint,
+    selectionAt3x: divergence[pricingId],
+  };
+}
 
 // Color scale for effect sizes
 function getEffectColor(cohen_h: number): string {
@@ -177,6 +204,48 @@ export default function ModelsPage() {
               ))}
             </div>
 
+            {/* Pricing sensitivity (if available) */}
+            {(() => {
+              const pricing = getPricingForModel(model.id);
+              if (!pricing) return null;
+              return (
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-text-mid)' }}>
+                      Price Sensitivity
+                    </span>
+                    <Link
+                      href="/apis/pricing"
+                      className="text-xs hover:underline"
+                      style={{ color: 'var(--color-accent)' }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Study →
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>
+                      {pricing.profile}
+                    </span>
+                    {pricing.meanBreakpoint && (
+                      <span className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                        Cliff: {pricing.meanBreakpoint}x
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs" style={{ color: 'var(--color-text-soft)' }}>At 3x:</span>
+                    <span
+                      className="text-xs font-mono font-medium"
+                      style={{ color: pricing.selectionAt3x > 0.4 ? 'var(--color-score-high)' : pricing.selectionAt3x > 0.25 ? 'var(--color-score-medium)' : 'var(--color-score-low)' }}
+                    >
+                      {Math.round(pricing.selectionAt3x * 100)}%
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* View fingerprint link */}
             <Link
               href={`/fingerprints/${model.id}`}
@@ -267,6 +336,71 @@ export default function ModelsPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Pricing Sensitivity Comparison */}
+      <section className="card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
+            Price Sensitivity Profiles
+          </h2>
+          <Link
+            href="/apis/pricing"
+            className="text-sm hover:underline"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            Full pricing study →
+          </Link>
+        </div>
+        <p className="text-sm mb-6" style={{ color: 'var(--color-text-soft)' }}>
+          From our pricing study (17,200 trials): how each model responds to price premiums.
+          Selection rate = % chance the model recommends the branded product over generic.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {models.filter(m => pricingModelMap[m.id]).map((model) => {
+            const pricing = getPricingForModel(model.id);
+            if (!pricing) return null;
+
+            return (
+              <div
+                key={model.id}
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-bg)', borderLeft: `4px solid var(--model-${model.id})` }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{model.name}</p>
+                    <p className="text-sm font-medium" style={{ color: `var(--model-${model.id})` }}>
+                      &ldquo;{pricing.profile}&rdquo;
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className="text-xl font-bold"
+                      style={{ color: pricing.selectionAt3x > 0.4 ? 'var(--color-score-high)' : pricing.selectionAt3x > 0.25 ? 'var(--color-score-medium)' : 'var(--color-score-low)' }}
+                    >
+                      {Math.round(pricing.selectionAt3x * 100)}%
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>at 3x premium</p>
+                  </div>
+                </div>
+                <p className="text-xs mb-2" style={{ color: 'var(--color-text-mid)' }}>
+                  {pricing.description}
+                </p>
+                {pricing.meanBreakpoint && (
+                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                    Price cliff at <strong>{pricing.meanBreakpoint}x</strong>
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="text-xs mt-4" style={{ color: 'var(--color-text-soft)' }}>
+          Models not shown (o3, Llama, Perplexity) were not included in the pricing study.
+        </p>
       </section>
 
       {/* Interpretation guide */}
