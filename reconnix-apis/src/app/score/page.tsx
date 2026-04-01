@@ -4,12 +4,11 @@ import { useState } from 'react';
 import { MLScore, ProductCategory } from '@/lib/types';
 import { detectCategory } from '@/lib/category-data';
 import { generateModelDistribution } from '@/lib/model-weights';
+import ScoreHeroDashboard from '@/components/score/ScoreHeroDashboard';
 import ScoreResult from '@/components/score/ScoreResult';
 import SignalInventory from '@/components/score/SignalInventory';
 import Recommendations from '@/components/score/Recommendations';
-import ExecutiveSummary from '@/components/score/ExecutiveSummary';
 import ModelScores from '@/components/score/ModelScores';
-import CompetitiveBenchmark from '@/components/score/CompetitiveBenchmark';
 
 export default function ScorePage() {
   const [url, setUrl] = useState('');
@@ -172,86 +171,72 @@ export default function ScorePage() {
       {/* Results */}
       {result && !isLoading && (
         <>
-          <ExecutiveSummary
+          {/* Executive Dashboard - CMO-friendly overview */}
+          <ScoreHeroDashboard
+            score={result}
+            category={category}
             recommendations={result.recommendations}
-            category={category}
-            universalScore={result.universal_score}
           />
-          <CompetitiveBenchmark
-            universalScore={result.universal_score}
-            category={category}
-          />
-          <ModelScores
-            modelDistribution={result.model_distribution || generateModelDistribution(result.signal_inventory, result.universal_score)}
-            signalInventory={result.signal_inventory}
-          />
-          <ScoreResult score={result} />
-          <Recommendations recommendations={result.recommendations} category={category} />
-          <SignalInventory signals={result.signal_inventory} />
+
+          {/* Deep Dive Section */}
+          <section className="mt-12">
+            <div className="flex items-center gap-4 mb-6">
+              <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+                Detailed Analysis
+              </h2>
+              <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+            </div>
+
+            {/* Model breakdown with full details */}
+            <ModelScores
+              modelDistribution={result.model_distribution || generateModelDistribution(result.signal_inventory, result.universal_score)}
+              signalInventory={result.signal_inventory}
+            />
+
+            {/* Full recommendations with copy suggestions */}
+            <div id="recommendations">
+              <Recommendations recommendations={result.recommendations} category={category} />
+            </div>
+
+            {/* Signal inventory - all 26 dimensions */}
+            <SignalInventory signals={result.signal_inventory} />
+
+            {/* Technical details */}
+            <ScoreResult score={result} />
+          </section>
         </>
       )}
 
       {/* Placeholder when no results */}
       {!result && !isLoading && !error && (
-        <section className="card p-8 border-dashed border-2 min-h-[400px] flex flex-col items-center justify-center" style={{ borderColor: 'var(--color-border)' }}>
-          <p className="text-center mb-4" style={{ color: 'var(--color-text-soft)' }}>
+        <section className="card p-8 border-dashed border-2 min-h-[300px] flex flex-col items-center justify-center" style={{ borderColor: 'var(--color-border)' }}>
+          <p className="text-center text-lg mb-2" style={{ color: 'var(--color-text)' }}>
             Enter a product URL above to get started
           </p>
-          <div className="text-sm space-y-2 text-center" style={{ color: 'var(--color-text-soft)' }}>
-            <p>Results will include:</p>
-            <ul className="list-disc list-inside">
-              <li>Universal Machine Likeability Score (0-100)</li>
-              <li>Model-specific score distribution</li>
-              <li>Signal inventory across all 26 dimensions</li>
-              <li>Actionable copy recommendations</li>
-              <li>Readability analysis</li>
-            </ul>
-          </div>
+          <p className="text-center max-w-md" style={{ color: 'var(--color-text-soft)' }}>
+            Find out how likely AI assistants like ChatGPT, Claude, and Gemini
+            are to recommend your product to shoppers.
+          </p>
         </section>
       )}
 
-      {/* How it works */}
+      {/* How it works - simplified */}
       <section className="card p-6">
         <h2 className="font-display text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-          How This Score Works
+          Why This Matters
         </h2>
-        <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          We analyzed how leading AI assistants (GPT-5, Claude, Gemini) evaluate product pages.
-          Our research tested 17,000+ purchase scenarios to identify exactly what content signals
-          make AI more likely to recommend products.
+        <p className="mb-4" style={{ color: 'var(--color-text-mid)' }}>
+          Millions of consumers now ask AI assistants like ChatGPT, Claude, and Google Gemini
+          for product recommendations. These AI systems evaluate your product pages and decide
+          whether to recommend you — or your competitors.
         </p>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
-              <span className="font-bold" style={{ color: 'var(--color-accent)' }}>1</span>
-            </div>
-            <h3 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>Extract Content</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We extract and parse all product content from the page, identifying
-              title, description, features, reviews, and metadata.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
-              <span className="font-bold" style={{ color: 'var(--color-accent)' }}>2</span>
-            </div>
-            <h3 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>Measure 26 Signals</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We detect the presence and intensity of each signal dimension
-              that our research identified as influencing AI recommendations.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
-              <span className="font-bold" style={{ color: 'var(--color-accent)' }}>3</span>
-            </div>
-            <h3 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>Calculate Score</h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-              We apply the empirical effect sizes from our research to calculate
-              how likely each AI model is to recommend this product.
-            </p>
-          </div>
-        </div>
+        <p style={{ color: 'var(--color-text-mid)' }}>
+          Our score is based on <span className="font-medium">56,640 simulated purchase decisions</span> across
+          6 leading AI models, identifying exactly what makes AI recommend one product over another.
+          <a href="/methodology" className="ml-1 hover:underline" style={{ color: 'var(--color-accent)' }}>
+            Learn more →
+          </a>
+        </p>
       </section>
     </div>
   );
