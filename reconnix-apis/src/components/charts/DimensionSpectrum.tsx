@@ -45,6 +45,19 @@ const MODEL_COLORS: Record<string, string> = {
   perplexity: '#20808D',
 };
 
+// Generate a plain-language description of model position on a dimension
+function getPositionDescription(cohen_h: number, poles: { low: string; high: string }): string {
+  const absH = Math.abs(cohen_h);
+
+  if (cohen_h >= 0.8) return `Strongly ${poles.high.toLowerCase()}`;
+  if (cohen_h >= 0.5) return `Moderately ${poles.high.toLowerCase()}`;
+  if (cohen_h >= 0.2) return `Slightly ${poles.high.toLowerCase()}`;
+  if (cohen_h > -0.2) return 'Neutral on this dimension';
+  if (cohen_h > -0.5) return `Slightly ${poles.low.toLowerCase()}`;
+  if (cohen_h > -0.8) return `Moderately ${poles.low.toLowerCase()}`;
+  return `Strongly ${poles.low.toLowerCase()}`;
+}
+
 interface DimensionSpectrumProps {
   dimension: Dimension;
   showLabels?: boolean;
@@ -159,17 +172,23 @@ export default function DimensionSpectrum({
             />
             {/* Tooltip */}
             <div
-              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
               style={{
                 backgroundColor: 'var(--color-bg-elevated)',
                 border: '1px solid var(--color-border)',
                 color: 'var(--color-text)',
+                minWidth: '160px',
               }}
             >
-              <span className="font-medium">{effect.model?.name || effect.model_id}</span>
-              <span className="ml-1 font-mono" style={{ color: effect.cohen_h >= 0 ? 'var(--color-green)' : 'var(--color-red)' }}>
-                {effect.cohen_h > 0 ? '+' : ''}{effect.cohen_h.toFixed(2)}
-              </span>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-medium">{effect.model?.name || effect.model_id}</span>
+                <span className="font-mono" style={{ color: effect.cohen_h >= 0 ? 'var(--color-green)' : 'var(--color-red)' }}>
+                  {effect.cohen_h > 0 ? '+' : ''}{effect.cohen_h.toFixed(2)}
+                </span>
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--color-text-soft)' }}>
+                {getPositionDescription(effect.cohen_h, poles)}
+              </div>
             </div>
           </div>
         ))}

@@ -19,6 +19,46 @@ const MODEL_COLORS: Record<string, string> = {
   perplexity: '#20808D',
 };
 
+// Cluster descriptions explaining what each cluster measures
+const CLUSTER_DESCRIPTIONS: Record<ClusterKey, string> = {
+  A: 'Classic persuasion signals derived from human psychology research. These dimensions replicate findings from Filandrianos et al. (2025) to test whether AI agents respond to the same influence tactics that work on humans.',
+  B: 'Values-driven purchasing factors that reflect ethical and social preferences. These dimensions measure how AI agents weight sustainability, privacy, and local origin claims when making recommendations.',
+  C: 'Risk perception and mitigation signals that affect purchase confidence. These dimensions capture how AI agents respond to uncertainty reducers like warranties, return policies, and novelty framing.',
+  D: 'Information gathering and evaluation patterns. These dimensions reveal how AI agents process review sentiment, recency cues, specificity levels, and comparative framing when assessing products.',
+  E: 'Decision architecture elements that shape choice contexts. These dimensions test whether AI agents are susceptible to ethical framing, default options, and loss/gain presentation.',
+  F: 'Multi-turn interaction behaviors in extended conversations. These dimensions measure how AI agents gather information, revise opinions, and calibrate confidence across multiple exchanges.',
+};
+
+// Short explanations for each dimension
+const DIMENSION_EXPLANATIONS: Record<string, string> = {
+  dim_01: 'Measures responsiveness to expert endorsements and professional credentials. High values indicate the model weighs authority claims heavily in recommendations.',
+  dim_02: 'Tests sensitivity to popularity signals like bestseller badges and "most purchased" claims. Models scoring high prioritize social proof in decisions.',
+  dim_03: 'Evaluates trust in platform-provided badges such as "Amazon\'s Choice" or "Top Rated". High scores suggest deference to marketplace curation.',
+  dim_04: 'Assesses reaction to time pressure tactics like "limited stock" and countdown timers. Models scoring high may be influenced by artificial urgency.',
+  dim_05: 'Measures susceptibility to price anchoring, where a high "original" price makes the current price seem like a deal. High values indicate anchor influence.',
+  dim_06: 'Tests preference for established brands over generic alternatives. High scores suggest brand familiarity influences recommendations.',
+  dim_07: 'Evaluates how free trials, samples, or money-back guarantees affect recommendations. High values indicate trial offers increase selection likelihood.',
+  dim_08: 'Measures preference for product bundles over individual items. Models scoring high tend to recommend bundled offerings.',
+  dim_09: 'Tests weight given to environmental and sustainability claims. High scores indicate eco-friendly messaging increases recommendation likelihood.',
+  dim_10: 'Assesses importance of data privacy claims in product descriptions. Models scoring high prioritize privacy-focused products.',
+  dim_11: 'Measures preference for locally-made or domestically-sourced products. High values indicate origin claims influence recommendations.',
+  dim_12: 'Tests willingness to recommend new or innovative products versus established alternatives. High scores indicate openness to novel options.',
+  dim_13: 'Evaluates tendency to recommend safer, lower-risk options. Models scoring high may avoid products with any uncertainty signals.',
+  dim_14: 'Measures how warranty coverage affects recommendations. High values indicate strong preference for warranted products.',
+  dim_15: 'Tests sensitivity to return policy generosity. Models scoring high favor products with flexible return options.',
+  dim_16: 'Evaluates how negative reviews affect recommendations. High scores indicate negative information is weighted heavily.',
+  dim_17: 'Measures preference for recent reviews over older ones. Models scoring high may discount historical feedback.',
+  dim_18: 'Tests preference for detailed specifications over vague descriptions. High values indicate specific claims are more persuasive.',
+  dim_19: 'Evaluates how side-by-side comparisons influence recommendations. Models scoring high may be swayed by favorable comparative framing.',
+  dim_20: 'Measures thoroughness in exploring product information before recommending. High scores indicate deep analysis behavior.',
+  dim_21: 'Tests tendency to ask clarifying questions versus making assumptions. Models scoring high seek more information before deciding.',
+  dim_22: 'Evaluates willingness to change recommendations when presented with new information. High values indicate opinion flexibility.',
+  dim_23: 'Measures alignment between stated confidence and actual recommendation accuracy. High scores indicate well-calibrated uncertainty.',
+  dim_24: 'Tests influence of ethical claims on recommendations. Models scoring high prioritize products with ethical positioning.',
+  dim_25: 'Evaluates tendency to recommend default or pre-selected options. High values indicate susceptibility to default bias.',
+  dim_26: 'Measures asymmetric response to gain vs. loss framing. Models scoring high react more strongly to potential losses.',
+};
+
 type ViewMode = 'list' | 'spectrum';
 
 export default function DimensionsPage() {
@@ -113,9 +153,16 @@ export default function DimensionsPage() {
       </section>
 
       {/* Cluster sections */}
-      {(Object.keys(clusters) as ClusterKey[]).sort().map((cluster) => (
+      {(Object.keys(clusters) as ClusterKey[]).sort().map((cluster) => {
+        // Calculate cluster average effect size
+        const clusterEffects = clusters[cluster].map(dim => getMeanEffect(dim.id)).filter((e): e is number => e !== null);
+        const clusterAvgEffect = clusterEffects.length > 0
+          ? clusterEffects.reduce((sum, e) => sum + e, 0) / clusterEffects.length
+          : null;
+
+        return (
         <section key={cluster} className="card p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <span className={`w-4 h-4 rounded-full bg-cluster-${cluster.toLowerCase()}`} />
             <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
               Cluster {cluster}: {CLUSTER_NAMES[cluster]}
@@ -123,7 +170,21 @@ export default function DimensionsPage() {
             <span className="badge text-xs" style={{ backgroundColor: 'var(--color-surface-2)', color: 'var(--color-text-mid)' }}>
               {clusters[cluster].length} dimensions
             </span>
+            {clusterAvgEffect !== null && (
+              <span
+                className="text-xs font-mono px-2 py-0.5 rounded"
+                style={{
+                  backgroundColor: clusterAvgEffect >= 0.2 ? 'rgba(34, 197, 94, 0.1)' : 'var(--color-surface-2)',
+                  color: clusterAvgEffect >= 0.2 ? '#22c55e' : 'var(--color-text-soft)',
+                }}
+              >
+                avg h = {clusterAvgEffect.toFixed(2)}
+              </span>
+            )}
           </div>
+          <p className="text-sm mb-6" style={{ color: 'var(--color-text-soft)' }}>
+            {CLUSTER_DESCRIPTIONS[cluster]}
+          </p>
 
           {viewMode === 'list' ? (
             /* List view */
@@ -175,20 +236,39 @@ export default function DimensionsPage() {
             </div>
           ) : (
             /* Spectrum view */
-            <div className="space-y-6">
+            <div className="space-y-8">
               {clusters[cluster].map((dim) => {
                 const poles = DIMENSION_POLES[dim.id] || { low: 'Low', high: 'High' };
+                const meanEffect = getMeanEffect(dim.id);
                 return (
-                  <div key={dim.id} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Link
-                        href={`/dimensions/${dim.id}`}
-                        className="font-medium hover:underline"
-                        style={{ color: 'var(--color-text)' }}
-                      >
-                        {dim.display_name}
-                      </Link>
-                      <div className="flex items-center gap-2">
+                  <div key={dim.id} className="space-y-2">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <Link
+                            href={`/dimensions/${dim.id}`}
+                            className="font-medium hover:underline"
+                            style={{ color: 'var(--color-text)' }}
+                          >
+                            {dim.display_name}
+                          </Link>
+                          {meanEffect !== null && (
+                            <span
+                              className="text-xs font-mono px-1.5 py-0.5 rounded"
+                              style={{
+                                backgroundColor: meanEffect >= 0.2 ? 'rgba(34, 197, 94, 0.1)' : meanEffect <= -0.2 ? 'rgba(239, 68, 68, 0.1)' : 'var(--color-surface-2)',
+                                color: meanEffect >= 0.2 ? '#22c55e' : meanEffect <= -0.2 ? '#ef4444' : 'var(--color-text-soft)',
+                              }}
+                            >
+                              h={meanEffect > 0 ? '+' : ''}{meanEffect.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-soft)' }}>
+                          {DIMENSION_EXPLANATIONS[dim.id]}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface-2)', color: 'var(--color-text-soft)' }}>
                           {poles.low}
                         </span>
@@ -205,7 +285,8 @@ export default function DimensionsPage() {
             </div>
           )}
         </section>
-      ))}
+        );
+      })}
     </div>
   );
 }
