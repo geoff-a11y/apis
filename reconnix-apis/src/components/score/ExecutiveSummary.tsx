@@ -159,16 +159,16 @@ export default function ExecutiveSummary({
             className="flex items-start gap-3 p-3 rounded-lg transition-colors"
             style={{ backgroundColor: 'var(--color-bg)' }}
           >
-            <span className="text-lg flex-shrink-0">{getPriorityIcon(rec.priority)}</span>
+            <span className="text-lg flex-shrink-0">{getPriorityIcon(rec.priority || 'medium')}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs px-2 py-0.5 rounded" style={{
-                  backgroundColor: rec.priority === 'high' ? 'rgba(239, 68, 68, 0.1)' :
-                    rec.priority === 'medium' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                  color: rec.priority === 'high' ? '#dc2626' :
-                    rec.priority === 'medium' ? '#ca8a04' : '#16a34a'
+                  backgroundColor: (rec.priority || 'medium') === 'high' ? 'rgba(239, 68, 68, 0.1)' :
+                    (rec.priority || 'medium') === 'medium' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                  color: (rec.priority || 'medium') === 'high' ? '#dc2626' :
+                    (rec.priority || 'medium') === 'medium' ? '#ca8a04' : '#16a34a'
                 }}>
-                  {getPriorityLabel(rec.priority)}
+                  {getPriorityLabel(rec.priority || 'medium')}
                 </span>
               </div>
               <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>

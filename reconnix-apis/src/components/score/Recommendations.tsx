@@ -72,13 +72,17 @@ export default function Recommendations({ recommendations, category = 'other' }:
   const categoryData = CATEGORY_DATA[category];
 
   // Sort by priority (high -> medium -> low) and then by predicted delta
-  const sortedRecommendations = [...recommendations].sort((a, b) => {
-    const priorityOrder = { high: 0, medium: 1, low: 2 };
-    if (a.priority !== b.priority) {
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    }
-    return b.predicted_delta - a.predicted_delta;
-  });
+  const sortedRecommendations = [...recommendations]
+    .filter(r => r && r.dimension_id) // Filter out malformed recommendations
+    .sort((a, b) => {
+      const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+      const aPriority = a.priority || 'low';
+      const bPriority = b.priority || 'low';
+      if (aPriority !== bPriority) {
+        return (priorityOrder[aPriority] ?? 2) - (priorityOrder[bPriority] ?? 2);
+      }
+      return (b.predicted_delta ?? 0) - (a.predicted_delta ?? 0);
+    });
 
   const getPriorityStyles = (priority: string) => {
     switch (priority) {
@@ -170,7 +174,7 @@ export default function Recommendations({ recommendations, category = 'other' }:
                         {rec.dimension_name || DIMENSION_NAMES[rec.dimension_id] || rec.dimension_id}
                       </h3>
                       <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-text-mid)' }}>
-                        <span className={styles.text}>{rec.priority.toUpperCase()} PRIORITY</span>
+                        <span className={styles.text}>{(rec.priority || 'medium').toUpperCase()} PRIORITY</span>
                         <span>•</span>
                         <span className="font-medium" style={{ color: 'var(--color-accent)' }}>
                           +{(rec.predicted_delta ?? 0).toFixed(1)} points potential
