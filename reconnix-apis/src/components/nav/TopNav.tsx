@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/score', label: 'ML Score' },
   { href: '/apis/benchmarks', label: 'Benchmarks' },
   { href: '/apis/pricing', label: 'Pricing Study' },
+  { href: '/apis/price-assessment', label: 'Price Check' },
   { href: '/research', label: 'Research' },
 ];
 
