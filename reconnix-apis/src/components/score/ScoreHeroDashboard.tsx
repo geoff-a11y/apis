@@ -150,7 +150,7 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
 
   // Get top 3 recommendations
   const top3 = [...recommendations]
-    .sort((a, b) => b.predicted_delta - a.predicted_delta)
+    .sort((a, b) => (b.predicted_delta ?? 0) - (a.predicted_delta ?? 0))
     .slice(0, 3);
 
   // Calculate actionable metrics
@@ -183,11 +183,11 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
     };
     if (s >= 35) return {
       label: 'Needs Work',
-      description: 'Missing key signals that penalize selection likelihood'
+      description: 'Missing key signals that AI agents look for'
     };
     return {
       label: 'Critical',
-      description: 'Major signal gaps significantly penalize selection'
+      description: 'Major signal gaps reduce recommendation likelihood'
     };
   };
 
@@ -506,7 +506,7 @@ export default function ScoreHeroDashboard({ score, category, recommendations }:
               Complete all 3 priorities to potentially reach
             </p>
             <p className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
-              {Math.min(100, Math.round(score.universal_score + top3.reduce((sum, r) => sum + r.predicted_delta, 0)))} / 100
+              {Math.min(100, Math.round(score.universal_score + top3.reduce((sum, r) => sum + (r.predicted_delta ?? 0), 0)))} / 100
             </p>
           </div>
         )}

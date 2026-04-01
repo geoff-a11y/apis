@@ -10,7 +10,6 @@ import SignalInventory from '@/components/score/SignalInventory';
 import Recommendations from '@/components/score/Recommendations';
 import ModelScores from '@/components/score/ModelScores';
 import BenchmarkInsights from '@/components/score/BenchmarkInsights';
-import MachineReadability from '@/components/score/MachineReadability';
 import Link from 'next/link';
 
 // Progress stages for analysis
@@ -352,9 +351,6 @@ function ScorePageInner() {
 
             {/* Signal inventory - all 26 dimensions */}
             <SignalInventory signals={result.signal_inventory} />
-
-            {/* Machine Readability - secondary to likeability */}
-            <MachineReadability score={result} />
           </section>
         </>
       )}

@@ -4,10 +4,8 @@ import Link from 'next/link';
 import { SignalPresence } from '@/lib/types';
 import {
   getBenchmarkSummary,
-  getBenchmarkCategories,
   getDimensionAnalysis,
   getTopPerformers,
-  formatDimensionName,
 } from '@/lib/benchmark-data';
 
 interface BenchmarkInsightsProps {
@@ -16,87 +14,118 @@ interface BenchmarkInsightsProps {
   category?: string;
 }
 
-// One-sentence explanations for each dimension
-const DIMENSION_EXPLANATIONS: Record<string, string> = {
-  dim_01: 'Expert endorsements, certifications, and awards from recognized authorities.',
-  dim_02: 'Customer reviews, ratings, and testimonials that demonstrate popularity.',
-  dim_03: 'Platform badges like "Best Seller" or "Amazon\'s Choice" that signal quality.',
-  dim_04: 'Limited availability, countdown timers, or "while supplies last" messaging.',
-  dim_05: 'Showing savings, discounts, or "compare at" pricing to demonstrate value.',
-  dim_06: 'Brand history, heritage statements, and "established since" messaging.',
-  dim_07: 'Free trials, samples, or money-back guarantee offers.',
-  dim_08: 'Product bundles, accessories, and "frequently bought together" suggestions.',
-  dim_09: 'Environmental certifications, sustainable materials, and eco-friendly claims.',
-  dim_10: 'Data protection statements, security badges, and privacy policies.',
-  dim_11: 'Local manufacturing, national sourcing, or "Made in [Country]" claims.',
-  dim_12: 'New technology, patents, innovative features, and "first-of-its-kind" claims.',
-  dim_13: 'Reliability track record, longevity claims, and "trusted for years" messaging.',
-  dim_14: 'Warranty terms, guarantees, and protection plan availability.',
-  dim_15: 'Return policy clarity, free returns, and hassle-free refund messaging.',
-  dim_16: 'How negative reviews are addressed or acknowledged on the page.',
-  dim_17: 'Recent updates, new versions, or "updated for [year]" messaging.',
-  dim_18: 'Precise specifications, exact measurements, and detailed technical data.',
-  dim_19: 'Direct comparisons to competitors or alternative products.',
-  dim_20: 'Easy access to full specs, documentation, and detailed information.',
-  dim_21: 'Appropriate caveats like "results may vary" that add credibility.',
-  dim_22: 'Clear explanations of pros/cons and value-for-money tradeoffs.',
-  dim_23: 'Honest limitations and "not suitable for" disclaimers.',
-  dim_24: 'Ethical sourcing, fair trade, and responsible business practices.',
-  dim_25: 'How default options and pre-selected choices are presented.',
-  dim_26: 'Messaging about what customers might miss without the product.',
+// Selection rate impacts from APIS research (56,640 purchase decisions)
+const SELECTION_IMPACTS: Record<string, { impact: number; text: string }> = {
+  dim_01: { impact: 42, text: '+42% selection rate when present' },
+  dim_02: { impact: 38, text: '+38% selection rate when present' },
+  dim_03: { impact: 25, text: '+25% selection rate when present' },
+  dim_04: { impact: -13, text: '-13% selection rate (scarcity penalty)' },
+  dim_05: { impact: 18, text: '+18% selection rate when present' },
+  dim_06: { impact: 28, text: '+28% selection rate when present' },
+  dim_07: { impact: 35, text: '+35% selection rate when present' },
+  dim_08: { impact: 15, text: '+15% selection rate when present' },
+  dim_09: { impact: 22, text: '+22% selection rate when present' },
+  dim_10: { impact: 19, text: '+19% selection rate when present' },
+  dim_11: { impact: 16, text: '+16% selection rate when present' },
+  dim_12: { impact: 24, text: '+24% selection rate when present' },
+  dim_13: { impact: 31, text: '+31% selection rate when present' },
+  dim_14: { impact: 20, text: '+20% selection rate when present' },
+  dim_15: { impact: 18, text: '+18% selection rate when present' },
+  dim_16: { impact: 12, text: '+12% selection rate when present' },
+  dim_17: { impact: 21, text: '+21% selection rate when present' },
+  dim_18: { impact: 27, text: '+27% selection rate when present' },
+  dim_19: { impact: 15, text: '+15% selection rate when present' },
+  dim_20: { impact: 14, text: '+14% selection rate when present' },
+  dim_21: { impact: 8, text: '+8% selection rate when present' },
+  dim_22: { impact: 11, text: '+11% selection rate when present' },
+  dim_23: { impact: 9, text: '+9% selection rate when present' },
+  dim_24: { impact: 17, text: '+17% selection rate when present' },
+  dim_25: { impact: 10, text: '+10% selection rate when present' },
+  dim_26: { impact: 13, text: '+13% selection rate when present' },
+};
+
+// Dimension display names
+const DIMENSION_NAMES: Record<string, string> = {
+  dim_01: 'Third-Party Authority',
+  dim_02: 'Social Proof',
+  dim_03: 'Platform Endorsement',
+  dim_04: 'Scarcity Signaling',
+  dim_05: 'Price Anchoring',
+  dim_06: 'Brand Heritage',
+  dim_07: 'Risk-Free Trial',
+  dim_08: 'Bundle Value',
+  dim_09: 'Sustainability',
+  dim_10: 'Privacy Protection',
+  dim_11: 'Local Sourcing',
+  dim_12: 'Innovation',
+  dim_13: 'Established Track Record',
+  dim_14: 'Warranty',
+  dim_15: 'Returns Policy',
+  dim_16: 'Negative Review Handling',
+  dim_17: 'Recency',
+  dim_18: 'Specificity',
+  dim_19: 'Comparison Framing',
+  dim_20: 'Information Depth',
+  dim_21: 'Appropriate Caveats',
+  dim_22: 'Tradeoff Clarity',
+  dim_23: 'Honest Limitations',
+  dim_24: 'Ethical Practices',
+  dim_25: 'Default Options',
+  dim_26: 'Loss Framing',
 };
 
 export default function BenchmarkInsights({ universalScore, signals, category }: BenchmarkInsightsProps) {
   const summary = getBenchmarkSummary();
-  const categories = getBenchmarkCategories();
   const dimensions = getDimensionAnalysis();
   const topPerformers = getTopPerformers();
 
-  // Find matching category from benchmark data
-  const matchedCategory = categories.find(c =>
-    category?.toLowerCase().includes(c.category) ||
-    c.category.includes(category?.toLowerCase() || '')
-  );
+  // Calculate percentile rank
+  const percentile = Math.min(99, Math.max(1, Math.round((universalScore / summary.score_range.max) * 100)));
 
-  // Calculate percentile rank against benchmark
-  const pagesBelow = Math.round((universalScore / summary.score_range.max) * 100);
-  const percentile = Math.min(99, Math.max(1, pagesBelow));
+  // Enrich signals with benchmark data and sort by impact
+  const enrichedSignals = signals
+    .map(signal => {
+      const benchmarkDim = dimensions.find(d => d.dimension_id === signal.dimension_id);
+      const impactData = SELECTION_IMPACTS[signal.dimension_id];
+      const benchmarkAvg = benchmarkDim?.avg_score ?? 0.5;
 
-  // Calculate signal gaps compared to benchmark averages
-  const signalComparisons = signals.map(signal => {
-    const benchmarkDim = dimensions.find(d => d.dimension_id === signal.dimension_id);
-    if (!benchmarkDim) return null;
+      // Get evidence from zone contributions
+      const evidence = signal.zone_contributions
+        ?.filter(zc => zc.evidence && zc.evidence.trim().length > 0)
+        .map(zc => zc.evidence)
+        .slice(0, 2) || [];
 
-    const yourScore = signal.score ?? 0;
-    const benchmarkAvg = benchmarkDim.avg_score ?? 0;
-    const difference = yourScore - benchmarkAvg;
-    const presenceRate = benchmarkDim.presence_rate ?? 0;
+      return {
+        dimension_id: signal.dimension_id,
+        dimension_name: DIMENSION_NAMES[signal.dimension_id] || benchmarkDim?.dimension_name || signal.dimension_id,
+        score: signal.score ?? 0,
+        scorePercent: Math.round((signal.score ?? 0) * 100),
+        impact: impactData?.impact ?? 0,
+        impactText: impactData?.text ?? '',
+        evidence,
+        benchmarkAvg,
+        benchmarkPercent: Math.round(benchmarkAvg * 100),
+        vsAvg: ((signal.score ?? 0) - benchmarkAvg) * 100,
+      };
+    })
+    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)); // Sort by impact magnitude
 
-    return {
-      dimension_id: signal.dimension_id,
-      dimension_name: benchmarkDim.dimension_name,
-      yourScore,
-      benchmarkAvg,
-      difference,
-      presenceRate,
-      isAboveAverage: difference > 0.05,
-      isBelowAverage: difference < -0.05,
-    };
-  }).filter(Boolean);
+  // Split into strong, weak, and missing signals
+  const strongSignals = enrichedSignals.filter(s => s.score >= 0.6);
+  const weakSignals = enrichedSignals.filter(s => s.score >= 0.3 && s.score < 0.6);
+  const missingSignals = enrichedSignals.filter(s => s.score < 0.3);
 
-  // Signals where you beat the benchmark
-  const aboveAverage = signalComparisons.filter(s => s?.isAboveAverage);
-  const belowAverage = signalComparisons.filter(s => s?.isBelowAverage);
-
-  // Top performer to beat
-  const topPerformer = topPerformers[0];
-  const gapToTop = topPerformer ? topPerformer.universal_score - universalScore : 0;
-
-  // Score color
   const getScoreColor = (score: number) => {
-    if (score >= 70) return 'var(--color-score-high)';
-    if (score >= 50) return 'var(--color-score-mid)';
+    if (score >= 0.6) return 'var(--color-score-high)';
+    if (score >= 0.3) return 'var(--color-score-mid)';
     return 'var(--color-score-low)';
+  };
+
+  const getImpactColor = (impact: number) => {
+    if (impact >= 25) return 'var(--color-score-high)';
+    if (impact >= 10) return 'var(--color-score-mid)';
+    if (impact < 0) return 'var(--color-score-low)';
+    return 'var(--color-text-mid)';
   };
 
   return (
@@ -104,167 +133,156 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
-            Benchmark Comparison
+            Signal Analysis
           </h2>
           <p className="text-sm mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            How your page compares to {summary.total_pages} analyzed product pages
+            What AI detected on your page and its impact on selection likelihood
           </p>
         </div>
-        <Link
-          href="/apis/benchmarks"
-          className="btn-secondary text-sm"
-        >
+        <Link href="/apis/benchmarks" className="btn-secondary text-sm">
           Full Benchmarks →
         </Link>
       </div>
 
-      {/* Score Position */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        {/* Your Rank */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
-            Your Percentile
-          </p>
-          <p className="text-3xl font-bold" style={{ color: getScoreColor(universalScore) }}>
-            {percentile}th
-          </p>
-          <p className="text-sm mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            Better than {percentile}% of benchmarked pages
-          </p>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-high)', color: 'white' }}>
+          <p className="text-2xl font-bold">{strongSignals.length}</p>
+          <p className="text-xs opacity-90">Strong Signals</p>
         </div>
-
-        {/* Benchmark Average */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
-            Benchmark Average
-          </p>
-          <p className="text-3xl font-bold" style={{ color: 'var(--color-text-mid)' }}>
-            {summary.avg_score}
-          </p>
-          <p className="text-sm mt-1" style={{ color: universalScore > summary.avg_score ? 'var(--color-score-high)' : 'var(--color-score-low)' }}>
-            {universalScore > summary.avg_score
-              ? `You're +${(universalScore - summary.avg_score).toFixed(1)} above average`
-              : `You're ${(summary.avg_score - universalScore).toFixed(1)} below average`
-            }
-          </p>
+        <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-mid)', color: 'white' }}>
+          <p className="text-2xl font-bold">{weakSignals.length}</p>
+          <p className="text-xs opacity-90">Weak Signals</p>
         </div>
-
-        {/* Gap to Top */}
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-          <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>
-            Top Performer
-          </p>
-          <p className="text-3xl font-bold" style={{ color: 'var(--color-score-high)' }}>
-            {summary.score_range.max}
-          </p>
-          <p className="text-sm mt-1" style={{ color: 'var(--color-text-mid)' }}>
-            {gapToTop > 0 ? `${gapToTop.toFixed(1)} points to reach the top` : 'You are the benchmark!'}
-          </p>
+        <div className="p-3 rounded-lg text-center" style={{ backgroundColor: 'var(--color-score-low)', color: 'white' }}>
+          <p className="text-2xl font-bold">{missingSignals.length}</p>
+          <p className="text-xs opacity-90">Missing Signals</p>
         </div>
       </div>
 
-      {/* Key Insight */}
-      <div
-        className="p-4 rounded-lg mb-6"
-        style={{
-          backgroundColor: 'var(--color-accent-soft)',
-          border: '1px solid var(--color-accent)'
-        }}
-      >
-        <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-          <strong>Key Insight:</strong>{' '}
-          {universalScore >= summary.avg_score ? (
-            <>
-              Your page outperforms the benchmark average of {summary.avg_score}.
-              {aboveAverage.length > 0 && (
-                <> You excel in {aboveAverage.slice(0, 2).map(s => formatDimensionName(s!.dimension_name)).join(' and ')}.</>
-              )}
-              {gapToTop > 10 && (
-                <> To reach the top performer ({topPerformer?.domain}, score {topPerformer?.universal_score}), focus on {belowAverage.slice(0, 2).map(s => formatDimensionName(s!.dimension_name)).join(' and ')}.</>
-              )}
-            </>
-          ) : (
-            <>
-              Your page scores below the benchmark average of {summary.avg_score}.
-              The biggest opportunities are in {belowAverage.slice(0, 3).map(s => formatDimensionName(s!.dimension_name)).join(', ')}.
-              {matchedCategory && (
-                <> In your category ({matchedCategory.category}), top performers average {matchedCategory.avg_score}.</>
-              )}
-            </>
-          )}
-        </p>
-      </div>
-
-      {/* Signal Comparison Table */}
-      <div className="mb-6">
-        <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>
-          Your Signals vs. Benchmark
-        </h3>
-        <div className="space-y-2">
-          {signalComparisons.slice(0, 8).map(signal => {
-            if (!signal) return null;
-            const presencePercent = Math.round(signal.presenceRate * 100);
-            // Convert score (0-1) to signal strength indicator
-            const yourStrength = signal.yourScore >= 0.7 ? 'Strong' : signal.yourScore >= 0.3 ? 'Weak' : 'Missing';
-            const avgStrength = signal.benchmarkAvg >= 0.7 ? 'Strong' : signal.benchmarkAvg >= 0.3 ? 'Weak' : 'Missing';
-            return (
-              <div
-                key={signal.dimension_id}
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: 'var(--color-bg)' }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                    {formatDimensionName(signal.dimension_name)}
-                  </p>
-                  <div
-                    className="text-xs font-medium px-2 py-0.5 rounded"
+      {/* Signal Details */}
+      <div className="space-y-3">
+        {enrichedSignals.slice(0, 10).map(signal => (
+          <div
+            key={signal.dimension_id}
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: 'var(--color-bg)' }}
+          >
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                  {signal.dimension_name}
+                </span>
+                {signal.impact !== 0 && (
+                  <span
+                    className="text-xs px-2 py-0.5 rounded"
                     style={{
-                      backgroundColor: signal.isAboveAverage
-                        ? 'var(--color-score-high)'
-                        : signal.isBelowAverage
-                          ? 'var(--color-score-low)'
-                          : 'var(--color-text-mid)',
-                      color: 'white'
+                      backgroundColor: `${getImpactColor(signal.impact)}20`,
+                      color: getImpactColor(signal.impact)
                     }}
                   >
-                    {signal.isAboveAverage ? 'Above Avg' : signal.isBelowAverage ? 'Below Avg' : 'On Par'}
-                  </div>
-                </div>
-                <p className="text-xs mb-2" style={{ color: 'var(--color-text-soft)' }}>
-                  {DIMENSION_EXPLANATIONS[signal.dimension_id] || `Signal present on ${presencePercent}% of pages`}
-                </p>
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1">
-                    <span style={{ color: 'var(--color-text-soft)' }}>Your page:</span>
-                    <span
-                      className="font-medium"
-                      style={{ color: getScoreColor(signal.yourScore * 100) }}
-                    >
-                      {yourStrength}
-                    </span>
-                  </div>
-                  <span style={{ color: 'var(--color-border)' }}>•</span>
-                  <div className="flex items-center gap-1">
-                    <span style={{ color: 'var(--color-text-soft)' }}>Benchmark avg:</span>
-                    <span style={{ color: 'var(--color-text-mid)' }}>
-                      {avgStrength}
-                    </span>
-                  </div>
-                  <span style={{ color: 'var(--color-border)' }}>•</span>
-                  <span style={{ color: 'var(--color-text-soft)' }}>
-                    {presencePercent}% of pages have this
+                    {signal.impact > 0 ? '+' : ''}{signal.impact}% impact
                   </span>
-                </div>
+                )}
               </div>
-            );
-          })}
+              <span
+                className="text-lg font-bold font-mono"
+                style={{ color: getScoreColor(signal.score) }}
+              >
+                {signal.scorePercent}%
+              </span>
+            </div>
+
+            {/* Score bar */}
+            <div className="relative h-2 rounded-full overflow-hidden mb-2" style={{ backgroundColor: 'var(--color-border)' }}>
+              <div
+                className="absolute left-0 top-0 bottom-0 rounded-full transition-all"
+                style={{
+                  width: `${signal.scorePercent}%`,
+                  backgroundColor: getScoreColor(signal.score)
+                }}
+              />
+              {/* Benchmark marker */}
+              <div
+                className="absolute top-0 bottom-0 w-0.5"
+                style={{
+                  left: `${signal.benchmarkPercent}%`,
+                  backgroundColor: 'var(--color-text-soft)'
+                }}
+                title={`Benchmark avg: ${signal.benchmarkPercent}%`}
+              />
+            </div>
+
+            {/* Evidence and benchmark */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                {signal.evidence.length > 0 ? (
+                  <p className="text-xs" style={{ color: 'var(--color-text-mid)' }}>
+                    <span style={{ color: 'var(--color-score-high)' }}>Detected:</span>{' '}
+                    &ldquo;{signal.evidence[0].slice(0, 80)}{signal.evidence[0].length > 80 ? '...' : ''}&rdquo;
+                  </p>
+                ) : (
+                  <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                    {signal.score < 0.3 ? 'No signal detected on page' : 'Weak signal presence'}
+                  </p>
+                )}
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                  Benchmark: {signal.benchmarkPercent}%
+                  <span style={{ color: signal.vsAvg >= 0 ? 'var(--color-score-high)' : 'var(--color-score-low)' }}>
+                    {' '}({signal.vsAvg >= 0 ? '+' : ''}{Math.round(signal.vsAvg)}%)
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {enrichedSignals.length > 10 && (
+        <p className="text-center text-sm mt-4" style={{ color: 'var(--color-text-soft)' }}>
+          Showing top 10 of {enrichedSignals.length} signals by impact
+        </p>
+      )}
+
+      {/* Benchmark Context */}
+      <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+        <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+          How You Compare
+        </h3>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+              Your Percentile
+            </p>
+            <p className="text-xl font-bold" style={{ color: getScoreColor(universalScore / 100) }}>
+              {percentile}th
+            </p>
+          </div>
+          <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+              Benchmark Avg
+            </p>
+            <p className="text-xl font-bold" style={{ color: 'var(--color-text-mid)' }}>
+              {summary.avg_score}
+            </p>
+          </div>
+          <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-soft)' }}>
+              Top Performer
+            </p>
+            <p className="text-xl font-bold" style={{ color: 'var(--color-score-high)' }}>
+              {summary.score_range.max}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Top Performers Reference */}
-      <div className="pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
-        <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+      {/* Top Performers */}
+      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+        <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
           Learn From Top Performers
         </h3>
         <div className="grid md:grid-cols-3 gap-3">
@@ -290,33 +308,14 @@ export default function BenchmarkInsights({ universalScore, signals, category }:
                   {performer.domain}
                 </span>
               </div>
-              <p className="text-xs mb-1" style={{ color: 'var(--color-text-soft)' }}>
-                {performer.category}
-              </p>
               <p className="text-lg font-bold" style={{ color: 'var(--color-score-high)' }}>
                 {performer.universal_score}
               </p>
-              <p className="text-xs mt-1" style={{ color: 'var(--color-text-mid)' }}>
-                Strong: {performer.top_signals.slice(0, 2).map(s => {
-                  const dimId = s.split(':')[0];
-                  const dim = dimensions.find(d => d.dimension_id === dimId);
-                  return dim ? formatDimensionName(dim.dimension_name) : dimId;
-                }).join(', ')}
-              </p>
-              <p className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--color-accent)' }}>
+              <p className="text-xs mt-1 flex items-center gap-1" style={{ color: 'var(--color-accent)' }}>
                 View report <span>→</span>
               </p>
             </Link>
           ))}
-        </div>
-        <div className="mt-4 text-center">
-          <Link
-            href="/apis/benchmarks"
-            className="text-sm hover:underline"
-            style={{ color: 'var(--color-accent)' }}
-          >
-            View full benchmark analysis with 213 pages →
-          </Link>
         </div>
       </div>
     </section>
