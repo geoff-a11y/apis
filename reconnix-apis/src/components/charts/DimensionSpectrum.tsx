@@ -97,7 +97,7 @@ export default function DimensionSpectrum({
   if (compact) {
     return (
       <div className="w-full">
-        <div className="relative h-6 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-surface-2)' }}>
+        <div className="relative h-6 rounded-full" style={{ backgroundColor: 'var(--color-surface-2)' }}>
           {/* Center line (neutral) */}
           <div
             className="absolute top-0 bottom-0 w-px"
@@ -170,7 +170,7 @@ export default function DimensionSpectrum({
       )}
 
       {/* Spectrum bar */}
-      <div className="relative h-8 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-surface-2)' }}>
+      <div className="relative h-8 rounded-lg" style={{ backgroundColor: 'var(--color-surface-2)' }}>
         {/* Gradient background: red (negative) → neutral → green (positive) */}
         <div
           className="absolute inset-0"
