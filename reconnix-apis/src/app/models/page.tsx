@@ -151,7 +151,7 @@ export default function ModelsPage() {
             onClick={() => setSelectedModel(selectedModel === model.id ? null : model.id)}
           >
             {/* Header */}
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
                   {model.name}
@@ -170,6 +170,13 @@ export default function ModelsPage() {
                 {meanEffect > 0 ? '+' : ''}{meanEffect.toFixed(2)} avg
               </span>
             </div>
+
+            {/* Behavioral fingerprint description */}
+            {model.fingerprint_description && (
+              <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--color-text-mid)' }}>
+                {model.fingerprint_description}
+              </p>
+            )}
 
             {/* Stats row */}
             <div className="flex gap-4 mb-4 text-sm">

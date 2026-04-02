@@ -10,8 +10,9 @@ export interface Model {
   measurement_date: string;      // "2026-03-27"
   color: string;                 // CSS var reference
   logo: string;                  // path to /public/images/model-logos/
-  study_type: 'confirmatory' | 'exploratory';
+  study_type: 'confirmatory' | 'exploratory' | 'pilot';
   notes?: string;
+  fingerprint_description?: string;  // 1-2 sentence behavioral profile
 }
 
 export interface Dimension {

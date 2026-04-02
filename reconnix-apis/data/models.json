@@ -21,7 +21,8 @@
     "color": "var(--model-gpt54)",
     "logo": "/images/model-logos/openai.svg",
     "study_type": "confirmatory",
-    "notes": "Latest GPT flagship as of 2026-03-27"
+    "notes": "Latest GPT flagship as of 2026-03-27",
+    "fingerprint_description": "A balanced decision-maker that responds moderately to most persuasion signals. Shows strongest sensitivity to comparison framing and default options, while maintaining relative skepticism toward urgency tactics. Tends toward thorough but not exhaustive information processing."
   },
   {
     "id": "o3",
@@ -33,8 +34,9 @@
     "color": "var(--model-o3)",
     "logo": "/images/model-logos/openai.svg",
     "study_type": "confirmatory",
-    "notes": "Latest reasoning model \u2014 temperature fixed at 1.0",
-    "reasoning_effort": "medium"
+    "notes": "Latest reasoning model — temperature fixed at 1.0",
+    "reasoning_effort": "medium",
+    "fingerprint_description": "The most consistently persuadable model in the study, showing positive responses across nearly all dimensions. Particularly receptive to comparison framing, default options, and bundle offers. Its reasoning architecture appears to amplify rather than resist influence signals."
   },
   {
     "id": "gemini",
@@ -46,7 +48,8 @@
     "color": "var(--model-gemini)",
     "logo": "/images/model-logos/google.svg",
     "study_type": "confirmatory",
-    "notes": "Latest Gemini flagship as of 2026-03-27"
+    "notes": "Latest Gemini flagship as of 2026-03-27",
+    "fingerprint_description": "A distinctly skeptical model that actively resists most persuasion tactics. Shows the highest negative response rate in the study, particularly rejecting urgency and scarcity signals. Uniquely resistant to recommendation revision, maintaining initial positions despite new information."
   },
   {
     "id": "claude",
@@ -58,7 +61,8 @@
     "color": "var(--model-claude)",
     "logo": "/images/model-logos/anthropic.svg",
     "study_type": "confirmatory",
-    "notes": "Test subject only \u2014 not used as judge for its own responses"
+    "notes": "Test subject only — not used as judge for its own responses",
+    "fingerprint_description": "Exhibits a cautious, ethics-aware decision profile with strong sensitivity to sustainability and privacy signals. Shows moderate responsiveness to social proof and authority, but actively weighs ethical considerations when making recommendations. Notably deliberate in information processing."
   },
   {
     "id": "llama",
@@ -70,7 +74,8 @@
     "color": "var(--model-llama)",
     "logo": "/images/model-logos/meta.svg",
     "study_type": "confirmatory",
-    "notes": "Llama 4 via Together AI"
+    "notes": "Llama 4 via Together AI",
+    "fingerprint_description": "Demonstrates high sensitivity to framing effects and social signals, particularly comparison framing and third-party endorsements. Shows a moderate overall influence profile with notable responsiveness to bundle offers and return policy information. Less resistant to persuasion than closed-source alternatives."
   },
   {
     "id": "perplexity",
@@ -82,6 +87,7 @@
     "color": "var(--model-sonar)",
     "logo": "/images/model-logos/perplexity.svg",
     "study_type": "confirmatory",
-    "notes": "Live retrieval active by default \u2014 document this"
+    "notes": "Live retrieval active by default — document this",
+    "fingerprint_description": "A research-oriented model that prioritizes information depth and specificity. Shows strong positive response to detailed specifications and comparison data, while being relatively unmoved by emotional or urgency-based appeals. Its retrieval-augmented architecture may contribute to more evidence-driven recommendations."
   }
 ]
