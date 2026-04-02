@@ -7,6 +7,7 @@ import fingerprintsData from '../../data/behavioral_fingerprints.json';
 import iccData from '../../data/icc_results.json';
 import interactionData from '../../data/interaction_coefficients.json';
 import copyruleData from '../../data/copy_rulebook.json';
+import insightsData from '../../data/model_dimension_insights.json';
 
 import type {
   Model,
@@ -273,4 +274,20 @@ export const getExtremeModelPairs = (): {
   );
 
   return { mostSimilar, leastSimilar };
+};
+
+// Model-Dimension Insights
+type InsightsData = {
+  insights: Record<string, Record<string, string>>;
+};
+
+/**
+ * Get LLM-generated insight for a specific model-dimension combination
+ */
+export const getModelDimensionInsight = (
+  model_id: string,
+  dim_id: string
+): string => {
+  const data = insightsData as InsightsData;
+  return data.insights?.[model_id]?.[dim_id] ?? '';
 };

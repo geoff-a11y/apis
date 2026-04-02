@@ -1,6 +1,6 @@
 'use client';
 
-import { getDimensionEffectSizes, getConfirmatoryModels, getModel } from '@/lib/data';
+import { getDimensionEffectSizes, getConfirmatoryModels, getModel, getModelDimensionInsight } from '@/lib/data';
 import type { Dimension } from '@/lib/types';
 
 // Semantic pole labels for each dimension
@@ -107,18 +107,53 @@ export default function DimensionSpectrum({
             }}
           />
           {/* Model dots */}
-          {modelEffects.map((effect) => (
+          {modelEffects.map((effect) => {
+            const insight = getModelDimensionInsight(effect.model_id, dimension.id);
+            return (
             <div
               key={effect.model_id}
-              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white shadow-sm"
+              className="absolute top-1/2 group"
               style={{
                 left: `${getPosition(effect.cohen_h)}%`,
-                backgroundColor: MODEL_COLORS[effect.model_id] || '#6b7280',
                 transform: 'translate(-50%, -50%)',
               }}
-              title={`${effect.model?.name || effect.model_id}: ${effect.cohen_h.toFixed(2)}`}
-            />
-          ))}
+            >
+              <div
+                className="w-4 h-4 rounded-full border-2 border-white shadow-sm cursor-pointer transition-transform hover:scale-125"
+                style={{
+                  backgroundColor: MODEL_COLORS[effect.model_id] || '#6b7280',
+                }}
+              />
+              {/* Tooltip */}
+              <div
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-bg-elevated)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                  minWidth: '240px',
+                  maxWidth: '280px',
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: MODEL_COLORS[effect.model_id] || '#6b7280' }}
+                  />
+                  <span className="font-semibold">{effect.model?.name || effect.model_id}</span>
+                  <span className="ml-auto font-mono" style={{ color: effect.cohen_h >= 0 ? 'var(--color-green)' : 'var(--color-red)' }}>
+                    {effect.cohen_h > 0 ? '+' : ''}{effect.cohen_h.toFixed(2)}
+                  </span>
+                </div>
+                {insight && (
+                  <p className="text-[10px] leading-relaxed mt-1" style={{ color: 'var(--color-text-mid)' }}>
+                    {insight}
+                  </p>
+                )}
+              </div>
+            </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -154,7 +189,9 @@ export default function DimensionSpectrum({
         />
 
         {/* Model dots */}
-        {modelEffects.map((effect) => (
+        {modelEffects.map((effect) => {
+          const insight = getModelDimensionInsight(effect.model_id, dimension.id);
+          return (
           <div
             key={effect.model_id}
             className="absolute top-1/2 group"
@@ -170,28 +207,49 @@ export default function DimensionSpectrum({
                 backgroundColor: MODEL_COLORS[effect.model_id] || '#6b7280',
               }}
             />
-            {/* Tooltip */}
+            {/* Enhanced Tooltip */}
             <div
-              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-3 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg"
               style={{
                 backgroundColor: 'var(--color-bg-elevated)',
                 border: '1px solid var(--color-border)',
                 color: 'var(--color-text)',
-                minWidth: '160px',
+                minWidth: '280px',
+                maxWidth: '320px',
               }}
             >
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="font-medium">{effect.model?.name || effect.model_id}</span>
-                <span className="font-mono" style={{ color: effect.cohen_h >= 0 ? 'var(--color-green)' : 'var(--color-red)' }}>
-                  {effect.cohen_h > 0 ? '+' : ''}{effect.cohen_h.toFixed(2)}
+              {/* Model name header with color indicator */}
+              <div className="flex items-center gap-2 mb-2 pb-2" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                <div
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: MODEL_COLORS[effect.model_id] || '#6b7280' }}
+                />
+                <span className="font-semibold text-sm">{effect.model?.name || effect.model_id}</span>
+                <span
+                  className="ml-auto font-mono text-sm px-1.5 py-0.5 rounded"
+                  style={{
+                    backgroundColor: effect.cohen_h >= 0.2 ? 'rgba(34, 197, 94, 0.15)' : effect.cohen_h <= -0.2 ? 'rgba(239, 68, 68, 0.15)' : 'var(--color-surface-2)',
+                    color: effect.cohen_h >= 0.2 ? '#22c55e' : effect.cohen_h <= -0.2 ? '#ef4444' : 'var(--color-text-soft)'
+                  }}
+                >
+                  h={effect.cohen_h > 0 ? '+' : ''}{effect.cohen_h.toFixed(2)}
                 </span>
               </div>
-              <div className="text-[10px]" style={{ color: 'var(--color-text-soft)' }}>
-                {getPositionDescription(effect.cohen_h, poles)}
-              </div>
+              {/* Insight text */}
+              {insight && (
+                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--color-text-mid)' }}>
+                  {insight}
+                </p>
+              )}
+              {!insight && (
+                <p className="text-[11px]" style={{ color: 'var(--color-text-soft)' }}>
+                  {getPositionDescription(effect.cohen_h, poles)}
+                </p>
+              )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Scale markers */}
