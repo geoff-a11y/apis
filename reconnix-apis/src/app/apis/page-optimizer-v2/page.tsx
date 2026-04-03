@@ -889,12 +889,11 @@ function PageOptimizerV2Inner() {
                   onClick={() => setContextType('b2c')}
                   disabled={isLoading}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    contextType === 'b2c' ? 'ring-2' : 'opacity-70 hover:opacity-100'
+                    contextType === 'b2c' ? 'ring-2 ring-[var(--color-accent)]' : 'opacity-70 hover:opacity-100'
                   }`}
                   style={{
                     backgroundColor: contextType === 'b2c' ? 'var(--color-accent)' : 'var(--color-surface)',
                     color: contextType === 'b2c' ? 'white' : 'var(--color-text)',
-                    ringColor: 'var(--color-accent)',
                   }}
                 >
                   B2C Consumer
@@ -903,12 +902,11 @@ function PageOptimizerV2Inner() {
                   onClick={() => setContextType('b2b')}
                   disabled={isLoading}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    contextType === 'b2b' ? 'ring-2' : 'opacity-70 hover:opacity-100'
+                    contextType === 'b2b' ? 'ring-2 ring-[var(--color-accent)]' : 'opacity-70 hover:opacity-100'
                   }`}
                   style={{
                     backgroundColor: contextType === 'b2b' ? 'var(--color-accent)' : 'var(--color-surface)',
                     color: contextType === 'b2b' ? 'white' : 'var(--color-text)',
-                    ringColor: 'var(--color-accent)',
                   }}
                 >
                   B2B Enterprise
