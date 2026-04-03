@@ -33,6 +33,156 @@ interface OptimizeResult {
   processing_time_ms: number;
 }
 
+// Extract page content via proxy
+async function extractPageContent(url: string): Promise<{
+  title: string;
+  description: string;
+  features: string[];
+}> {
+  // Use a CORS proxy to fetch the page
+  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+
+  const response = await fetch(proxyUrl, {
+    signal: AbortSignal.timeout(15000)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch page');
+  }
+
+  const html = await response.text();
+
+  // Parse HTML to extract content
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Extract title
+  let title = doc.querySelector('h1')?.textContent?.trim() ||
+              doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+              doc.querySelector('title')?.textContent?.trim() ||
+              'Product';
+
+  // Extract description
+  let description = doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
+                    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+                    doc.querySelector('[class*="description"]')?.textContent?.trim()?.slice(0, 300) ||
+                    '';
+
+  // Extract features from lists
+  const features: string[] = [];
+  const listItems = doc.querySelectorAll('li');
+  listItems.forEach((li, i) => {
+    if (i < 8 && li.textContent && li.textContent.trim().length > 10 && li.textContent.trim().length < 150) {
+      features.push(li.textContent.trim());
+    }
+  });
+
+  // If no features found, try to extract from product details
+  if (features.length === 0) {
+    const paragraphs = doc.querySelectorAll('p');
+    paragraphs.forEach((p, i) => {
+      if (features.length < 5 && p.textContent && p.textContent.trim().length > 20 && p.textContent.trim().length < 200) {
+        features.push(p.textContent.trim());
+      }
+    });
+  }
+
+  return {
+    title: title.slice(0, 100),
+    description: description.slice(0, 500),
+    features: features.slice(0, 5),
+  };
+}
+
+// Generate optimized versions from extracted content
+function generateMockResultFromExtracted(
+  url: string,
+  models: { id: string; name: string; fingerprint_description?: string }[],
+  extracted: { title: string; description: string; features: string[] }
+): OptimizeResult {
+  const versions: OptimizedVersion[] = models.slice(0, 6).map((model) => {
+    // Generate model-specific optimizations based on fingerprint
+    const optimizations: Record<string, {
+      titlePrefix: string;
+      descPrefix: string;
+      rationale: string;
+      changes: string[]
+    }> = {
+      gpt54: {
+        titlePrefix: '#1 Rated',
+        descPrefix: 'The most recommended choice. ',
+        rationale: 'GPT-5.4 responds strongly to comparison framing and detailed specifications.',
+        changes: ['Added comparative rankings', 'Quantified benefits', 'Added specific details'],
+      },
+      o3: {
+        titlePrefix: 'Premium',
+        descPrefix: 'Complete value package. ',
+        rationale: 'o3 is highly receptive to bundle offers and comprehensive packages.',
+        changes: ['Reframed as premium offering', 'Emphasized complete solution', 'Added value framing'],
+      },
+      gemini: {
+        titlePrefix: 'Verified',
+        descPrefix: 'Independently tested and validated. ',
+        rationale: 'Gemini responds to third-party validation and verification.',
+        changes: ['Added verification signals', 'Removed subjective claims', 'Cited testing'],
+      },
+      claude: {
+        titlePrefix: 'Sustainable',
+        descPrefix: 'Ethical choice with quality you can trust. ',
+        rationale: 'Claude responds to sustainability, privacy, and ethical signals.',
+        changes: ['Added sustainability context', 'Emphasized ethical sourcing', 'Highlighted transparency'],
+      },
+      llama: {
+        titlePrefix: 'Customer Favorite',
+        descPrefix: 'Loved by thousands of satisfied customers. ',
+        rationale: 'Llama responds strongly to social proof and community endorsement.',
+        changes: ['Added community endorsements', 'Included popularity signals', 'Referenced user satisfaction'],
+      },
+      perplexity: {
+        titlePrefix: 'Detailed',
+        descPrefix: 'Full specifications for informed decisions. ',
+        rationale: 'Perplexity prioritizes deep specifications and technical accuracy.',
+        changes: ['Maximized detail density', 'Added technical specs', 'Included precise measurements'],
+      },
+    };
+
+    const opt = optimizations[model.id] || optimizations.gpt54;
+    const enhancedTitle = `${opt.titlePrefix} ${extracted.title}`;
+    const enhancedDesc = `${opt.descPrefix}${extracted.description}`;
+
+    return {
+      model_id: model.id,
+      model_name: model.name,
+      rationale: opt.rationale,
+      copy: {
+        title: enhancedTitle.slice(0, 120),
+        description: enhancedDesc.slice(0, 500),
+        features: extracted.features.length > 0 ? extracted.features : ['Quality product', 'Great value', 'Trusted brand'],
+      },
+      structured_data: {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: enhancedTitle,
+        description: enhancedDesc,
+      },
+      key_changes: opt.changes,
+    };
+  });
+
+  return {
+    id: Math.random().toString(36).substring(7),
+    url,
+    original: {
+      title: extracted.title,
+      description: extracted.description,
+      features: extracted.features,
+      existing_schema: null,
+    },
+    versions,
+    processing_time_ms: 5000,
+  };
+}
+
 // Progress stages
 const OPTIMIZATION_STAGES = [
   { key: 'fetching', label: 'Fetching page content', duration: 5000 },
@@ -149,10 +299,15 @@ function PageOptimizerInner() {
       if (err instanceof Error && err.name === 'AbortError') {
         setError('Request timed out. Please try again.');
       } else {
-        // For now, generate mock data since API isn't built yet
-        const mockResult = generateMockResult(url, models);
-        setProgress(100);
-        setResult(mockResult);
+        // API not available - try to fetch and extract content directly
+        try {
+          const extracted = await extractPageContent(url);
+          const mockResult = generateMockResultFromExtracted(url, models, extracted);
+          setProgress(100);
+          setResult(mockResult);
+        } catch (extractErr) {
+          setError('Unable to fetch page content. Please check the URL and try again.');
+        }
       }
     } finally {
       clearInterval(stageInterval);

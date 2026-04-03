@@ -9,12 +9,10 @@ const navLinks = [
   { href: '/models', label: 'Models' },
   { href: '/fingerprints', label: 'Fingerprints' },
   { href: '/dimensions', label: 'Dimensions' },
-  { href: '/compare', label: 'Compare' },
-  { href: '/score', label: 'ML Score' },
-  { href: '/apis/benchmarks', label: 'Benchmarks' },
+  { href: '/score', label: 'Page Assessment' },
+  { href: '/apis/benchmarks', label: 'Page Benchmarks' },
   { href: '/apis/pricing', label: 'Pricing Study' },
-  { href: '/apis/page-optimizer', label: 'Page Optimizer' },
-  { href: '/research', label: 'Research' },
+  { href: '/apis/page-optimizer-v2', label: 'Page Optimizer' },
 ];
 
 export function TopNav() {
