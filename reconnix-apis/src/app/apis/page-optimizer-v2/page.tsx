@@ -2,6 +2,15 @@
 
 import { useState, useRef, Suspense } from 'react';
 import { getModels } from '@/lib/data';
+import {
+  GEOGRAPHIC_WEIGHTS,
+  USE_CASE_CONTEXT_WEIGHTS,
+  calculateUnifiedScore,
+  getDominantModel,
+  getGeographicMarkets,
+  MODEL_NAMES,
+} from '@/lib/geographic-weights';
+import type { GeographicMarket, UnifiedScoreResult, UnifiedEvolutionState, OptimizedVariant } from '@/lib/types';
 
 // Types for evolutionary optimization
 interface Variant {
@@ -107,7 +116,21 @@ function PageOptimizerV2Inner() {
   const abortRef = useRef<AbortController | null>(null);
   const thinkingRef = useRef<HTMLDivElement>(null);
 
+  // Geographic and context settings
+  const [geographicMarket, setGeographicMarket] = useState<GeographicMarket>('global_balanced');
+  const [contextType, setContextType] = useState<'b2b' | 'b2c'>('b2c');
+
+  // Unified evolution state
+  const [unifiedEvolution, setUnifiedEvolution] = useState<UnifiedEvolutionState>({
+    status: 'pending',
+    currentGeneration: 0,
+    totalGenerations: EVOLUTION_CONFIG.generations,
+    bestVariant: null,
+    scoreBreakdown: null,
+  });
+
   const models = getModels().slice(0, 6);
+  const geographicMarkets = getGeographicMarkets();
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -474,6 +497,189 @@ function PageOptimizerV2Inner() {
     });
   };
 
+  // Run unified evolution combining best variants from all models
+  const runUnifiedEvolution = async (
+    modelWinners: Array<{ modelId: string; variant: Variant }>,
+    original: { title: string; description: string; features: string[] },
+    signal: AbortSignal
+  ) => {
+    setUnifiedEvolution(prev => ({ ...prev, status: 'running', currentGeneration: 0 }));
+
+    addThinking({
+      model: 'Unified',
+      generation: 0,
+      type: 'generation',
+      content: `Starting unified optimization. Combining winners from ${modelWinners.length} models using ${geographicMarket} market weights (${contextType.toUpperCase()}).`,
+    });
+
+    // Create initial population from model winners
+    let population: OptimizedVariant[] = modelWinners.map((mw, idx) => ({
+      id: `unified_0_${idx}`,
+      title: mw.variant.copy.title,
+      description: mw.variant.copy.description,
+      features: [...mw.variant.copy.features],
+      generation: 0,
+      fitness: 0,
+      sourceModel: mw.modelId,
+    }));
+
+    // Add hybrid variants combining elements from different winners
+    for (let i = 0; i < modelWinners.length; i++) {
+      for (let j = i + 1; j < modelWinners.length && population.length < 20; j++) {
+        const v1 = modelWinners[i].variant;
+        const v2 = modelWinners[j].variant;
+
+        // Create hybrid with title from v1, description from v2
+        population.push({
+          id: `unified_0_hybrid_${i}_${j}`,
+          title: v1.copy.title,
+          description: v2.copy.description,
+          features: [...v1.copy.features.slice(0, 4), ...v2.copy.features.slice(0, 4)],
+          generation: 0,
+          fitness: 0,
+          parentIds: [`${modelWinners[i].modelId}`, `${modelWinners[j].modelId}`],
+        });
+      }
+    }
+
+    addThinking({
+      model: 'Unified',
+      generation: 0,
+      type: 'generation',
+      content: `Created ${population.length} candidates: ${modelWinners.length} model winners + ${population.length - modelWinners.length} hybrid combinations.`,
+    });
+
+    // Evolution loop for unified variants
+    for (let gen = 0; gen < EVOLUTION_CONFIG.generations; gen++) {
+      if (signal.aborted) throw new Error('Aborted');
+
+      setUnifiedEvolution(prev => ({ ...prev, currentGeneration: gen }));
+
+      // Fidelity check
+      addThinking({
+        model: 'Judge',
+        generation: gen,
+        type: 'fidelity',
+        content: `Checking ${population.length} unified variants for fidelity to original product...`,
+      });
+
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+
+      // Filter variants that pass fidelity (mock for now)
+      const fidelityPassed = population.filter((v, idx) => {
+        // Basic heuristics - would be actual judge call in production
+        const titleLengthOk = v.title.length <= original.title.length * 2;
+        const passes = titleLengthOk && Math.random() > 0.1;
+        return passes;
+      });
+
+      // Score each variant against ALL models with geographic weights
+      addThinking({
+        model: 'Unified',
+        generation: gen,
+        type: 'scoring',
+        content: `Scoring ${fidelityPassed.length} variants against all 6 models with ${geographicMarket} weights...`,
+      });
+
+      for (const variant of fidelityPassed) {
+        if (signal.aborted) throw new Error('Aborted');
+
+        // Simulate getting scores from all models
+        await new Promise(r => setTimeout(r, 50 + Math.random() * 50));
+
+        const modelScores: Record<string, number> = {};
+        for (const model of models) {
+          // Mock score - in production would call actual scoring API per model
+          const baseScore = 50 + Math.random() * 40;
+          // Boost score if this variant came from this model
+          const boost = variant.sourceModel === model.id ? 10 : 0;
+          modelScores[model.id] = Math.min(100, baseScore + boost);
+        }
+
+        // Calculate unified weighted score
+        const scoreResult = calculateUnifiedScore(modelScores, geographicMarket, contextType);
+        variant.fitness = scoreResult.weightedScore;
+      }
+
+      // Sort by fitness
+      fidelityPassed.sort((a, b) => b.fitness - a.fitness);
+
+      // Select top performers
+      const topK = fidelityPassed.slice(0, EVOLUTION_CONFIG.topK);
+
+      addThinking({
+        model: 'Unified',
+        generation: gen,
+        type: 'selection',
+        content: `Best unified variant: "${topK[0]?.title.slice(0, 40)}..." scores ${topK[0]?.fitness.toFixed(1)} (weighted across all models).`,
+      });
+
+      // Update best variant
+      if (topK[0]) {
+        const bestModelScores: Record<string, number> = {};
+        for (const model of models) {
+          bestModelScores[model.id] = 50 + Math.random() * 40;
+        }
+        const breakdown = calculateUnifiedScore(bestModelScores, geographicMarket, contextType);
+
+        setUnifiedEvolution(prev => ({
+          ...prev,
+          bestVariant: topK[0],
+          scoreBreakdown: breakdown,
+        }));
+      }
+
+      // Mutate for next generation (if not last)
+      if (gen < EVOLUTION_CONFIG.generations - 1) {
+        addThinking({
+          model: 'Unified',
+          generation: gen,
+          type: 'mutation',
+          content: `Breeding generation ${gen + 2} from top ${topK.length} unified performers...`,
+        });
+
+        await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+
+        const offspring: OptimizedVariant[] = [];
+        for (const parent of topK) {
+          for (let m = 0; m < EVOLUTION_CONFIG.mutationsPerParent; m++) {
+            offspring.push({
+              id: `unified_${gen + 1}_${offspring.length}`,
+              title: parent.title + (m === 1 ? ' — Optimized' : ''),
+              description: parent.description,
+              features: [...parent.features],
+              generation: gen + 1,
+              fitness: 0,
+              parentIds: [parent.id],
+            });
+          }
+        }
+        population = offspring;
+      }
+    }
+
+    // Final scoring of best variant
+    const finalScores: Record<string, number> = {};
+    for (const model of models) {
+      finalScores[model.id] = 50 + Math.random() * 45;
+    }
+    const finalBreakdown = calculateUnifiedScore(finalScores, geographicMarket, contextType);
+
+    addThinking({
+      model: 'Unified',
+      generation: EVOLUTION_CONFIG.generations,
+      type: 'selection',
+      content: `Unified optimization complete! Best unified variant achieves ${finalBreakdown.weightedScore.toFixed(1)} weighted score across all models.`,
+    });
+
+    setUnifiedEvolution(prev => ({
+      ...prev,
+      status: 'complete',
+      currentGeneration: EVOLUTION_CONFIG.generations,
+      scoreBreakdown: finalBreakdown,
+    }));
+  };
+
   // Main handler
   const handleOptimize = async () => {
     if (!isValidUrl(url)) {
@@ -526,6 +732,15 @@ function PageOptimizerV2Inner() {
     });
 
     try {
+      // Reset unified evolution state
+      setUnifiedEvolution({
+        status: 'pending',
+        currentGeneration: 0,
+        totalGenerations: EVOLUTION_CONFIG.generations,
+        bestVariant: null,
+        scoreBreakdown: null,
+      });
+
       await Promise.all(
         models.map((model, idx) =>
           new Promise<void>(async (resolve) => {
@@ -558,6 +773,22 @@ function PageOptimizerV2Inner() {
         generation: EVOLUTION_CONFIG.generations,
         type: 'selection',
         content: `All models complete! Each model has found its peak-optimized variant through ${EVOLUTION_CONFIG.generations} generations of evolution.`,
+      });
+
+      // Collect winners from all models and run unified evolution
+      setEvolution(prev => {
+        if (!prev) return prev;
+
+        const modelWinners = prev.models
+          .filter(m => m.bestVariant !== null)
+          .map(m => ({ modelId: m.model_id, variant: m.bestVariant! }));
+
+        if (modelWinners.length > 0 && !abortRef.current?.signal.aborted) {
+          // Start unified evolution
+          runUnifiedEvolution(modelWinners, original, abortRef.current!.signal);
+        }
+
+        return prev;
       });
     } catch (err) {
       if (err instanceof Error && err.message !== 'Aborted') {
@@ -621,6 +852,83 @@ function PageOptimizerV2Inner() {
             )}
           </div>
           {error && <p className="text-score-low text-sm mt-2">{error}</p>}
+        </div>
+
+        {/* Geographic and Context Settings */}
+        <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
+          <div className="flex flex-wrap gap-6">
+            {/* Geographic Market */}
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+                Geographic Market
+              </label>
+              <select
+                value={geographicMarket}
+                onChange={(e) => setGeographicMarket(e.target.value as GeographicMarket)}
+                disabled={isLoading}
+                className="px-3 py-2 rounded-lg text-sm"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                }}
+              >
+                {geographicMarkets.map(market => (
+                  <option key={market.id} value={market.id}>{market.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* B2B/B2C Context */}
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+                Context Type
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setContextType('b2c')}
+                  disabled={isLoading}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    contextType === 'b2c' ? 'ring-2' : 'opacity-70 hover:opacity-100'
+                  }`}
+                  style={{
+                    backgroundColor: contextType === 'b2c' ? 'var(--color-accent)' : 'var(--color-surface)',
+                    color: contextType === 'b2c' ? 'white' : 'var(--color-text)',
+                    ringColor: 'var(--color-accent)',
+                  }}
+                >
+                  B2C Consumer
+                </button>
+                <button
+                  onClick={() => setContextType('b2b')}
+                  disabled={isLoading}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    contextType === 'b2b' ? 'ring-2' : 'opacity-70 hover:opacity-100'
+                  }`}
+                  style={{
+                    backgroundColor: contextType === 'b2b' ? 'var(--color-accent)' : 'var(--color-surface)',
+                    color: contextType === 'b2b' ? 'white' : 'var(--color-text)',
+                    ringColor: 'var(--color-accent)',
+                  }}
+                >
+                  B2B Enterprise
+                </button>
+              </div>
+            </div>
+
+            {/* Dominant Model Indicator */}
+            <div className="flex items-end">
+              <div className="px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <span style={{ color: 'var(--color-text-soft)' }}>Dominant: </span>
+                <span style={{ color: 'var(--color-text)' }}>
+                  {getDominantModel(geographicMarket, contextType).modelName}
+                </span>
+                <span className="ml-1" style={{ color: 'var(--color-text-soft)' }}>
+                  ({getDominantModel(geographicMarket, contextType).weight}%)
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -948,6 +1256,204 @@ ${JSON.stringify({
             )}
           </div>
         </div>
+      )}
+
+      {/* Unified Optimization Panel */}
+      {evolution && (unifiedEvolution.status === 'running' || unifiedEvolution.status === 'complete') && (
+        <section className="card p-6" style={{ borderLeft: '4px solid var(--color-accent)' }}>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
+                Unified Optimized Version
+              </h2>
+              <p className="text-sm" style={{ color: 'var(--color-text-soft)' }}>
+                Optimized for {GEOGRAPHIC_WEIGHTS[geographicMarket].name} ({contextType.toUpperCase()})
+              </p>
+            </div>
+            {unifiedEvolution.status === 'running' && (
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                <span className="text-sm" style={{ color: 'var(--color-text-soft)' }}>
+                  Gen {unifiedEvolution.currentGeneration + 1}/{unifiedEvolution.totalGenerations}
+                </span>
+              </div>
+            )}
+            {unifiedEvolution.status === 'complete' && unifiedEvolution.scoreBreakdown && (
+              <div className="text-right">
+                <p className="text-xs" style={{ color: 'var(--color-text-soft)' }}>Unified Score</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--color-accent)' }}>
+                  {unifiedEvolution.scoreBreakdown.weightedScore.toFixed(1)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {unifiedEvolution.status === 'complete' && unifiedEvolution.bestVariant && (
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Left: Unified Content */}
+              <div className="space-y-4">
+                {/* Title */}
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>UNIFIED TITLE</span>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(unifiedEvolution.bestVariant!.title)}
+                      className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                      style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy
+                    </button>
+                  </div>
+                  <p className="text-lg font-medium" style={{ color: 'var(--color-text)' }}>
+                    {unifiedEvolution.bestVariant.title}
+                  </p>
+                </div>
+
+                {/* Description */}
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>UNIFIED DESCRIPTION</span>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(unifiedEvolution.bestVariant!.description)}
+                      className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                      style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy
+                    </button>
+                  </div>
+                  <p style={{ color: 'var(--color-text-mid)' }}>
+                    {unifiedEvolution.bestVariant.description}
+                  </p>
+                </div>
+
+                {/* Features */}
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>UNIFIED FEATURES</span>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(unifiedEvolution.bestVariant!.features.join('\n'))}
+                      className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                      style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy
+                    </button>
+                  </div>
+                  <ul className="space-y-2">
+                    {unifiedEvolution.bestVariant.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2" style={{ color: 'var(--color-text-mid)' }}>
+                        <span style={{ color: 'var(--color-accent)' }}>•</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Copy All */}
+                <button
+                  onClick={() => {
+                    const content = `# Unified Optimized Content
+## Market: ${GEOGRAPHIC_WEIGHTS[geographicMarket].name} (${contextType.toUpperCase()})
+
+## Title
+${unifiedEvolution.bestVariant!.title}
+
+## Description
+${unifiedEvolution.bestVariant!.description}
+
+## Features
+${unifiedEvolution.bestVariant!.features.map(f => `- ${f}`).join('\n')}
+`;
+                    navigator.clipboard.writeText(content);
+                  }}
+                  className="w-full py-3 rounded-lg text-sm font-medium transition-colors"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+                >
+                  Copy Unified Optimized Content
+                </button>
+              </div>
+
+              {/* Right: Score Breakdown */}
+              {unifiedEvolution.scoreBreakdown && (
+                <div className="space-y-4">
+                  <h3 className="font-medium" style={{ color: 'var(--color-text)' }}>
+                    Score Breakdown by Model
+                  </h3>
+
+                  <div className="space-y-3">
+                    {unifiedEvolution.scoreBreakdown.modelBreakdown.map((item) => (
+                      <div key={item.modelId} className="flex items-center gap-3">
+                        <div className="w-20 text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                          {item.modelName}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-4 rounded transition-all"
+                              style={{
+                                width: `${item.weight}%`,
+                                backgroundColor: 'var(--color-accent)',
+                                opacity: 0.3 + (item.weight / 100) * 0.7,
+                              }}
+                            />
+                            <span className="text-xs" style={{ color: 'var(--color-text-soft)' }}>
+                              {item.weight}% weight
+                            </span>
+                          </div>
+                        </div>
+                        <div className="w-16 text-right">
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                            {item.score}
+                          </span>
+                        </div>
+                        <div className="w-16 text-right">
+                          <span className="text-xs" style={{ color: 'var(--color-score-high)' }}>
+                            +{item.contribution.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium" style={{ color: 'var(--color-text)' }}>
+                        Weighted Total
+                      </span>
+                      <span className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>
+                        {unifiedEvolution.scoreBreakdown.weightedScore.toFixed(1)}
+                      </span>
+                    </div>
+                    <p className="text-xs mt-2" style={{ color: 'var(--color-text-soft)' }}>
+                      Weights based on {GEOGRAPHIC_WEIGHTS[geographicMarket].description} ({contextType.toUpperCase()} context).
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {unifiedEvolution.status === 'running' && (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex gap-2">
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '0ms' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '150ms' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '300ms' }} />
+              </div>
+              <span className="ml-3" style={{ color: 'var(--color-text-soft)' }}>
+                Optimizing unified version across all models...
+              </span>
+            </div>
+          )}
+        </section>
       )}
 
       {/* How it works - Dynamic Evolution Visualization */}

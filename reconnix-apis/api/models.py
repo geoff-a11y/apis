@@ -177,3 +177,49 @@ class ScrapeResponse(BaseModel):
     description: str = Field(..., description="Page description/meta description")
     features: List[str] = Field(..., description="Extracted features/bullet points")
     success: bool = Field(..., description="Whether scraping was successful")
+
+
+# === Enhanced Scrape Models (Dynamic Page Structure) ===
+
+ContentBlockType = Literal[
+    "headline", "subheadline", "paragraph", "list",
+    "table", "spec_table", "pricing", "testimonial",
+    "faq", "image_caption", "cta", "badge", "stat"
+]
+
+PageType = Literal["product", "service", "saas", "landing", "unknown"]
+PageContext = Literal["b2b", "b2c", "mixed"]
+ExtractionQuality = Literal["full", "partial", "minimal"]
+
+
+class ContentBlock(BaseModel):
+    """A single content block with type and content, preserving page structure"""
+    block_type: ContentBlockType = Field(..., description="Type of content block")
+    level: Optional[int] = Field(None, ge=1, le=6, description="Hierarchy level for headlines (1=h1, 2=h2, etc.)")
+    content: str = Field(..., description="Text content of the block")
+    children: Optional[List["ContentBlock"]] = Field(None, description="Nested content blocks")
+    metadata: Optional[Dict[str, any]] = Field(None, description="Additional structured data (e.g., table headers/rows, prices)")
+
+
+class PageStructure(BaseModel):
+    """Full page structure preserving semantic hierarchy"""
+    url: str = Field(..., description="Source URL")
+    title: str = Field(..., description="Page title")
+    meta_description: Optional[str] = Field(None, description="Meta description tag content")
+    og_data: Optional[Dict[str, str]] = Field(None, description="OpenGraph data (og:title, og:description, og:image)")
+    schema_org: Optional[Dict[str, any]] = Field(None, description="JSON-LD Schema.org structured data if present")
+    content_blocks: List[ContentBlock] = Field(..., description="Ordered list of content blocks preserving page structure")
+    detected_page_type: PageType = Field(..., description="Auto-detected page type")
+    detected_context: PageContext = Field(..., description="Auto-detected B2B/B2C context")
+    extraction_quality: ExtractionQuality = Field(..., description="Quality of extraction (full/partial/minimal)")
+
+
+class EnhancedScrapeResponse(BaseModel):
+    """Enhanced scrape response with full page structure"""
+    # Legacy fields for backward compatibility
+    title: str = Field(..., description="Page title")
+    description: str = Field(..., description="Page description")
+    features: List[str] = Field(..., description="Extracted features (legacy)")
+    success: bool = Field(..., description="Whether scraping was successful")
+    # Enhanced fields
+    structure: Optional[PageStructure] = Field(None, description="Full page structure with all content blocks")

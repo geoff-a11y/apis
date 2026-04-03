@@ -612,3 +612,575 @@ def fetch_html(url: str, timeout: int = 30000) -> Tuple[str, str]:
     # All methods failed
     error_summary = "; ".join(errors)
     raise ValueError(f"Failed to fetch HTML with all methods. Errors: {error_summary}")
+
+
+# ============================================================================
+# Enhanced Page Structure Extraction
+# ============================================================================
+
+import json
+import re
+from typing import List, Dict, Any, Optional
+from models import (
+    ContentBlock, PageStructure, EnhancedScrapeResponse,
+    ContentBlockType, PageType, PageContext, ExtractionQuality
+)
+
+
+# B2B indicator keywords
+B2B_KEYWORDS = [
+    'enterprise', 'business', 'corporate', 'b2b', 'saas', 'platform',
+    'solution', 'workflow', 'integration', 'api', 'dashboard', 'analytics',
+    'team', 'organization', 'company', 'roi', 'compliance', 'scalable',
+    'deployment', 'infrastructure', 'procurement', 'vendor', 'stakeholder',
+    'demo', 'pilot', 'contract', 'sla', 'support plan', 'onboarding',
+]
+
+# B2C indicator keywords
+B2C_KEYWORDS = [
+    'buy now', 'add to cart', 'shop', 'order', 'checkout', 'shipping',
+    'free delivery', 'returns', 'warranty', 'gift', 'deal', 'sale',
+    'discount', 'coupon', 'save', 'personal', 'family', 'home',
+    'everyday', 'lifestyle', 'easy', 'simple', 'fast', 'instant',
+    'try', 'love', 'enjoy', 'perfect for', 'great for',
+]
+
+
+def detect_page_type(soup: BeautifulSoup, schema_data: Optional[Dict]) -> PageType:
+    """Detect page type from schema.org data and content patterns."""
+    # Check schema.org first
+    if schema_data:
+        schema_type = schema_data.get('@type', '').lower()
+        if 'product' in schema_type:
+            return 'product'
+        if 'service' in schema_type:
+            return 'service'
+        if 'softwareapplication' in schema_type:
+            return 'saas'
+
+    # Check for pricing patterns (SaaS indicator)
+    text = soup.get_text().lower()
+    if any(p in text for p in ['per month', '/mo', 'per user', 'monthly', 'annually', 'pricing plans', 'free trial']):
+        if any(p in text for p in ['enterprise', 'team', 'business plan', 'pro plan']):
+            return 'saas'
+
+    # Check for product indicators
+    if any(p in text for p in ['add to cart', 'buy now', 'in stock', 'ships', 'delivery']):
+        return 'product'
+
+    # Check for service indicators
+    if any(p in text for p in ['book now', 'schedule', 'consultation', 'our services', 'we offer']):
+        return 'service'
+
+    # Check meta tags
+    og_type = soup.find('meta', property='og:type')
+    if og_type:
+        og_value = og_type.get('content', '').lower()
+        if 'product' in og_value:
+            return 'product'
+
+    return 'landing'
+
+
+def detect_context(soup: BeautifulSoup) -> PageContext:
+    """Detect B2B vs B2C context from content patterns."""
+    text = soup.get_text().lower()
+
+    b2b_score = sum(1 for kw in B2B_KEYWORDS if kw in text)
+    b2c_score = sum(1 for kw in B2C_KEYWORDS if kw in text)
+
+    if b2b_score > b2c_score * 1.5:
+        return 'b2b'
+    elif b2c_score > b2b_score * 1.5:
+        return 'b2c'
+    else:
+        return 'mixed'
+
+
+def extract_schema_org(soup: BeautifulSoup) -> Optional[Dict[str, Any]]:
+    """Extract JSON-LD Schema.org data if present."""
+    scripts = soup.find_all('script', type='application/ld+json')
+
+    for script in scripts:
+        try:
+            data = json.loads(script.string)
+            # Handle arrays of schemas
+            if isinstance(data, list):
+                # Find most relevant (Product, Service, etc.)
+                for item in data:
+                    if isinstance(item, dict) and item.get('@type') in [
+                        'Product', 'Service', 'SoftwareApplication', 'Organization'
+                    ]:
+                        return item
+                return data[0] if data else None
+            return data
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+    return None
+
+
+def extract_og_data(soup: BeautifulSoup) -> Optional[Dict[str, str]]:
+    """Extract OpenGraph meta tags."""
+    og_data = {}
+
+    og_tags = ['og:title', 'og:description', 'og:image', 'og:type', 'og:url']
+    for tag in og_tags:
+        meta = soup.find('meta', property=tag)
+        if meta and meta.get('content'):
+            og_data[tag.replace('og:', '')] = meta['content']
+
+    return og_data if og_data else None
+
+
+def is_testimonial(element) -> bool:
+    """Check if element looks like a testimonial."""
+    classes = ' '.join(element.get('class', [])).lower()
+    element_id = (element.get('id') or '').lower()
+
+    testimonial_patterns = ['testimonial', 'review', 'quote', 'customer-', 'client-']
+    if any(p in classes or p in element_id for p in testimonial_patterns):
+        return True
+
+    # Check for blockquote with attribution
+    if element.name == 'blockquote':
+        return True
+
+    return False
+
+
+def is_faq(element) -> bool:
+    """Check if element looks like an FAQ."""
+    classes = ' '.join(element.get('class', [])).lower()
+    element_id = (element.get('id') or '').lower()
+
+    faq_patterns = ['faq', 'accordion', 'question', 'q-and-a', 'qanda']
+    if any(p in classes or p in element_id for p in faq_patterns):
+        return True
+
+    # Check for details/summary pattern
+    if element.name == 'details':
+        return True
+
+    return False
+
+
+def is_pricing(element) -> bool:
+    """Check if element looks like pricing content."""
+    classes = ' '.join(element.get('class', [])).lower()
+    element_id = (element.get('id') or '').lower()
+
+    pricing_patterns = ['pricing', 'price', 'plan', 'tier', 'package']
+    if any(p in classes or p in element_id for p in pricing_patterns):
+        return True
+
+    # Check for currency patterns in text
+    text = element.get_text()
+    if re.search(r'[$€£]\s*\d+', text):
+        return True
+
+    return False
+
+
+def is_stat(element) -> bool:
+    """Check if element looks like a stat/metric."""
+    classes = ' '.join(element.get('class', [])).lower()
+
+    stat_patterns = ['stat', 'metric', 'number', 'counter', 'achievement']
+    if any(p in classes for p in stat_patterns):
+        return True
+
+    # Check for large number patterns
+    text = element.get_text().strip()
+    if re.match(r'^[\d,]+[+%]?$', text) or re.match(r'^\d+[KMB]\+?', text):
+        return True
+
+    return False
+
+
+def extract_table_metadata(table) -> Dict[str, Any]:
+    """Extract table structure with headers and rows."""
+    metadata = {'headers': [], 'rows': []}
+
+    # Extract headers
+    thead = table.find('thead')
+    if thead:
+        header_row = thead.find('tr')
+        if header_row:
+            metadata['headers'] = [th.get_text(strip=True) for th in header_row.find_all(['th', 'td'])]
+    else:
+        # Try first row as header
+        first_row = table.find('tr')
+        if first_row and first_row.find('th'):
+            metadata['headers'] = [th.get_text(strip=True) for th in first_row.find_all('th')]
+
+    # Extract rows (limit to first 10 for size)
+    tbody = table.find('tbody') or table
+    rows = tbody.find_all('tr')[:10]
+    for row in rows:
+        cells = [td.get_text(strip=True) for td in row.find_all(['td', 'th'])]
+        if cells and cells != metadata['headers']:
+            metadata['rows'].append(cells)
+
+    return metadata
+
+
+def classify_table(table) -> ContentBlockType:
+    """Classify table as regular table or spec_table."""
+    # Check class names
+    classes = ' '.join(table.get('class', [])).lower()
+    if any(p in classes for p in ['spec', 'specification', 'feature', 'comparison', 'compare']):
+        return 'spec_table'
+
+    # Check if it's a two-column key-value table (common for specs)
+    rows = table.find_all('tr')
+    if rows:
+        cells_per_row = [len(row.find_all(['td', 'th'])) for row in rows[:5]]
+        if cells_per_row and all(c == 2 for c in cells_per_row):
+            return 'spec_table'
+
+    return 'table'
+
+
+def extract_content_blocks(soup: BeautifulSoup) -> List[ContentBlock]:
+    """
+    Walk DOM tree and extract content blocks preserving structure.
+
+    Extracts: headlines, paragraphs, lists, tables, testimonials, FAQs,
+    pricing blocks, stats, CTAs, and badges.
+    """
+    blocks = []
+
+    # Find main content area (try common selectors)
+    main_content = (
+        soup.find('main') or
+        soup.find('article') or
+        soup.find(id='content') or
+        soup.find(class_='content') or
+        soup.find(id='main') or
+        soup.find(class_='main') or
+        soup.body or
+        soup
+    )
+
+    if not main_content:
+        return blocks
+
+    # Remove unwanted elements
+    for element in main_content.find_all([
+        'script', 'style', 'nav', 'header', 'footer', 'aside',
+        'noscript', 'iframe', 'form', 'select', 'input', 'textarea'
+    ]):
+        element.decompose()
+
+    # Remove by class patterns
+    for element in main_content.find_all(class_=lambda x: x and any(
+        p in str(x).lower() for p in [
+            'cookie', 'modal', 'popup', 'banner', 'nav', 'menu',
+            'sidebar', 'footer', 'header', 'social', 'share'
+        ]
+    )):
+        element.decompose()
+
+    def process_element(element, depth=0) -> Optional[ContentBlock]:
+        """Process a single element into a ContentBlock."""
+        if element.name is None:
+            return None
+
+        # Skip already-decomposed elements
+        if not hasattr(element, 'name'):
+            return None
+
+        # Headlines (h1-h6)
+        if element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+            text = element.get_text(strip=True)
+            if text and len(text) > 2:
+                level = int(element.name[1])
+                block_type = 'headline' if level <= 2 else 'subheadline'
+                return ContentBlock(
+                    block_type=block_type,
+                    level=level,
+                    content=text[:500]  # Cap length
+                )
+
+        # Paragraphs
+        if element.name == 'p':
+            text = element.get_text(strip=True)
+            if text and len(text) > 10:
+                return ContentBlock(
+                    block_type='paragraph',
+                    content=text[:2000]
+                )
+
+        # Lists
+        if element.name in ['ul', 'ol']:
+            items = []
+            for li in element.find_all('li', recursive=False):
+                text = li.get_text(strip=True)
+                if text:
+                    items.append(text[:500])
+
+            if items:
+                return ContentBlock(
+                    block_type='list',
+                    content='\n'.join(f'• {item}' for item in items[:20]),
+                    metadata={'items': items[:20], 'ordered': element.name == 'ol'}
+                )
+
+        # Tables
+        if element.name == 'table':
+            table_type = classify_table(element)
+            metadata = extract_table_metadata(element)
+            if metadata['rows']:
+                # Create text summary of table
+                content_parts = []
+                if metadata['headers']:
+                    content_parts.append(' | '.join(metadata['headers']))
+                for row in metadata['rows'][:5]:
+                    content_parts.append(' | '.join(row))
+
+                return ContentBlock(
+                    block_type=table_type,
+                    content='\n'.join(content_parts),
+                    metadata=metadata
+                )
+
+        # Blockquotes (often testimonials)
+        if element.name == 'blockquote':
+            text = element.get_text(strip=True)
+            if text:
+                return ContentBlock(
+                    block_type='testimonial',
+                    content=text[:1000]
+                )
+
+        # Details/Summary (FAQs)
+        if element.name == 'details':
+            summary = element.find('summary')
+            question = summary.get_text(strip=True) if summary else ''
+            # Get answer (rest of content)
+            answer_parts = [child.get_text(strip=True) for child in element.children
+                           if child.name != 'summary' and hasattr(child, 'get_text')]
+            answer = ' '.join(answer_parts)
+
+            if question:
+                return ContentBlock(
+                    block_type='faq',
+                    content=f"Q: {question}\nA: {answer[:500]}",
+                    metadata={'question': question, 'answer': answer[:500]}
+                )
+
+        # Figure with caption
+        if element.name == 'figure':
+            caption = element.find('figcaption')
+            if caption:
+                return ContentBlock(
+                    block_type='image_caption',
+                    content=caption.get_text(strip=True)[:300]
+                )
+
+        # Check for special div types
+        if element.name == 'div':
+            # Testimonials
+            if is_testimonial(element):
+                text = element.get_text(strip=True)
+                if text and len(text) > 20:
+                    return ContentBlock(
+                        block_type='testimonial',
+                        content=text[:1000]
+                    )
+
+            # FAQs
+            if is_faq(element):
+                text = element.get_text(strip=True)
+                if text:
+                    return ContentBlock(
+                        block_type='faq',
+                        content=text[:1000]
+                    )
+
+            # Pricing
+            if is_pricing(element):
+                text = element.get_text(strip=True)
+                if text:
+                    # Try to extract price
+                    price_match = re.search(r'[$€£]\s*[\d,]+(?:\.\d{2})?', text)
+                    return ContentBlock(
+                        block_type='pricing',
+                        content=text[:1000],
+                        metadata={'price': price_match.group() if price_match else None}
+                    )
+
+            # Stats
+            if is_stat(element):
+                text = element.get_text(strip=True)
+                if text:
+                    return ContentBlock(
+                        block_type='stat',
+                        content=text[:200]
+                    )
+
+        # Buttons and CTAs
+        if element.name in ['button', 'a']:
+            classes = ' '.join(element.get('class', [])).lower()
+            if any(p in classes for p in ['cta', 'btn-primary', 'button-primary', 'action']):
+                text = element.get_text(strip=True)
+                if text and len(text) < 50:
+                    return ContentBlock(
+                        block_type='cta',
+                        content=text
+                    )
+
+        return None
+
+    # Walk through relevant elements
+    seen_content = set()
+
+    for element in main_content.find_all([
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'p', 'ul', 'ol', 'table', 'blockquote',
+        'details', 'figure', 'div', 'button', 'a'
+    ]):
+        # Skip nested elements we'll process separately
+        if element.find_parent(['ul', 'ol', 'table', 'blockquote', 'details', 'figure']):
+            if element.name not in ['li', 'tr', 'td', 'th', 'summary', 'figcaption']:
+                continue
+
+        block = process_element(element)
+        if block:
+            # Deduplicate by content hash
+            content_hash = hash(block.content[:100])
+            if content_hash not in seen_content:
+                seen_content.add(content_hash)
+                blocks.append(block)
+
+    return blocks
+
+
+def determine_extraction_quality(blocks: List[ContentBlock]) -> ExtractionQuality:
+    """Determine quality of extraction based on content found."""
+    if not blocks:
+        return 'minimal'
+
+    # Count meaningful blocks
+    headlines = sum(1 for b in blocks if b.block_type in ['headline', 'subheadline'])
+    paragraphs = sum(1 for b in blocks if b.block_type == 'paragraph')
+    lists = sum(1 for b in blocks if b.block_type == 'list')
+    total_content_length = sum(len(b.content) for b in blocks)
+
+    # Full extraction: multiple headlines, paragraphs, and good content length
+    if headlines >= 2 and paragraphs >= 3 and total_content_length > 1000:
+        return 'full'
+
+    # Partial: some structure found
+    if (headlines >= 1 or paragraphs >= 2) and total_content_length > 300:
+        return 'partial'
+
+    return 'minimal'
+
+
+def extract_page_structure(url: str, html: str) -> PageStructure:
+    """
+    Extract full page structure from HTML.
+
+    Walks the DOM tree and extracts all semantic content blocks while
+    preserving hierarchy and detecting page type and B2B/B2C context.
+
+    Args:
+        url: Source URL
+        html: Raw HTML content
+
+    Returns:
+        PageStructure with all extracted content blocks
+    """
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Extract metadata
+    title = soup.title.string.strip() if soup.title and soup.title.string else ''
+
+    meta_desc = None
+    meta_tag = soup.find('meta', attrs={'name': 'description'})
+    if meta_tag and meta_tag.get('content'):
+        meta_desc = meta_tag['content']
+
+    og_data = extract_og_data(soup)
+    schema_org = extract_schema_org(soup)
+
+    # Extract content blocks
+    content_blocks = extract_content_blocks(soup)
+
+    # Detect page type and context
+    page_type = detect_page_type(soup, schema_org)
+    context = detect_context(soup)
+
+    # Determine extraction quality
+    quality = determine_extraction_quality(content_blocks)
+
+    return PageStructure(
+        url=url,
+        title=title[:500],
+        meta_description=meta_desc[:1000] if meta_desc else None,
+        og_data=og_data,
+        schema_org=schema_org,
+        content_blocks=content_blocks,
+        detected_page_type=page_type,
+        detected_context=context,
+        extraction_quality=quality
+    )
+
+
+def scrape_enhanced(url: str, timeout: int = 30000) -> EnhancedScrapeResponse:
+    """
+    Scrape URL and return enhanced response with full page structure.
+
+    Maintains backward compatibility with legacy fields (title, description, features)
+    while adding the new PageStructure with all content blocks.
+
+    Args:
+        url: URL to scrape
+        timeout: Timeout in milliseconds
+
+    Returns:
+        EnhancedScrapeResponse with legacy fields and full structure
+    """
+    try:
+        # Fetch HTML
+        html, method = fetch_html(url, timeout=timeout)
+
+        # Extract page structure
+        structure = extract_page_structure(url, html)
+
+        # Build legacy fields for backward compatibility
+        description = structure.meta_description or ''
+        if not description:
+            # Try to build from first paragraph
+            paragraphs = [b for b in structure.content_blocks if b.block_type == 'paragraph']
+            if paragraphs:
+                description = paragraphs[0].content[:500]
+
+        # Extract features from lists
+        features = []
+        for block in structure.content_blocks:
+            if block.block_type == 'list' and block.metadata:
+                items = block.metadata.get('items', [])
+                features.extend(items[:8 - len(features)])
+                if len(features) >= 8:
+                    break
+
+        return EnhancedScrapeResponse(
+            title=structure.title,
+            description=description,
+            features=features[:8],
+            success=True,
+            structure=structure
+        )
+
+    except Exception as e:
+        logger.error(f"Enhanced scrape failed for {url}: {e}")
+        return EnhancedScrapeResponse(
+            title='',
+            description='',
+            features=[],
+            success=False,
+            structure=None
+        )

@@ -265,3 +265,160 @@ export function formatGap(gap: number, benchmark?: number): string {
   }
   return `Room to improve: ${points} points`;
 }
+
+// ============================================================================
+// ENHANCED PAGE STRUCTURE TYPES (for /scrape-enhanced endpoint)
+// ============================================================================
+
+/**
+ * Content block types for semantic page structure
+ */
+export type ContentBlockType =
+  | 'headline'
+  | 'subheadline'
+  | 'paragraph'
+  | 'list'
+  | 'table'
+  | 'spec_table'
+  | 'pricing'
+  | 'testimonial'
+  | 'faq'
+  | 'image_caption'
+  | 'cta'
+  | 'badge'
+  | 'stat';
+
+/**
+ * Detected page type
+ */
+export type PageType = 'product' | 'service' | 'saas' | 'landing' | 'unknown';
+
+/**
+ * Detected B2B/B2C context
+ */
+export type PageContext = 'b2b' | 'b2c' | 'mixed';
+
+/**
+ * Extraction quality indicator
+ */
+export type ExtractionQuality = 'full' | 'partial' | 'minimal';
+
+/**
+ * A single content block preserving page structure
+ */
+export interface ContentBlock {
+  block_type: ContentBlockType;
+  level?: number;                    // h1=1, h2=2, etc. for headlines
+  content: string;
+  children?: ContentBlock[];          // Nested content blocks
+  metadata?: Record<string, unknown>; // Additional data (table headers/rows, list items, prices)
+}
+
+/**
+ * Full page structure with all extracted content
+ */
+export interface PageStructure {
+  url: string;
+  title: string;
+  meta_description?: string;
+  og_data?: Record<string, string>;           // OpenGraph data
+  schema_org?: Record<string, unknown>;       // JSON-LD Schema.org
+  content_blocks: ContentBlock[];
+  detected_page_type: PageType;
+  detected_context: PageContext;
+  extraction_quality: ExtractionQuality;
+}
+
+/**
+ * Enhanced scrape response with full structure
+ */
+export interface EnhancedScrapeResponse {
+  title: string;
+  description: string;
+  features: string[];
+  success: boolean;
+  structure?: PageStructure;
+}
+
+// ============================================================================
+// GEOGRAPHIC WEIGHTS AND UNIFIED SCORING TYPES
+// ============================================================================
+
+/**
+ * Geographic market identifiers
+ */
+export type GeographicMarket =
+  | 'us_b2b'
+  | 'us_b2c'
+  | 'eu_b2b'
+  | 'eu_b2c'
+  | 'apac_b2b'
+  | 'apac_b2c'
+  | 'global_balanced';
+
+/**
+ * Geographic weight configuration
+ */
+export interface GeographicWeights {
+  id: string;
+  name: string;
+  description: string;
+  model_weights: Record<string, number>;
+}
+
+/**
+ * Model breakdown item in unified score result
+ */
+export interface ModelBreakdownItem {
+  modelId: string;
+  modelName: string;
+  score: number;           // 0-100
+  weight: number;          // Percentage (0-100)
+  contribution: number;    // Score * weight contribution
+}
+
+/**
+ * Unified score result combining all models with weights
+ */
+export interface UnifiedScoreResult {
+  weightedScore: number;
+  modelBreakdown: ModelBreakdownItem[];
+  geographicMarket: GeographicMarket;
+  contextType: 'b2b' | 'b2c';
+  weightsUsed: Record<string, number>;
+}
+
+// ============================================================================
+// UNIFIED EVOLUTION TYPES (for Page Optimizer V2 unified panel)
+// ============================================================================
+
+/**
+ * Status of unified evolution process
+ */
+export type UnifiedEvolutionStatus = 'pending' | 'running' | 'complete' | 'error';
+
+/**
+ * State for unified evolution panel
+ */
+export interface UnifiedEvolutionState {
+  status: UnifiedEvolutionStatus;
+  currentGeneration: number;
+  totalGenerations: number;
+  bestVariant: OptimizedVariant | null;
+  scoreBreakdown: UnifiedScoreResult | null;
+  error?: string;
+}
+
+/**
+ * An optimized content variant
+ */
+export interface OptimizedVariant {
+  id: string;
+  title: string;
+  description: string;
+  features: string[];
+  generation: number;
+  fitness: number;
+  sourceModel?: string;      // Which model's winner this came from
+  parentIds?: string[];      // Parent variant IDs for hybrids
+}

@@ -4,6 +4,7 @@ FastAPI backend for APIS webapp scoring.
 Endpoints:
   POST /score - Score a product URL
   POST /scrape - Extract page content (title, description, features)
+  POST /scrape-enhanced - Full page structure extraction with content blocks
   GET /health - Health check
   GET /benchmark/stats - Aggregated benchmark statistics
   GET /benchmark/categories - Per-category breakdown
@@ -22,11 +23,11 @@ from models import (
     ScoreRequest, MLScore, HealthResponse,
     BenchmarkStatsResponse, CategoryStatsResponse, DimensionStatsResponse,
     TopPerformersResponse, CategoryStatsItem, DimensionStatsItem, TopPerformerItem,
-    ScrapeRequest, ScrapeResponse
+    ScrapeRequest, ScrapeResponse, EnhancedScrapeResponse
 )
 from database import init_database, get_db
 import benchmark_service
-from scraper import fetch_html
+from scraper import fetch_html, scrape_enhanced, validate_url
 from scorer import score_url
 
 # Get allowed origins from environment variable
@@ -276,6 +277,88 @@ async def scrape_page(request: ScrapeRequest):
         )
 
 
+@app.post("/scrape-enhanced", response_model=EnhancedScrapeResponse, tags=["scoring"])
+async def scrape_page_enhanced(request: ScrapeRequest):
+    """
+    Enhanced page scraping with full content structure extraction.
+
+    Extracts ALL semantic content from the page preserving structure:
+    - Headlines (h1-h6) with hierarchy levels
+    - Paragraphs
+    - Lists (ordered/unordered with nested items)
+    - Tables (regular and spec tables)
+    - Testimonials and reviews
+    - FAQs
+    - Pricing blocks
+    - Stats and badges
+    - CTAs
+    - Schema.org structured data
+    - OpenGraph metadata
+
+    Also auto-detects:
+    - Page type (product, service, saas, landing)
+    - B2B vs B2C context
+
+    Maintains backward compatibility with legacy fields (title, description, features).
+
+    Args:
+        request: ScrapeRequest with URL
+
+    Returns:
+        EnhancedScrapeResponse with full page structure and legacy fields
+    """
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+
+    try:
+        logger.info(f"Enhanced scraping URL: {request.url}")
+
+        # Validate URL
+        if not request.url.startswith(("http://", "https://")):
+            raise HTTPException(
+                status_code=400,
+                detail="URL must start with http:// or https://"
+            )
+
+        if not validate_url(request.url):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or blocked URL (localhost/private IPs not allowed)"
+            )
+
+        # Run sync scraper in thread pool
+        loop = asyncio.get_event_loop()
+        with ThreadPoolExecutor() as executor:
+            result = await loop.run_in_executor(executor, scrape_enhanced, request.url)
+
+        if not result.success:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to scrape page content"
+            )
+
+        logger.info(
+            f"Enhanced scrape complete: {request.url} - "
+            f"{len(result.structure.content_blocks) if result.structure else 0} blocks, "
+            f"type={result.structure.detected_page_type if result.structure else 'unknown'}, "
+            f"context={result.structure.detected_context if result.structure else 'unknown'}"
+        )
+
+        return result
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        logger.error(f"ValueError in enhanced scrape {request.url}: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error in enhanced scrape {request.url}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to scrape page: {str(e)}"
+        )
+
+
 @app.get("/health", response_model=HealthResponse, tags=["health"])
 async def health_check():
     """
@@ -411,6 +494,8 @@ async def root():
         "endpoints": {
             "health": "GET /health",
             "score": "POST /score",
+            "scrape": "POST /scrape",
+            "scrape_enhanced": "POST /scrape-enhanced",
             "benchmark_stats": "GET /benchmark/stats",
             "benchmark_categories": "GET /benchmark/categories",
             "benchmark_dimensions": "GET /benchmark/dimensions",
