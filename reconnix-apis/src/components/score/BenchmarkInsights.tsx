@@ -77,7 +77,8 @@ const DIMENSION_INFO: Record<string, { name: string; description: string }> = {
 
 export default function BenchmarkInsights({ universalScore, signals, category }: BenchmarkInsightsProps) {
   const [showAllSignals, setShowAllSignals] = useState(false);
-  const summary = getBenchmarkSummary();
+  // Use combined benchmark summary (544 pages) for comparison
+  const summary = getBenchmarkSummary('combined');
   const dimensions = getDimensionAnalysis();
 
   // Enrich signals with impact data

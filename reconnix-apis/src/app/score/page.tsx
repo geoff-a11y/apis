@@ -382,7 +382,7 @@ function ScorePageInner() {
           </p>
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-mid)' }}>
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent)' }} />
-            <span>Compare against <strong>213 benchmarked product pages</strong></span>
+            <span>Compare against <strong>544 benchmarked pages</strong> (products & services)</span>
           </div>
           <Link
             href="/apis/benchmarks"
@@ -419,9 +419,9 @@ function ScorePageInner() {
             Benchmark Insight
           </p>
           <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
-            We've analyzed <strong>213 product pages</strong> across 7 categories. The average score is just <strong>49.6</strong> —
-            meaning most sites leave significant AI recommendation potential untapped. Top performers like T-Mobile (81.3)
-            and Razer (72.1) show what's possible with optimized signals.
+            We've analyzed <strong>544 pages</strong> across products and services. Consumer products average <strong>49.6</strong> while
+            services/B2B average just <strong>5.22</strong> — revealing a massive optimization gap in non-product content.
+            Top performers like T-Mobile (81.3) and Purple (22.6) show what's possible with optimized signals.
           </p>
           <Link
             href="/apis/benchmarks"
