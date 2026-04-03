@@ -786,11 +786,25 @@ def calculate_readability_score(text: str) -> Tuple[float, List[str]]:
 
 def generate_recommendations(
     signal_inventory: List[SignalPresence],
-    universal_score: float
+    universal_score: float,
+    title: str = "",
+    body_text: str = ""
 ) -> List[Recommendation]:
     """
     Generate improvement recommendations based on signal gaps.
+    Uses actual page content to create personalized suggestions.
     """
+    # Extract a short product description from the content
+    product_snippet = ""
+    if body_text:
+        # Get first meaningful sentence (skip very short fragments)
+        sentences = [s.strip() for s in body_text.split('.') if len(s.strip()) > 30]
+        if sentences:
+            product_snippet = sentences[0][:100] + "..."
+        else:
+            product_snippet = body_text[:100] + "..."
+    elif title:
+        product_snippet = title
     recommendations = []
 
     # Sort dimensions by potential impact (mean effect size * signal gap)
@@ -837,9 +851,23 @@ def generate_recommendations(
         # Predict delta from improvement
         predicted_delta = item["mean_effect"] * (target_signal - item["current_signal"]) * 10
 
-        # Generate copy suggestion from dimension examples
+        # Generate copy suggestion with actual product content
+        # Extract the signal prefix from the example (the part before "The Brand A")
         signal_example = dimension["signal_example"]["present"]
-        copy_suggestion = f"Add {dimension['display_name']} signal. Example: {signal_example[:150]}..."
+
+        # Find where the generic product description starts
+        if "The Brand A" in signal_example:
+            signal_prefix = signal_example.split("The Brand A")[0].strip()
+        elif ". " in signal_example:
+            signal_prefix = signal_example.split(". ")[0] + "."
+        else:
+            signal_prefix = signal_example[:80]
+
+        # Combine signal prefix with actual product content
+        if product_snippet:
+            copy_suggestion = f"Add {dimension['display_name']} signal. Example: {signal_prefix} {product_snippet}"
+        else:
+            copy_suggestion = f"Add {dimension['display_name']} signal. Example: {signal_example[:150]}..."
 
         recommendations.append(
             Recommendation(
@@ -1027,8 +1055,8 @@ def score_url(
     # Calculate readability
     readability_score, readability_flags = calculate_readability_score(body_text)
 
-    # Generate recommendations
-    recommendations = generate_recommendations(signal_inventory, universal_score)
+    # Generate recommendations with actual product content
+    recommendations = generate_recommendations(signal_inventory, universal_score, title, body_text)
 
     # Create response
     ml_score = MLScore(
