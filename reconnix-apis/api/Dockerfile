@@ -11,11 +11,14 @@ RUN pip install --no-cache-dir fastapi uvicorn pydantic requests beautifulsoup4 
 # Copy application code
 COPY . .
 
+# Make start script executable
+RUN chmod +x start.sh
+
 # Create data directory for SQLite
 RUN mkdir -p /app/data
 
-# Default port (Railway will override with $PORT)
+# Default port
 ENV PORT=8000
 
 # Start command
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+CMD ["./start.sh"]
