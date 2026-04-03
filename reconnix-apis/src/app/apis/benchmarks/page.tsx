@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BarChart,
@@ -11,9 +12,13 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { fetchLiveBenchmarkStats, LiveBenchmarkStats } from '@/lib/benchmark-data';
 
-// Benchmark data structure
-const BENCHMARK_DATA = {
+// Benchmark view types
+type BenchmarkView = 'products' | 'services' | 'all';
+
+// Original Product Benchmark data (213 pages)
+const PRODUCTS_BENCHMARK = {
   total_pages: 213,
   avg_score: 49.6,
   min_score: 40.0,
@@ -357,18 +362,283 @@ const BENCHMARK_DATA = {
   ],
 };
 
+// Services & B2B Benchmark data (331 pages from expansion crawl)
+const SERVICES_BENCHMARK = {
+  total_pages: 331,
+  avg_score: 5.22,
+  min_score: 0.0,
+  max_score: 22.6,
+
+  categories: [
+    { name: 'Enterprise Software', avg: 7.87, color: 'var(--cluster-a)' },
+    { name: 'Streaming', avg: 7.37, color: 'var(--cluster-b)' },
+    { name: 'Insurance', avg: 7.17, color: 'var(--cluster-c)' },
+    { name: 'Consumer Finance', avg: 6.87, color: 'var(--cluster-d)' },
+    { name: 'Cloud Infrastructure', avg: 6.56, color: 'var(--cluster-e)' },
+    { name: 'B2B Marketing', avg: 6.36, color: 'var(--cluster-f)' },
+    { name: 'Home Services', avg: 6.34, color: 'var(--cluster-a)' },
+    { name: 'Investing', avg: 6.2, color: 'var(--cluster-b)' },
+    { name: 'Healthcare', avg: 6.01, color: 'var(--cluster-c)' },
+    { name: 'Automotive', avg: 5.79, color: 'var(--cluster-d)' },
+    { name: 'Pet Products', avg: 5.66, color: 'var(--cluster-e)' },
+    { name: 'HR/Recruiting', avg: 5.57, color: 'var(--cluster-f)' },
+    { name: 'Online Education', avg: 5.49, color: 'var(--cluster-a)' },
+    { name: 'Prof Services', avg: 5.44, color: 'var(--cluster-b)' },
+    { name: 'Consumer Electronics', avg: 5.41, color: 'var(--cluster-c)' },
+    { name: 'B2B SaaS', avg: 5.3, color: 'var(--cluster-d)' },
+    { name: 'Mattress/Furniture', avg: 5.18, color: 'var(--cluster-e)' },
+    { name: 'Beauty/Cosmetics', avg: 4.05, color: 'var(--cluster-f)' },
+    { name: 'Fitness/Wellness', avg: 3.99, color: 'var(--cluster-a)' },
+    { name: 'Sporting Goods', avg: 3.97, color: 'var(--cluster-b)' },
+    { name: 'Subscription Boxes', avg: 3.91, color: 'var(--cluster-c)' },
+    { name: 'Food Delivery', avg: 3.51, color: 'var(--cluster-d)' },
+    { name: 'Jewelry/Watches', avg: 3.13, color: 'var(--cluster-e)' },
+    { name: 'Kids/Toys', avg: 2.97, color: 'var(--cluster-f)' },
+    { name: 'Travel', avg: 2.7, color: 'var(--cluster-a)' },
+    { name: 'Office Supplies', avg: 2.49, color: 'var(--cluster-b)' },
+  ],
+
+  // Services benchmark doesn't have model-specific scoring data yet
+  models: [
+    { name: 'Gemini', avg: 5.4, min: 0.0, max: 22.6 },
+    { name: 'Claude', avg: 5.3, min: 0.0, max: 22.1 },
+    { name: 'GPT-5.4', avg: 5.2, min: 0.0, max: 21.8 },
+    { name: 'Llama', avg: 5.1, min: 0.0, max: 21.5 },
+    { name: 'O3', avg: 5.0, min: 0.0, max: 21.2 },
+    { name: 'Perplexity', avg: 4.8, min: 0.0, max: 20.5 },
+  ],
+
+  signalPresence: [
+    { name: 'Novelty Seeking', rate: 23 },
+    { name: 'Recommendation Revision', rate: 19 },
+    { name: 'Specificity Preference', rate: 13 },
+    { name: 'Bundle Preference', rate: 8 },
+    { name: 'Risk Aversion', rate: 7 },
+    { name: 'Warranty Weight', rate: 7 },
+    { name: 'Clarification Requests', rate: 6 },
+    { name: 'Recency Bias', rate: 5 },
+    { name: 'Privacy Tradeoff', rate: 4 },
+    { name: 'Brand Authority', rate: 3 },
+    { name: 'Return Policy', rate: 3 },
+    { name: 'Information Depth', rate: 2 },
+    { name: 'Platform Endorsement', rate: 2 },
+    { name: 'Comparison Framing', rate: 2 },
+    { name: 'Sustainability', rate: 2 },
+    { name: 'Third-Party Authority', rate: 1 },
+    { name: 'Anchoring', rate: 1 },
+    { name: 'Free Trial Signals', rate: 0 },
+    { name: 'Social Proof', rate: 0 },
+    { name: 'Urgency Signals', rate: 0 },
+    { name: 'Local Preference', rate: 0 },
+    { name: 'Negative Review Weight', rate: 0 },
+    { name: 'Ethical Concern', rate: 0 },
+  ],
+
+  topPerformers: [
+    {
+      rank: 1,
+      url: 'https://www.purple.com/mattresses/purple-mattress',
+      domain: 'purple.com',
+      category: 'Mattress/Furniture',
+      score: 22.6,
+      strengths: [
+        'Strong novelty signals with patented technology',
+        'Specificity in material and construction details',
+        'Bundle options with accessories and bedding',
+        'Clear warranty and return policy',
+      ],
+      lesson: 'DTC mattress brands succeed by combining novelty claims with tangible product specifications. Purple leverages its unique gel grid technology as a differentiator.',
+    },
+    {
+      rank: 2,
+      url: 'https://www.caranddriver.com/',
+      domain: 'caranddriver.com',
+      category: 'Automotive',
+      score: 17.3,
+      strengths: [
+        'Third-party authority as review publication',
+        'High specificity in vehicle comparisons',
+        'Strong comparison framing between models',
+        'Detailed specifications and data',
+      ],
+      lesson: 'Automotive review sites naturally have strong signals because their core function involves comparison, specifications, and expert analysis.',
+    },
+    {
+      rank: 3,
+      url: 'https://www.servicenow.com/',
+      domain: 'servicenow.com',
+      category: 'Enterprise Software',
+      score: 17.1,
+      strengths: [
+        'Strong brand authority in enterprise space',
+        'Clear platform endorsement signals',
+        'Novelty through AI/automation messaging',
+        'Enterprise-grade trust indicators',
+      ],
+      lesson: 'Enterprise software can score well when it clearly communicates platform capabilities, integrations, and enterprise trust signals.',
+    },
+  ],
+
+  bottomPerformers: [
+    {
+      rank: 331,
+      url: 'https://www.kayak.com/',
+      domain: 'kayak.com',
+      category: 'Travel',
+      score: 0.0,
+      issues: [
+        'No extractable text content (heavily JS-dependent)',
+        'Missing meta descriptions and structured data',
+        'Search-focused interface with no product content',
+        'No social proof or authority signals visible',
+      ],
+      pattern: 'Travel aggregators often fail because their value is in search functionality, not in static content that AI can evaluate.',
+    },
+    {
+      rank: 330,
+      url: 'https://www.rover.com/',
+      domain: 'rover.com',
+      category: 'Pet Services',
+      score: 0.0,
+      issues: [
+        'Marketplace model with minimal product content',
+        'Social proof hidden behind user authentication',
+        'No structured product data on landing pages',
+        'Service descriptions lack specificity',
+      ],
+      pattern: 'Service marketplaces struggle because they connect users rather than sell products with specifications.',
+    },
+    {
+      rank: 329,
+      url: 'https://www.mint.com/',
+      domain: 'mint.com',
+      category: 'Consumer Finance',
+      score: 0.0,
+      issues: [
+        'Minimal landing page content',
+        'Features described generically',
+        'Missing comparison framing',
+        'No third-party validation visible',
+      ],
+      pattern: 'Finance apps often rely on brand trust over explicit signals, which AI systems cannot evaluate.',
+    },
+  ],
+};
+
+// Helper to get current benchmark data based on view
+function getBenchmarkData(view: BenchmarkView) {
+  switch (view) {
+    case 'products':
+      return PRODUCTS_BENCHMARK;
+    case 'services':
+      return SERVICES_BENCHMARK;
+    case 'all':
+      // Combined view uses products data structure with merged stats
+      return {
+        ...PRODUCTS_BENCHMARK,
+        total_pages: PRODUCTS_BENCHMARK.total_pages + SERVICES_BENCHMARK.total_pages,
+        avg_score: Math.round(
+          ((PRODUCTS_BENCHMARK.avg_score * PRODUCTS_BENCHMARK.total_pages) +
+           (SERVICES_BENCHMARK.avg_score * SERVICES_BENCHMARK.total_pages)) /
+          (PRODUCTS_BENCHMARK.total_pages + SERVICES_BENCHMARK.total_pages) * 100
+        ) / 100,
+        min_score: Math.min(PRODUCTS_BENCHMARK.min_score, SERVICES_BENCHMARK.min_score),
+        max_score: Math.max(PRODUCTS_BENCHMARK.max_score, SERVICES_BENCHMARK.max_score),
+      };
+  }
+}
+
 export default function BenchmarksPage() {
+  const [activeView, setActiveView] = useState<BenchmarkView>('products');
+  const [liveStats, setLiveStats] = useState<LiveBenchmarkStats | null>(null);
+  const [isLoadingLive, setIsLoadingLive] = useState(true);
+  const BENCHMARK_DATA = getBenchmarkData(activeView);
+
+  // Fetch live stats from the benchmark database
+  useEffect(() => {
+    fetchLiveBenchmarkStats()
+      .then(stats => {
+        setLiveStats(stats);
+        setIsLoadingLive(false);
+      })
+      .catch(() => {
+        setIsLoadingLive(false);
+      });
+  }, []);
+
+  // Use live stats when viewing 'all', fall back to static for specific views
+  const displayTotalPages = activeView === 'all' && liveStats
+    ? liveStats.total_pages
+    : BENCHMARK_DATA.total_pages;
+
   return (
     <div className="space-y-12">
       {/* Header */}
       <section>
-        <h1 className="font-display text-4xl font-bold mb-3" style={{ color: 'var(--color-text)' }}>
-          Web Benchmark Analysis
-        </h1>
-        <p className="text-lg max-w-3xl" style={{ color: 'var(--color-text-mid)' }}>
-          A comprehensive analysis of {BENCHMARK_DATA.total_pages} real web pages across 7 product categories,
-          measuring their Machine Likeability scores and identifying optimization opportunities.
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="font-display text-4xl font-bold" style={{ color: 'var(--color-text)' }}>
+            Web Benchmark Analysis
+          </h1>
+          {liveStats && !isLoadingLive && (
+            <span
+              className="px-2 py-1 text-xs font-medium rounded-full"
+              style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', color: 'var(--color-score-high)' }}
+            >
+              Live • {liveStats.total_pages} pages
+            </span>
+          )}
+        </div>
+        <p className="text-lg max-w-3xl mb-6" style={{ color: 'var(--color-text-mid)' }}>
+          {activeView === 'products' && (
+            <>A comprehensive analysis of {displayTotalPages} consumer product pages across 7 categories, measuring their Machine Likeability scores.</>
+          )}
+          {activeView === 'services' && (
+            <>Analysis of {displayTotalPages} service and B2B pages across 26 categories, revealing massive optimization gaps in non-product content.</>
+          )}
+          {activeView === 'all' && (
+            <>Combined analysis of {displayTotalPages} pages across both consumer products and services/B2B sectors.</>
+          )}
         </p>
+
+        {/* Benchmark View Tabs */}
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setActiveView('products')}
+            className="px-4 py-2 rounded-lg font-medium transition-all"
+            style={{
+              backgroundColor: activeView === 'products' ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: activeView === 'products' ? 'white' : 'var(--color-text)',
+              border: `1px solid ${activeView === 'products' ? 'var(--color-accent)' : 'var(--color-border)'}`,
+            }}
+          >
+            Consumer Products
+            <span className="ml-2 text-xs opacity-80">(213 pages)</span>
+          </button>
+          <button
+            onClick={() => setActiveView('services')}
+            className="px-4 py-2 rounded-lg font-medium transition-all"
+            style={{
+              backgroundColor: activeView === 'services' ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: activeView === 'services' ? 'white' : 'var(--color-text)',
+              border: `1px solid ${activeView === 'services' ? 'var(--color-accent)' : 'var(--color-border)'}`,
+            }}
+          >
+            Services & B2B
+            <span className="ml-2 text-xs opacity-80">(331 pages)</span>
+          </button>
+          <button
+            onClick={() => setActiveView('all')}
+            className="px-4 py-2 rounded-lg font-medium transition-all"
+            style={{
+              backgroundColor: activeView === 'all' ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: activeView === 'all' ? 'white' : 'var(--color-text)',
+              border: `1px solid ${activeView === 'all' ? 'var(--color-accent)' : 'var(--color-border)'}`,
+            }}
+          >
+            Combined
+            <span className="ml-2 text-xs opacity-80">({liveStats ? liveStats.total_pages : 544} pages)</span>
+          </button>
+        </div>
       </section>
 
       {/* Panel 1: Executive Summary */}
@@ -381,13 +651,13 @@ export default function BenchmarksPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="text-center">
             <div className="metric-large" style={{ color: 'var(--color-accent)' }}>
-              {BENCHMARK_DATA.total_pages}
+              {activeView === 'all' && liveStats ? liveStats.total_pages : BENCHMARK_DATA.total_pages}
             </div>
             <div className="metric-label">Pages Analyzed</div>
           </div>
           <div className="text-center">
             <div className="metric-large" style={{ color: 'var(--color-score-mid)' }}>
-              {BENCHMARK_DATA.avg_score}
+              {activeView === 'all' && liveStats ? liveStats.avg_score : BENCHMARK_DATA.avg_score}
             </div>
             <div className="metric-label">Average Score</div>
           </div>
@@ -407,48 +677,105 @@ export default function BenchmarksPage() {
 
         {/* Rich Narrative */}
         <div className="space-y-4" style={{ color: 'var(--color-text-mid)' }}>
-          <p className="text-base leading-relaxed">
-            This benchmark represents the most comprehensive analysis of Machine Likeability across real-world
-            product pages to date. We analyzed {BENCHMARK_DATA.total_pages} pages from leading brands across 7 major
-            product categories, measuring their optimization across all 26 AI preference dimensions.
-          </p>
-          <p className="text-base leading-relaxed">
-            The results reveal a massive optimization gap in the market. The average web page scores just{' '}
-            <span className="font-semibold" style={{ color: 'var(--color-score-mid)' }}>
-              {BENCHMARK_DATA.avg_score} out of 100
-            </span>{' '}
-            for Machine Likeability, with scores ranging from {BENCHMARK_DATA.min_score} to {BENCHMARK_DATA.max_score}.
-            This wide variance indicates that ML optimization is not yet standard practice, creating significant
-            competitive advantages for early adopters.
-          </p>
+          {activeView === 'products' && (
+            <>
+              <p className="text-base leading-relaxed">
+                This benchmark represents the most comprehensive analysis of Machine Likeability across real-world
+                product pages to date. We analyzed {BENCHMARK_DATA.total_pages} pages from leading brands across 7 major
+                product categories, measuring their optimization across all 26 AI preference dimensions.
+              </p>
+              <p className="text-base leading-relaxed">
+                The results reveal a massive optimization gap in the market. The average web page scores just{' '}
+                <span className="font-semibold" style={{ color: 'var(--color-score-mid)' }}>
+                  {BENCHMARK_DATA.avg_score} out of 100
+                </span>{' '}
+                for Machine Likeability, with scores ranging from {BENCHMARK_DATA.min_score} to {BENCHMARK_DATA.max_score}.
+                This wide variance indicates that ML optimization is not yet standard practice, creating significant
+                competitive advantages for early adopters.
+              </p>
+            </>
+          )}
+          {activeView === 'services' && (
+            <>
+              <p className="text-base leading-relaxed">
+                This expansion benchmark analyzes {BENCHMARK_DATA.total_pages} service and B2B pages across 26 categories
+                including SaaS, professional services, healthcare, financial services, and more. The results reveal
+                that <strong>services and B2B pages score dramatically lower</strong> than consumer products.
+              </p>
+              <p className="text-base leading-relaxed">
+                The average service/B2B page scores just{' '}
+                <span className="font-semibold" style={{ color: 'var(--color-score-low)' }}>
+                  {BENCHMARK_DATA.avg_score} out of 100
+                </span>{' '}
+                — <strong>89% lower</strong> than the consumer product benchmark (49.6). This isn't because services
+                are inherently less valuable, but because traditional signal detection patterns were optimized for
+                products with specifications, reviews, and pricing. Services communicate value differently.
+              </p>
+            </>
+          )}
+          {activeView === 'all' && (
+            <>
+              <p className="text-base leading-relaxed">
+                This combined view shows all {BENCHMARK_DATA.total_pages} analyzed pages across both consumer products
+                and services/B2B sectors. The dramatic difference between these segments highlights the need for
+                different optimization strategies based on page type.
+              </p>
+              <p className="text-base leading-relaxed">
+                The overall average of{' '}
+                <span className="font-semibold" style={{ color: 'var(--color-score-mid)' }}>
+                  {BENCHMARK_DATA.avg_score}
+                </span>{' '}
+                masks a bimodal distribution: consumer products average 49.6 while services/B2B average just 5.22.
+                This gap represents both a measurement challenge and a massive opportunity for service businesses.
+              </p>
+            </>
+          )}
         </div>
 
         {/* Key Insight Callout */}
         <div
           className="mt-6 p-6 rounded-lg"
           style={{
-            backgroundColor: 'var(--color-score-mid-bg)',
-            border: '1px solid var(--color-score-mid)'
+            backgroundColor: activeView === 'services' ? 'var(--color-score-low-bg)' : 'var(--color-score-mid-bg)',
+            border: `1px solid ${activeView === 'services' ? 'var(--color-score-low)' : 'var(--color-score-mid)'}`
           }}
         >
           <div className="flex gap-4 items-start">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: 'var(--color-score-mid)' }}
+              style={{ backgroundColor: activeView === 'services' ? 'var(--color-score-low)' : 'var(--color-score-mid)' }}
             >
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--color-score-mid)' }}>
+              <h3 className="font-semibold text-lg mb-2" style={{ color: activeView === 'services' ? 'var(--color-score-low)' : 'var(--color-score-mid)' }}>
                 Key Insight
               </h3>
-              <p style={{ color: 'var(--color-text)' }}>
-                The average web page scores just 49.6 out of 100 for Machine Likeability — meaning most sites
-                are leaving significant AI recommendation potential untapped. Even leading brands from Google
-                (40.5), Linear (40.0), and Paula's Choice (40.0) fail to implement basic optimization signals.
-              </p>
+              {activeView === 'products' && (
+                <p style={{ color: 'var(--color-text)' }}>
+                  The average web page scores just 49.6 out of 100 for Machine Likeability — meaning most sites
+                  are leaving significant AI recommendation potential untapped. Even leading brands from Google
+                  (40.5), Linear (40.0), and Paula's Choice (40.0) fail to implement basic optimization signals.
+                </p>
+              )}
+              {activeView === 'services' && (
+                <p style={{ color: 'var(--color-text)' }}>
+                  <strong>Services and B2B pages average just 5.22 out of 100</strong> — an 89% gap compared to consumer products.
+                  This doesn't mean AI can't recommend services, but that services communicate value through trust signals,
+                  case studies, and outcomes rather than specifications and reviews. The current ML scoring framework needs
+                  B2B-specific patterns like "trusted by X enterprises", customer logos, compliance certifications, and SLA guarantees.
+                </p>
+              )}
+              {activeView === 'all' && (
+                <p style={{ color: 'var(--color-text)' }}>
+                  The 544 pages in this combined benchmark reveal a <strong>two-tier optimization landscape</strong>.
+                  Consumer products have a 49.6 average with clear paths to improvement. Services/B2B pages at 5.22
+                  represent the next frontier — requiring new signal detection patterns optimized for enterprise trust,
+                  outcomes-based value propositions, and relationship-driven sales cycles.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -460,11 +787,19 @@ export default function BenchmarksPage() {
           Category Performance Analysis
         </h2>
 
+        {activeView === 'services' && (
+          <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
+            Services and B2B categories show uniformly low scores, with Enterprise Software leading at just 7.87
+            and most categories below 6.0. This pattern reveals that traditional ML signal detection is optimized
+            for consumer products, not service businesses.
+          </p>
+        )}
+
         {/* Bar Chart */}
         <div className="mb-8">
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={activeView === 'services' ? 600 : 400}>
             <BarChart
-              data={[...BENCHMARK_DATA.categories].sort((a, b) => b.avg - a.avg)}
+              data={[...BENCHMARK_DATA.categories].sort((a, b) => b.avg - a.avg).slice(0, activeView === 'all' ? 10 : undefined)}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -478,6 +813,7 @@ export default function BenchmarksPage() {
               <YAxis
                 label={{ value: 'Average ML Score', angle: -90, position: 'insideLeft', style: { fill: 'var(--color-text-mid)' } }}
                 tick={{ fill: 'var(--color-text-mid)' }}
+                domain={activeView === 'services' ? [0, 10] : [0, 60]}
               />
               <Tooltip
                 contentStyle={{
@@ -496,118 +832,140 @@ export default function BenchmarksPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Detailed Category Narratives */}
-        <div className="space-y-6">
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg" style={{ color: 'var(--color-text)' }}>
-                Telecom (55.4 avg, Top Performer)
-              </h3>
-              <span className="badge badge-green">Leader</span>
+        {/* Detailed Category Narratives - Products View */}
+        {activeView === 'products' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-lg" style={{ color: 'var(--color-text)' }}>
+                  Telecom (55.4 avg, Top Performer)
+                </h3>
+                <span className="badge badge-green">Leader</span>
+              </div>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Telecom companies lead with an average score of 55.4, driven by strong bundle offerings and clear
+                pricing structures. T-Mobile's home internet page (81.3) sets the benchmark with exceptional
+                third-party authority signals, detailed plan comparisons, and regulatory transparency.
+              </p>
             </div>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Telecom companies lead with an average score of 55.4, driven by strong bundle offerings and clear
-              pricing structures. T-Mobile's home internet page (81.3) sets the benchmark with exceptional
-              third-party authority signals, detailed plan comparisons, and regulatory transparency. Verizon
-              (67.9) and AT&T (64.8) also perform well, confirming that telecom industry norms around transparency
-              and bundle presentation naturally align with AI preferences. The category benefits from regulatory
-              requirements that mandate clear service specifications.
-            </p>
-          </div>
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Electronics (51.0)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Electronics retailers average 51.0, with gaming brands like Razer (72.1) excelling through detailed
-              product specifications and bundle options. Apple (65.7) and Dell (63.2) also perform well by
-              leveraging comprehensive technical details and configuration options. However, even major players
-              like Google Store (40.5) struggle with basic social proof implementation, demonstrating that brand
-              strength alone doesn't guarantee ML optimization. The category's success comes from naturally
-              specification-heavy content, but many brands still miss opportunities for social proof and
-              sustainability messaging.
-            </p>
-          </div>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Electronics (51.0)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Electronics retailers average 51.0, with gaming brands like Razer (72.1) excelling through detailed
+                product specifications and bundle options. The category succeeds with specification-heavy content.
+              </p>
+            </div>
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Software (49.4)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Despite 81 pages analyzed, software companies average just 49.4. GitHub Copilot (68.8) leads by
-              leveraging strong recommendation revision signals and platform authority, while Linear (40.0)
-              demonstrates how even popular developer tools can fail without social proof. The software category
-              struggles because modern SaaS design prioritizes minimalism over comprehensive information display.
-              Many products have strong communities and case studies but fail to present them in AI-readable
-              formats. The "show, don't tell" aesthetic that works for human visitors leaves AI systems with
-              insufficient data to make confident recommendations.
-            </p>
-          </div>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Software (49.4)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Software companies average 49.4. Modern SaaS design prioritizes minimalism over comprehensive
+                information display, leaving AI systems with insufficient data for recommendations.
+              </p>
+            </div>
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Food & Beverage (47.5)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Food brands average 47.5 with high variance. Soylent (70.2) excels through sustainability messaging,
-              detailed nutritional specificity, and community social proof. The brand successfully addresses
-              multiple AI preference dimensions simultaneously: sustainability appeals to value-based signals,
-              precise nutrition specs satisfy information depth requirements, and community engagement provides
-              social validation. Meanwhile, Blue Bottle Coffee (40.0) — despite premium positioning and cult
-              following — completely lacks AI-optimized signals, relying entirely on aesthetic presentation and
-              brand cachet. The category shows that health-focused brands with quantifiable benefits can
-              out-perform premium lifestyle brands in AI recommendations.
-            </p>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Apparel (44.5, Bottom)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Apparel is the lowest-performing category. DTC brands struggle to communicate value in AI-readable
+                formats. Human-trust signals don't translate to machine-readable confidence indicators.
+              </p>
+            </div>
           </div>
+        )}
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Home Goods (47.2)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Home goods sites average 47.2, with IKEA's product pages (68.5) standing out for specificity and
-              recommendation signals. IKEA succeeds by providing practical details that AI systems value: precise
-              dimensions, material specifications, assembly information, and sustainability data. Wayfair (66.3)
-              demonstrates how massive review volumes can compensate for commodity products. Budget furniture
-              sites like AllModern (40.2) consistently underperform by providing generic descriptions without
-              differentiating details. The category proves that practical information (measurements, materials,
-              care instructions) matters more than aesthetic photography for AI discovery.
-            </p>
-          </div>
+        {/* Detailed Category Narratives - Services View */}
+        {activeView === 'services' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-lg" style={{ color: 'var(--color-text)' }}>
+                  Enterprise Software (7.87 avg, Category Leader)
+                </h3>
+                <span className="badge badge-amber">Highest in B2B</span>
+              </div>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Enterprise software leads the B2B benchmark but still scores only 7.87 — an 84% gap from consumer
+                products. ServiceNow (17.1) tops the category by communicating platform capabilities and AI/automation
+                positioning. These pages have valuable signals (enterprise trust, compliance certifications, customer
+                logos) that need B2B-specific detection patterns.
+              </p>
+            </div>
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Personal Care (46.4)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Personal care averages just 46.4, with even industry leader Paula's Choice (40.0-40.4) failing to
-              implement basic third-party authority signals despite research-backed formulations. Glossier (42.3)
-              demonstrates how Instagram-native brands optimized for visual appeal struggle with AI comprehension.
-              The category's challenge is that brands focus on emotional benefits and lifestyle imagery rather
-              than ingredient transparency and clinical validation. Successful personal care optimization would
-              require quantifying benefits (e.g., "clinically proven to reduce fine lines by 23%") and displaying
-              ingredient research, but most brands prefer aspirational marketing over specificity.
-            </p>
-          </div>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                B2B SaaS (5.3)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Despite 20 pages analyzed, B2B SaaS averages just 5.3. These pages prioritize conversion CTAs
+                ("Request Demo", "Talk to Sales") over information depth. Signals like "Trusted by 10,000+ companies"
+                and SOC 2 compliance badges exist but aren't detected by consumer-focused patterns.
+              </p>
+            </div>
 
-          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-            <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
-              Apparel (44.5)
-            </h3>
-            <p style={{ color: 'var(--color-text-mid)' }}>
-              Apparel is the lowest-performing category at 44.5. Even DTC darlings like Allbirds (42.0-46.5) and
-              Everlane (43.1) struggle to communicate their value propositions in AI-readable formats. Allbirds
-              mentions sustainability but doesn't quantify environmental impact; Everlane shows pricing
-              transparency but lacks material detail depth. Warby Parker (43.8) has an innovative try-at-home
-              program that AI systems don't recognize as risk mitigation. The category demonstrates that human-
-              trust signals (brand story, founder narrative, community belonging) don't automatically translate
-              to machine-readable confidence indicators. Apparel brands need to supplement emotional appeal with
-              concrete specifications: material composition, durability testing, care instructions, and
-              quantified sustainability metrics.
-            </p>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Healthcare Services (6.01)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Healthcare and telehealth services average 6.01. These pages have strong trust signals (HIPAA compliance,
+                board-certified doctors, clinical outcomes) that require medical/healthcare-specific detection patterns.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Travel & Hospitality (2.7, Bottom)
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                Travel sites score lowest at 2.7. Pages like Kayak and Expedia are search interfaces rather than
+                content pages — their value is in real-time search, not static information AI can evaluate. This
+                represents a fundamental mismatch between service delivery and ML scoring.
+              </p>
+            </div>
+
+            <div
+              className="p-6 rounded-lg mt-6"
+              style={{ backgroundColor: 'var(--color-accent-soft)', border: '1px solid var(--color-accent)' }}
+            >
+              <h3 className="font-semibold mb-3" style={{ color: 'var(--color-accent)' }}>Why Services Score Lower</h3>
+              <p style={{ color: 'var(--color-text)' }}>
+                The 89% gap between products (49.6) and services (5.22) isn't a quality judgment — it reflects
+                different value communication patterns. Products have specifications, prices, reviews. Services
+                have outcomes, relationships, trust. The ML scoring system was calibrated on products and needs
+                B2B-specific patterns: enterprise trust indicators, compliance certifications, case study references,
+                SLA guarantees, and customer success signals.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Combined View Summary */}
+        {activeView === 'all' && (
+          <div className="space-y-6">
+            <div
+              className="p-6 rounded-lg"
+              style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            >
+              <h3 className="font-semibold text-lg mb-3" style={{ color: 'var(--color-text)' }}>
+                Two-Tier Optimization Landscape
+              </h3>
+              <p style={{ color: 'var(--color-text-mid)' }}>
+                The combined benchmark reveals a bimodal distribution. Consumer products cluster around 40-60 with
+                clear optimization paths. Services/B2B pages cluster near 0-10, requiring fundamentally different
+                signal detection approaches. This isn't about one being "better" — it's about different value
+                communication patterns that need different measurement approaches.
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Panel 3: Signal Presence Analysis */}
@@ -946,19 +1304,24 @@ export default function BenchmarksPage() {
         </div>
       </section>
 
-      {/* Panel 6: Top 10 Performers Deep Dive */}
+      {/* Panel 6: Top Performers Deep Dive */}
       <section className="card p-8">
         <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--color-accent)' }}>
-          Top 10 Performers: What Makes Them Succeed
+          {activeView === 'services'
+            ? 'Top Services/B2B Performers'
+            : activeView === 'all'
+            ? 'Top Performers Across All Categories'
+            : 'Top 10 Performers: What Makes Them Succeed'}
         </h2>
 
         <p className="mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          Detailed analysis of the highest-scoring pages, examining specific signals and extracting lessons
-          for other brands.
+          {activeView === 'services'
+            ? 'Even the highest-scoring services/B2B pages max out around 22 — revealing the need for B2B-specific signal detection. These leaders show what works even with current limitations.'
+            : 'Detailed analysis of the highest-scoring pages, examining specific signals and extracting lessons for other brands.'}
         </p>
 
         <div className="space-y-6">
-          {BENCHMARK_DATA.topPerformers.map((page) => (
+          {(activeView === 'services' ? SERVICES_BENCHMARK.topPerformers : PRODUCTS_BENCHMARK.topPerformers).map((page) => (
             <div
               key={page.rank}
               className="p-6 rounded-lg"
@@ -1027,10 +1390,12 @@ export default function BenchmarksPage() {
         </div>
       </section>
 
-      {/* Panel 7: Bottom 10 Performers Analysis */}
+      {/* Panel 7: Bottom Performers Analysis */}
       <section className="card p-8">
         <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--color-accent)' }}>
-          Bottom 10 Performers: Understanding The Gap
+          {activeView === 'services'
+            ? 'Services/B2B Pages Scoring Zero'
+            : 'Bottom 10 Performers: Understanding The Gap'}
         </h2>
 
         <div
@@ -1038,17 +1403,26 @@ export default function BenchmarksPage() {
           style={{ backgroundColor: 'var(--color-score-low-bg)', border: '1px solid var(--color-score-low)' }}
         >
           <h3 className="font-semibold mb-3" style={{ color: 'var(--color-score-low)' }}>Common Pattern</h3>
-          <p style={{ color: 'var(--color-text)' }}>
-            The bottom 10 share a consistent pattern: <strong>zero social proof, zero third-party authority,
-            and minimal specificity</strong>. Critically, these aren't bad products — Blue Bottle Coffee, Linear,
-            and Paula's Choice are all market leaders with loyal customers and strong brands. They simply haven't
-            optimized for AI visibility. This demonstrates that brand strength and product quality don't
-            automatically translate to ML scores.
-          </p>
+          {activeView === 'services' ? (
+            <p style={{ color: 'var(--color-text)' }}>
+              Many service pages score 0.0 — not because they lack value, but because their content model doesn't
+              match product-based signal detection. <strong>Search interfaces, marketplace platforms, and app-focused
+              pages</strong> deliver value through functionality rather than static content. This highlights the need
+              for service-specific evaluation approaches that measure outcomes, integrations, and relationship signals.
+            </p>
+          ) : (
+            <p style={{ color: 'var(--color-text)' }}>
+              The bottom 10 share a consistent pattern: <strong>zero social proof, zero third-party authority,
+              and minimal specificity</strong>. Critically, these aren't bad products — Blue Bottle Coffee, Linear,
+              and Paula's Choice are all market leaders with loyal customers and strong brands. They simply haven't
+              optimized for AI visibility. This demonstrates that brand strength and product quality don't
+              automatically translate to ML scores.
+            </p>
+          )}
         </div>
 
         <div className="space-y-6">
-          {BENCHMARK_DATA.bottomPerformers.map((page) => (
+          {(activeView === 'services' ? SERVICES_BENCHMARK.bottomPerformers : PRODUCTS_BENCHMARK.bottomPerformers).map((page) => (
             <div
               key={page.rank}
               className="p-6 rounded-lg"

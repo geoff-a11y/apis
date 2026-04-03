@@ -1,0 +1,22 @@
+# APIS Scoring API - Python Dependencies
+
+# FastAPI and server
+fastapi==0.115.0
+uvicorn[standard]==0.31.0
+pydantic==2.9.2
+
+# HTTP requests
+requests==2.32.3
+
+# HTML parsing
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# Headless browser for scraping (bypasses bot detection)
+playwright>=1.40.0
+
+# Additional utilities (optional but recommended)
+python-dotenv==1.0.1
+
+# Note: After installing playwright, run: python -m playwright install chromium
+# This downloads the Chromium browser needed for headless scraping

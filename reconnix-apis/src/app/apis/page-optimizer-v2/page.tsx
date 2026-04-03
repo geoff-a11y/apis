@@ -60,66 +60,32 @@ const EVOLUTION_CONFIG = {
   mutationsPerParent: 4,
 };
 
-// Extract page content via CORS proxy
+// API URL for backend scraping
+const API_URL = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
+
+// Extract page content via backend scraper (uses Playwright for reliability)
 async function extractPageContent(url: string): Promise<{
   title: string;
   description: string;
   features: string[];
 }> {
-  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-
-  const response = await fetch(proxyUrl, {
-    signal: AbortSignal.timeout(15000)
+  const response = await fetch(`${API_URL}/scrape`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+    signal: AbortSignal.timeout(60000) // 60s timeout for Playwright
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch page');
+    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(error.detail || 'Failed to fetch page');
   }
 
-  const html = await response.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  // Extract title
-  let title = doc.querySelector('h1')?.textContent?.trim() ||
-              doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
-              doc.querySelector('title')?.textContent?.trim() ||
-              'Product';
-
-  // Extract description
-  let description = doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
-                    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
-                    doc.querySelector('[class*="description"]')?.textContent?.trim()?.slice(0, 300) ||
-                    '';
-
-  // Extract features from lists
-  const features: string[] = [];
-  const listItems = doc.querySelectorAll('li');
-  listItems.forEach((li, i) => {
-    if (i < 8 && li.textContent && li.textContent.trim().length > 10 && li.textContent.trim().length < 150) {
-      features.push(li.textContent.trim());
-    }
-  });
-
-  // If no features found, try paragraphs
-  if (features.length === 0) {
-    const paragraphs = doc.querySelectorAll('p');
-    paragraphs.forEach((p) => {
-      if (features.length < 5 && p.textContent && p.textContent.trim().length > 20 && p.textContent.trim().length < 200) {
-        features.push(p.textContent.trim());
-      }
-    });
-  }
-
-  // Default features if none found
-  if (features.length === 0) {
-    features.push('Quality product', 'Great value', 'Trusted brand');
-  }
-
+  const data = await response.json();
   return {
-    title: title.slice(0, 100),
-    description: description.slice(0, 500) || 'High-quality product.',
-    features: features.slice(0, 5),
+    title: data.title || 'Product',
+    description: data.description || '',
+    features: data.features || ['Quality product', 'Great value', 'Trusted brand']
   };
 }
 
@@ -984,27 +950,132 @@ ${JSON.stringify({
         </div>
       )}
 
-      {/* How it works */}
+      {/* How it works - Dynamic Evolution Visualization */}
       {!evolution && (
         <section className="card p-6">
-          <h2 className="font-display text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+          <h2 className="font-display text-xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>
             How Evolutionary Optimization Works
           </h2>
-          <div className="grid md:grid-cols-4 gap-4">
-            {[
-              { step: 1, title: 'Generate', desc: `Opus creates ${EVOLUTION_CONFIG.populationSize} diverse variants`, icon: '🧬' },
-              { step: 2, title: 'Score', desc: 'Each scored against target model', icon: '📊' },
-              { step: 3, title: 'Select', desc: `Top ${EVOLUTION_CONFIG.topK} survive to breed`, icon: '🏆' },
-              { step: 4, title: 'Evolve', desc: `Repeat for ${EVOLUTION_CONFIG.generations} generations`, icon: '🔄' },
-            ].map((s) => (
-              <div key={s.step} className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <div className="text-3xl mb-2">{s.icon}</div>
-                <h3 className="font-medium" style={{ color: 'var(--color-text)' }}>{s.title}</h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>{s.desc}</p>
+
+          {/* Evolution Flow Diagram */}
+          <div className="relative">
+            {/* Process Steps */}
+            <div className="grid md:grid-cols-4 gap-4 mb-6">
+              {[
+                { step: 1, title: 'Generate', desc: `Opus creates ${EVOLUTION_CONFIG.populationSize} diverse variants` },
+                { step: 2, title: 'Score', desc: 'Each scored against target model' },
+                { step: 3, title: 'Select', desc: `Top ${EVOLUTION_CONFIG.topK} survive to breed` },
+                { step: 4, title: 'Evolve', desc: `Repeat for ${EVOLUTION_CONFIG.generations} generations` },
+              ].map((s) => (
+                <div
+                  key={s.step}
+                  className="group relative p-4 rounded-lg text-center transition-all hover:scale-105"
+                  style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
+                >
+                  {/* Step indicator */}
+                  <div
+                    className="w-10 h-10 mx-auto mb-3 rounded-full flex items-center justify-center font-bold text-white transition-colors group-hover:scale-110"
+                    style={{ backgroundColor: 'var(--color-accent)' }}
+                  >
+                    {s.step}
+                  </div>
+                  <h3 className="font-medium mb-1" style={{ color: 'var(--color-text)' }}>{s.title}</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>{s.desc}</p>
+
+                  {/* Connecting arrow (except last) */}
+                  {s.step < 4 && (
+                    <div className="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 4L10 8L6 12" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Visual Evolution Tree */}
+            <div className="mt-8 p-6 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex items-center justify-center gap-8">
+                {/* Generation 1 */}
+                <div className="text-center">
+                  <div className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>Gen 1</div>
+                  <div className="flex flex-col gap-1">
+                    {[1,2,3,4,5].map(i => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full transition-all hover:scale-150"
+                        style={{ backgroundColor: i <= 2 ? 'var(--color-score-high)' : 'var(--color-border)' }}
+                        title={i <= 2 ? 'Selected for breeding' : 'Did not survive'}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
+                  <path d="M5 10 Q20 30 35 10" stroke="var(--color-score-high)" strokeWidth="1.5" fill="none" opacity="0.5"/>
+                  <path d="M5 20 Q20 35 35 20" stroke="var(--color-score-high)" strokeWidth="1.5" fill="none" opacity="0.5"/>
+                  <path d="M5 30 L35 30" stroke="var(--color-border)" strokeWidth="1" strokeDasharray="2 2" fill="none" opacity="0.3"/>
+                </svg>
+
+                {/* Generation 2 */}
+                <div className="text-center">
+                  <div className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>Gen 2</div>
+                  <div className="flex flex-col gap-1">
+                    {[1,2,3,4,5].map(i => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full transition-all hover:scale-150"
+                        style={{ backgroundColor: i <= 2 ? 'var(--color-score-high)' : 'var(--color-border)' }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
+                  <path d="M5 10 Q20 25 35 15" stroke="var(--color-score-high)" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                  <path d="M5 20 Q20 30 35 15" stroke="var(--color-score-high)" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                </svg>
+
+                {/* Generation 3 */}
+                <div className="text-center">
+                  <div className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>Gen 3</div>
+                  <div className="flex flex-col gap-1">
+                    {[1,2,3,4,5].map(i => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full transition-all hover:scale-150"
+                        style={{ backgroundColor: i <= 2 ? 'var(--color-score-high)' : 'var(--color-border)' }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
+                  <path d="M5 15 Q20 20 35 10" stroke="var(--color-score-high)" strokeWidth="2" fill="none" opacity="0.8"/>
+                </svg>
+
+                {/* Generation 4 - Best */}
+                <div className="text-center">
+                  <div className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-soft)' }}>Gen 4</div>
+                  <div className="flex flex-col items-center gap-1">
+                    <div
+                      className="w-5 h-5 rounded-full transition-all hover:scale-150"
+                      style={{ backgroundColor: 'var(--color-score-high)', boxShadow: '0 0 0 2px var(--color-accent)' }}
+                      title="Peak-optimized variant"
+                    />
+                    <div className="text-xs mt-1 font-medium" style={{ color: 'var(--color-score-high)' }}>Best</div>
+                  </div>
+                </div>
               </div>
-            ))}
+
+              <p className="text-center mt-4 text-sm" style={{ color: 'var(--color-text-soft)' }}>
+                Hover over dots to see variant paths. Green variants are selected for breeding.
+              </p>
+            </div>
           </div>
-          <p className="mt-4 text-sm text-center" style={{ color: 'var(--color-text-soft)' }}>
+
+          <p className="mt-6 text-sm text-center" style={{ color: 'var(--color-text-soft)' }}>
             Runs in parallel for all 6 models. Finds peak-optimized content for each AI.
           </p>
         </section>
