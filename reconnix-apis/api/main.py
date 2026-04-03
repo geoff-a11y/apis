@@ -18,22 +18,22 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
 
-from .models import (
+from models import (
     ScoreRequest, MLScore, HealthResponse,
     BenchmarkStatsResponse, CategoryStatsResponse, DimensionStatsResponse,
     TopPerformersResponse, CategoryStatsItem, DimensionStatsItem, TopPerformerItem,
     ScrapeRequest, ScrapeResponse
 )
-from .database import init_database, get_db
-from . import benchmark_service
-from .scraper import fetch_html
+from database import init_database, get_db
+import benchmark_service
+from scraper import fetch_html
+from scorer import score_url
 
 # Get allowed origins from environment variable
 ALLOWED_ORIGINS = os.environ.get(
     "CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000"
 ).split(",")
-from .scorer import score_url
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -288,7 +288,7 @@ async def health_check():
     Returns:
         HealthResponse with status and timestamp
     """
-    from .scorer import DIMENSIONS, EFFECT_SIZES
+    from scorer import DIMENSIONS, EFFECT_SIZES
 
     # Check data dependencies
     if not DIMENSIONS or not EFFECT_SIZES:
