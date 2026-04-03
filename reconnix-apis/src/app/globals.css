@@ -41,6 +41,8 @@
 
   /* Model brand colors */
   --model-gpt54:    #10a37f;
+  --model-gpt52:    #0d8a6a;  /* Darker green for earlier GPT */
+  --model-gpt53:    #0f9476;  /* Mid green for GPT-5.3 */
   --model-o3:       #ffffff;
   --model-gemini:   #4285f4;
   --model-claude:   #d4a853;

@@ -129,7 +129,8 @@ function PageOptimizerV2Inner() {
     scoreBreakdown: null,
   });
 
-  const models = getModels().slice(0, 6);
+  // Filter to confirmatory study models (main study) - excludes exploratory/lineage models
+  const models = getModels().filter(m => m.study_type === 'confirmatory');
   const geographicMarkets = getGeographicMarkets();
 
   const isValidUrl = (urlString: string): boolean => {

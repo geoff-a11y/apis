@@ -154,6 +154,8 @@ export const USE_CASE_CONTEXT_WEIGHTS: Record<'b2b' | 'b2c', GeographicWeights> 
  */
 export const MODEL_NAMES: Record<string, string> = {
   gpt54: 'GPT-5.4',
+  gpt52: 'GPT-5.2',
+  gpt53: 'GPT-5.3',
   o3: 'o3',
   gemini: 'Gemini 3.1',
   claude: 'Claude 4.6',

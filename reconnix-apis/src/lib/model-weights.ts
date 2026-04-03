@@ -83,6 +83,8 @@ export function getModelContributions(
 
   const MODEL_NAMES: Record<string, string> = {
     gpt54: 'GPT-5.4',
+    gpt52: 'GPT-5.2',
+    gpt53: 'GPT-5.3',
     o3: 'o3',
     gemini: 'Gemini 3.1',
     claude: 'Claude 4.6',
@@ -152,6 +154,26 @@ export function generateModelDistribution(
       dim_19: 1.30, // Comparative claims - very responsive
       dim_25: 1.15, // Default selection - more sensitive
     },
+    gpt52: {
+      // GPT-5.2 - earlier version, less refined sensitivities
+      dim_01: 1.10, // Third party authority - moderately sensitive
+      dim_02: 1.15, // Social proof - slightly more than 5.4
+      dim_09: 0.90, // Sustainability - less sensitive
+      dim_14: 1.15, // Warranty - moderately sensitive
+      dim_18: 1.15, // Precision - values specificity
+      dim_19: 1.20, // Comparative claims - responsive
+      dim_25: 1.20, // Default selection - more sensitive than 5.4
+    },
+    gpt53: {
+      // GPT-5.3 - transitional, temperature=1.0 leads to more variance
+      dim_01: 1.12, // Third party authority - moderately sensitive
+      dim_02: 1.08, // Social proof - slightly less than 5.2
+      dim_09: 0.92, // Sustainability - moderately less
+      dim_14: 1.18, // Warranty - growing sensitivity
+      dim_18: 1.22, // Precision - increasing specificity focus
+      dim_19: 1.28, // Comparative claims - high responsiveness
+      dim_25: 1.18, // Default selection - moderate sensitivity
+    },
     claude: {
       dim_01: 1.10, // Third party authority
       dim_09: 1.25, // Sustainability - much more sensitive
@@ -216,6 +238,8 @@ export function generateModelDistribution(
     // Add some natural variance between models (±5-10 points)
     const modelVariance: Record<string, number> = {
       gpt54: 3,
+      gpt52: 1,   // Slightly lower than 5.4
+      gpt53: 2,   // Between 5.2 and 5.4
       claude: -2,
       gemini: 1,
       sonar: -4,
