@@ -1,10 +1,12 @@
-FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
+# Copy requirements first for better caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install dependencies (skip playwright for now - use requests-only scraping)
+RUN pip install --no-cache-dir fastapi uvicorn pydantic requests beautifulsoup4 lxml python-dotenv sqlalchemy
 
 # Copy application code
 COPY . .
@@ -15,5 +17,5 @@ RUN mkdir -p /app/data
 # Default port (Railway will override with $PORT)
 ENV PORT=8000
 
-# Start command using shell form to expand $PORT
+# Start command
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT
