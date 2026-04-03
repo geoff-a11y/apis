@@ -1,0 +1,13 @@
+# Nixpacks configuration for APIS Scoring API
+
+[phases.setup]
+nixPkgs = ["chromium", "python39"]
+
+[phases.install]
+cmds = [
+    "pip install -r requirements.txt",
+    "playwright install chromium --with-deps"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"

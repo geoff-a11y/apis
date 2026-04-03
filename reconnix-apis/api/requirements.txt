@@ -15,6 +15,9 @@ lxml==5.3.0
 # Headless browser for scraping (bypasses bot detection)
 playwright>=1.40.0
 
+# Database
+sqlalchemy>=2.0.0
+
 # Additional utilities (optional but recommended)
 python-dotenv==1.0.1
 
