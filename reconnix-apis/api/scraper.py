@@ -110,12 +110,59 @@ def fetch_with_requests(url: str, timeout: int = 10) -> Tuple[str, str]:
     if soup.title:
         title = soup.title.string or ""
 
-    # Remove script and style elements
-    for script in soup(["script", "style", "nav", "header", "footer"]):
-        script.decompose()
+    # Remove non-content elements comprehensively
+    # This prevents garbage like state dropdowns, legal text, forms from being extracted
+    elements_to_remove = [
+        "script", "style", "nav", "header", "footer",
+        "form", "select", "option", "input", "textarea", "button",
+        "aside", "sidebar", "menu", "menubar",
+        "noscript", "iframe", "embed", "object",
+        "svg", "canvas", "video", "audio",
+    ]
+    for element in soup(elements_to_remove):
+        element.decompose()
+
+    # Remove elements by common class/id patterns that indicate non-content
+    for element in soup.find_all(class_=lambda x: x and any(
+        pattern in str(x).lower() for pattern in [
+            'cookie', 'privacy', 'modal', 'popup', 'banner', 'alert',
+            'sidebar', 'aside', 'nav', 'menu', 'footer', 'header',
+            'legal', 'disclaimer', 'terms', 'policy', 'consent',
+            'dropdown', 'select', 'filter', 'sort', 'pagination',
+            'breadcrumb', 'social', 'share', 'subscribe', 'newsletter',
+            'cart', 'checkout', 'login', 'signup', 'signin',
+        ]
+    )):
+        element.decompose()
+
+    for element in soup.find_all(id=lambda x: x and any(
+        pattern in str(x).lower() for pattern in [
+            'cookie', 'privacy', 'modal', 'popup', 'banner', 'alert',
+            'sidebar', 'nav', 'menu', 'footer', 'header',
+            'legal', 'disclaimer', 'terms', 'policy',
+            'dropdown', 'filter', 'sort',
+        ]
+    )):
+        element.decompose()
 
     # Get text
     body_text = soup.get_text(separator=" ", strip=True)
+
+    # Post-process to remove common patterns that slip through
+    import re
+    # Remove state lists (common in form dropdowns)
+    body_text = re.sub(
+        r'\b(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|'
+        r'Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|'
+        r'Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|'
+        r'Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|'
+        r'New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|'
+        r'Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|'
+        r'Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\s*',
+        ' ', body_text, flags=re.IGNORECASE
+    )
+    # Clean up multiple spaces
+    body_text = re.sub(r'\s+', ' ', body_text).strip()
 
     return title, body_text
 
@@ -196,15 +243,35 @@ def fetch_with_playwright(url: str, timeout: int = 30000) -> Tuple[str, str]:
             # Extract title
             title = page.title()
 
-            # Extract body text (remove scripts, styles, etc.)
+            # Extract body text (remove scripts, styles, forms, and non-content elements)
             body_text = page.evaluate("""
                 () => {
-                    // Remove unwanted elements
-                    const unwanted = document.querySelectorAll('script, style, nav, header, footer, iframe, noscript');
+                    // Remove unwanted elements comprehensively
+                    const unwantedSelectors = [
+                        'script', 'style', 'nav', 'header', 'footer', 'iframe', 'noscript',
+                        'form', 'select', 'option', 'input', 'textarea', 'button',
+                        'aside', 'menu', 'menubar', 'svg', 'canvas', 'video', 'audio',
+                        '[class*="cookie"]', '[class*="privacy"]', '[class*="modal"]',
+                        '[class*="popup"]', '[class*="banner"]', '[class*="sidebar"]',
+                        '[class*="dropdown"]', '[class*="legal"]', '[class*="disclaimer"]',
+                        '[class*="consent"]', '[class*="newsletter"]', '[class*="subscribe"]',
+                        '[id*="cookie"]', '[id*="privacy"]', '[id*="modal"]', '[id*="popup"]',
+                        '[id*="sidebar"]', '[id*="dropdown"]', '[id*="legal"]'
+                    ];
+                    const unwanted = document.querySelectorAll(unwantedSelectors.join(', '));
                     unwanted.forEach(el => el.remove());
 
                     // Get text content
-                    return document.body.innerText || document.body.textContent || '';
+                    let text = document.body.innerText || document.body.textContent || '';
+
+                    // Remove state lists that slip through
+                    const states = /\\b(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\\s*/gi;
+                    text = text.replace(states, ' ');
+
+                    // Clean up multiple spaces
+                    text = text.replace(/\\s+/g, ' ').trim();
+
+                    return text;
                 }
             """)
 
@@ -265,12 +332,44 @@ def fetch_with_scrapingbee(url: str) -> Tuple[str, str]:
     if soup.title:
         title = soup.title.string or ""
 
-    # Remove script and style elements
-    for script in soup(["script", "style", "nav", "header", "footer"]):
-        script.decompose()
+    # Remove non-content elements comprehensively
+    elements_to_remove = [
+        "script", "style", "nav", "header", "footer",
+        "form", "select", "option", "input", "textarea", "button",
+        "aside", "sidebar", "menu", "menubar",
+        "noscript", "iframe", "embed", "object",
+        "svg", "canvas", "video", "audio",
+    ]
+    for element in soup(elements_to_remove):
+        element.decompose()
+
+    # Remove elements by common class/id patterns
+    for element in soup.find_all(class_=lambda x: x and any(
+        pattern in str(x).lower() for pattern in [
+            'cookie', 'privacy', 'modal', 'popup', 'banner', 'alert',
+            'sidebar', 'aside', 'nav', 'menu', 'footer', 'header',
+            'legal', 'disclaimer', 'terms', 'policy', 'consent',
+            'dropdown', 'select', 'filter', 'sort', 'pagination',
+        ]
+    )):
+        element.decompose()
 
     # Get text
     body_text = soup.get_text(separator=" ", strip=True)
+
+    # Post-process to remove state lists
+    import re
+    body_text = re.sub(
+        r'\b(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|'
+        r'Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|'
+        r'Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|'
+        r'Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|'
+        r'New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|'
+        r'Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|'
+        r'Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\s*',
+        ' ', body_text, flags=re.IGNORECASE
+    )
+    body_text = re.sub(r'\s+', ' ', body_text).strip()
 
     # Log API credits used
     credits_used = response.headers.get('Spb-Cost', 'unknown')
@@ -409,3 +508,107 @@ def validate_url(url: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def fetch_html(url: str, timeout: int = 30000) -> Tuple[str, str]:
+    """
+    Fetch raw HTML from a URL with multi-layered fallback strategy.
+
+    Returns raw HTML for further parsing by the caller.
+
+    Strategy:
+    1. Try enhanced requests (fast, works for ~60% of sites)
+    2. Fall back to Playwright (slower but works for ~95% of sites)
+
+    Args:
+        url: Target URL
+        timeout: Timeout in milliseconds for Playwright (default 30s)
+
+    Returns:
+        (html, method) tuple where method is 'requests' or 'playwright'
+
+    Raises:
+        ValueError: If URL is invalid or all methods fail
+    """
+    errors = []
+
+    # Method 1: Enhanced requests (fastest)
+    try:
+        logger.info(f"Fetching HTML from {url} with requests")
+        headers = get_realistic_headers(url)
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=timeout // 1000,  # Convert to seconds
+            allow_redirects=True
+        )
+        response.raise_for_status()
+
+        # Validate we got meaningful content
+        if len(response.text) > 100:
+            logger.info(f"Successfully fetched HTML from {url} with requests")
+            return response.text, "requests"
+        else:
+            errors.append("requests: minimal content")
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            logger.warning(f"403 Forbidden for {url}, trying Playwright")
+            errors.append("requests: 403 Forbidden")
+        else:
+            errors.append(f"requests: HTTP {e.response.status_code}")
+    except Exception as e:
+        errors.append(f"requests: {str(e)[:100]}")
+
+    # Method 2: Playwright (slower but more reliable)
+    if PLAYWRIGHT_AVAILABLE:
+        try:
+            logger.info(f"Fetching HTML from {url} with Playwright")
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=[
+                        '--disable-blink-features=AutomationControlled',
+                        '--disable-features=IsolateOrigins,site-per-process',
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                    ]
+                )
+
+                context = browser.new_context(
+                    viewport={'width': 1920, 'height': 1080},
+                    user_agent=USER_AGENTS[0],
+                    locale='en-US',
+                )
+
+                # Stealth measures
+                context.add_init_script("""
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                """)
+
+                page = context.new_page()
+
+                try:
+                    page.goto(url, wait_until='load', timeout=timeout)
+                    page.wait_for_timeout(2000)  # Wait for dynamic content
+                    html = page.content()
+
+                    if len(html) > 100:
+                        logger.info(f"Successfully fetched HTML from {url} with Playwright")
+                        return html, "playwright"
+                    else:
+                        errors.append("playwright: minimal content")
+                finally:
+                    browser.close()
+
+        except Exception as e:
+            errors.append(f"playwright: {str(e)[:100]}")
+    else:
+        errors.append("playwright: not available")
+
+    # All methods failed
+    error_summary = "; ".join(errors)
+    raise ValueError(f"Failed to fetch HTML with all methods. Errors: {error_summary}")

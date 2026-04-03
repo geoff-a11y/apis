@@ -184,6 +184,8 @@ async def scrape_page(request: ScrapeRequest):
     """
     from bs4 import BeautifulSoup
     import re
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
 
     try:
         logger.info(f"Scraping URL: {request.url}")
@@ -195,8 +197,10 @@ async def scrape_page(request: ScrapeRequest):
                 detail="URL must start with http:// or https://"
             )
 
-        # Fetch HTML using the robust scraper
-        html, method = fetch_html(request.url)
+        # Run sync scraper in thread pool to avoid async/sync conflict
+        loop = asyncio.get_event_loop()
+        with ThreadPoolExecutor() as executor:
+            html, method = await loop.run_in_executor(executor, fetch_html, request.url)
         logger.info(f"Fetched {request.url} using {method}")
 
         # Parse HTML
@@ -318,6 +322,10 @@ async def score_product(request: ScoreRequest, db: Session = Depends(get_db)):
     Raises:
         HTTPException: If URL cannot be fetched or scored
     """
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+    from functools import partial
+
     try:
         logger.info(f"Scoring URL: {request.url}")
 
@@ -328,11 +336,11 @@ async def score_product(request: ScoreRequest, db: Session = Depends(get_db)):
                 detail="URL must start with http:// or https://"
             )
 
-        # Score the URL
-        ml_score = score_url(
-            url=request.url,
-            model_distribution=request.model_distribution
-        )
+        # Run sync scorer in thread pool to avoid async/sync Playwright conflict
+        loop = asyncio.get_event_loop()
+        score_func = partial(score_url, url=request.url, model_distribution=request.model_distribution)
+        with ThreadPoolExecutor() as executor:
+            ml_score = await loop.run_in_executor(executor, score_func)
 
         logger.info(
             f"Scored URL {request.url}: universal_score={ml_score.universal_score}"
