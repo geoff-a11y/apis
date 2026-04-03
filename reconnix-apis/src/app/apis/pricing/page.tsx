@@ -75,36 +75,9 @@ export default function PricingStudyPage() {
     <div className="space-y-12">
       {/* Hero Section */}
       <section className="text-center py-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm mb-4" style={{ backgroundColor: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent)' }} />
-          Pre-registered Study
-        </div>
-        <h1 className="font-display text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-          {summary.headline}
+        <h1 className="font-display text-4xl md:text-5xl font-bold" style={{ color: 'var(--color-text)' }}>
+          Price sensitivity analysis: overview
         </h1>
-        <p className="text-xl max-w-3xl mx-auto mb-6" style={{ color: 'var(--color-text-mid)' }}>
-          {summary.finding}
-        </p>
-        <div className="flex flex-wrap justify-center items-center gap-8">
-          <div className="text-center">
-            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-accent)' }}>
-              38.6pp
-            </span>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>spread at 3x premium</p>
-          </div>
-          <div className="text-center">
-            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-score-high)' }}>
-              59.4%
-            </span>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>Gemini Flash at 3x</p>
-          </div>
-          <div className="text-center">
-            <span className="font-display text-5xl font-bold" style={{ color: 'var(--color-score-low)' }}>
-              20.8%
-            </span>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-soft)' }}>Claude at 3x</p>
-          </div>
-        </div>
       </section>
 
       {/* Key Metrics */}
