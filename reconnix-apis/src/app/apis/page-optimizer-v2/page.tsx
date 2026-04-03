@@ -519,11 +519,15 @@ function PageOptimizerV2Inner() {
     setError(null);
     abortRef.current = new AbortController();
 
-    const original = {
-      title: 'Premium Product',
-      description: 'High-quality product with excellent features.',
-      features: ['Premium quality', 'Advanced technology', 'Durable construction', 'Easy to use'],
-    };
+    // Extract actual content from the URL
+    let original: { title: string; description: string; features: string[] };
+    try {
+      original = await extractPageContent(url);
+    } catch (err) {
+      setError('Unable to fetch page content. Please check the URL and try again.');
+      setIsLoading(false);
+      return;
+    }
 
     const initialState: EvolutionState = {
       url,
@@ -684,6 +688,38 @@ function PageOptimizerV2Inner() {
         </section>
       )}
 
+      {/* Original Content Extracted */}
+      {evolution && evolution.original && (
+        <section className="card p-6" style={{ borderLeft: '4px solid var(--color-text-soft)' }}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-medium" style={{ color: 'var(--color-text)' }}>
+              Extracted from URL
+            </h3>
+            <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-soft)' }}>
+              Original Content
+            </span>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-soft)' }}>TITLE</p>
+              <p style={{ color: 'var(--color-text-mid)' }}>{evolution.original.title}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-soft)' }}>DESCRIPTION</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-mid)' }}>{evolution.original.description || '(No description found)'}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-soft)' }}>FEATURES</p>
+              <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-mid)' }}>
+                {evolution.original.features.map((f, i) => (
+                  <li key={i}>• {f}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Main Evolution Panel */}
       {evolution && (
         <div className="grid lg:grid-cols-2 gap-6">
@@ -755,29 +791,138 @@ function PageOptimizerV2Inner() {
                   </div>
                 )}
 
-                {/* Best variant */}
+                {/* Best variant - Full Copy Output */}
                 {activeModel.bestVariant && (
-                  <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-soft)' }}>Peak Variant</h3>
-                      <button
-                        className="text-xs px-2 py-1 rounded"
-                        style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
-                      >
-                        Copy
-                      </button>
+                  <div className="space-y-4">
+                    {/* Title Section */}
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>TITLE</span>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(activeModel.bestVariant!.copy.title)}
+                          className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                      <p className="text-lg font-medium" style={{ color: 'var(--color-text)' }}>
+                        {activeModel.bestVariant.copy.title}
+                      </p>
                     </div>
-                    <p className="font-medium mb-1" style={{ color: 'var(--color-text)' }}>
-                      {activeModel.bestVariant.copy.title}
-                    </p>
-                    <p className="text-sm mb-2" style={{ color: 'var(--color-text-mid)' }}>
-                      {activeModel.bestVariant.copy.description}
-                    </p>
-                    <ul className="text-sm space-y-1">
-                      {activeModel.bestVariant.copy.features.map((f, i) => (
-                        <li key={i} style={{ color: 'var(--color-text-soft)' }}>• {f}</li>
-                      ))}
-                    </ul>
+
+                    {/* Description Section */}
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>DESCRIPTION</span>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(activeModel.bestVariant!.copy.description)}
+                          className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                      <p style={{ color: 'var(--color-text-mid)' }}>
+                        {activeModel.bestVariant.copy.description}
+                      </p>
+                    </div>
+
+                    {/* Features Section */}
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>FEATURES</span>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(activeModel.bestVariant!.copy.features.join('\n'))}
+                          className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                      <ul className="space-y-2">
+                        {activeModel.bestVariant.copy.features.map((f, i) => (
+                          <li key={i} className="flex items-start gap-2" style={{ color: 'var(--color-text-mid)' }}>
+                            <span style={{ color: 'var(--color-accent)' }}>•</span>
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Structured Data Section */}
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>STRUCTURED DATA (JSON-LD)</span>
+                        <button
+                          onClick={() => {
+                            const schema = {
+                              '@context': 'https://schema.org',
+                              '@type': 'Product',
+                              name: activeModel.bestVariant!.copy.title,
+                              description: activeModel.bestVariant!.copy.description,
+                            };
+                            navigator.clipboard.writeText(JSON.stringify(schema, null, 2));
+                          }}
+                          className="text-xs px-2 py-1 rounded flex items-center gap-1"
+                          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                      <pre className="text-xs font-mono overflow-x-auto" style={{ color: 'var(--color-text-mid)' }}>
+{JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: activeModel.bestVariant.copy.title,
+  description: activeModel.bestVariant.copy.description,
+}, null, 2)}
+                      </pre>
+                    </div>
+
+                    {/* Copy All Button */}
+                    <button
+                      onClick={() => {
+                        const allContent = `# ${activeModel.model_name} Optimized Content
+
+## Title
+${activeModel.bestVariant!.copy.title}
+
+## Description
+${activeModel.bestVariant!.copy.description}
+
+## Features
+${activeModel.bestVariant!.copy.features.map(f => `- ${f}`).join('\n')}
+
+## Structured Data (JSON-LD)
+\`\`\`json
+${JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: activeModel.bestVariant!.copy.title,
+  description: activeModel.bestVariant!.copy.description,
+}, null, 2)}
+\`\`\`
+`;
+                        navigator.clipboard.writeText(allContent);
+                      }}
+                      className="w-full py-3 rounded-lg text-sm font-medium transition-colors"
+                      style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+                    >
+                      Copy All Content for {activeModel.model_name}
+                    </button>
                   </div>
                 )}
               </div>
