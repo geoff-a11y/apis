@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from pathlib import Path
 
-from .models import (
+from models import (
     MLScore,
     SignalPresence,
     SignalInteraction,
@@ -19,7 +19,7 @@ from .models import (
 )
 
 # Import advanced scraper with fallback strategies
-from .scraper import fetch_url_content, validate_url
+from scraper import fetch_url_content, validate_url
 
 
 # Load dimension and effect size data with validation

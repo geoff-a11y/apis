@@ -9,8 +9,8 @@ from typing import Optional, List, Dict, Any
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
 
-from .db_models import BenchmarkEntry
-from .models import MLScore
+from db_models import BenchmarkEntry
+from models import MLScore
 
 logger = logging.getLogger(__name__)
 

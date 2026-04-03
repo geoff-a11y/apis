@@ -33,7 +33,7 @@ def init_database():
     Initialize database, creating tables if they don't exist.
     Call this on application startup.
     """
-    from .db_models import BenchmarkEntry  # Import to register models
+    from db_models import BenchmarkEntry  # Import to register models
     Base.metadata.create_all(bind=engine)
 
 

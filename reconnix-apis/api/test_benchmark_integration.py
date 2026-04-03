@@ -14,7 +14,7 @@ These integration tests verify the full API works with real data.
 import pytest
 from fastapi.testclient import TestClient
 
-from .main import app
+from main import app
 
 
 @pytest.fixture(scope="module")

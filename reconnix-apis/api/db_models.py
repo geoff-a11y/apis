@@ -4,7 +4,7 @@ SQLAlchemy ORM models for APIS benchmark database.
 
 from datetime import datetime
 from sqlalchemy import Column, String, Float, Text, Index, DateTime
-from .database import Base
+from database import Base
 
 
 class BenchmarkEntry(Base):

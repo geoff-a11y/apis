@@ -10,8 +10,8 @@ import uuid
 from pathlib import Path
 from datetime import datetime
 
-from .database import init_database, get_db_session
-from .db_models import BenchmarkEntry
+from database import init_database, get_db_session
+from db_models import BenchmarkEntry
 
 # Data directory
 DATA_DIR = Path(__file__).parent.parent / "data"

@@ -11,10 +11,10 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .database import Base
-from .db_models import BenchmarkEntry
-from .models import MLScore, SignalPresence, ZoneContribution
-from . import benchmark_service
+from database import Base
+from db_models import BenchmarkEntry
+from models import MLScore, SignalPresence, ZoneContribution
+import benchmark_service
 
 
 @pytest.fixture
