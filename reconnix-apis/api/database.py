@@ -9,8 +9,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from contextlib import contextmanager
 
-# Database file location
-DATA_DIR = Path(__file__).parent.parent / "data"
+# Database file location - use env var or detect based on environment
+# In container: /app/data, locally: ../data relative to api/
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent / "data")))
+if not DATA_DIR.exists():
+    # Fallback to parent.parent/data for local development
+    DATA_DIR = Path(__file__).parent.parent / "data"
 DATABASE_PATH = DATA_DIR / "benchmark.db"
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 

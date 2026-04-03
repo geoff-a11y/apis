@@ -23,7 +23,12 @@ from scraper import fetch_url_content, validate_url
 
 
 # Load dimension and effect size data with validation
-DATA_DIR = Path(__file__).parent.parent / "data"
+# In container: /app/data, locally: ../data relative to api/
+import os
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent / "data")))
+if not DATA_DIR.exists():
+    # Fallback to parent.parent/data for local development
+    DATA_DIR = Path(__file__).parent.parent / "data"
 
 def load_json_safe(filepath: Path, default: list) -> list:
     """Load JSON file with validation and fallback."""
