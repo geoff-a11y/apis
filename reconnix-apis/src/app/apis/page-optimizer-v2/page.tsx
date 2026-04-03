@@ -61,7 +61,7 @@ const EVOLUTION_CONFIG = {
 };
 
 // API URL for backend scraping
-const API_URL = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://api.agentonomics.io';
+const API_URL = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://apis-scoring-api-production.up.railway.app';
 
 // Extract page content via backend scraper (uses Playwright for reliability)
 async function extractPageContent(url: string): Promise<{
