@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, Suspense, useCallback } from 'react';
+import { useState, useRef, Suspense, useCallback, useEffect } from 'react';
 import { getModels } from '@/lib/data';
 import {
   GEOGRAPHIC_WEIGHTS,
@@ -62,6 +62,12 @@ interface GenerationLog {
   userFeedback?: string;
 }
 
+interface ThinkingStep {
+  timestamp: number;
+  type: 'generation' | 'fidelity' | 'scoring' | 'selection' | 'mutation' | 'analysis';
+  content: string;
+}
+
 interface EvolutionStateV3 {
   status: 'idle' | 'fetching' | 'analyzing' | 'evolving' | 'complete' | 'error';
   url: string;
@@ -78,6 +84,7 @@ interface EvolutionStateV3 {
   weights: Weights;
   userFeedback: string;
   userGuidedCount: number;
+  thinkingLog: ThinkingStep[];
 }
 
 // ============================================================================
@@ -555,30 +562,79 @@ function VariantDetail({
     ? scoreBrandVoiceConsistency(variant, brandVoiceProfile)
     : null;
 
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: variant.title,
+    description: variant.description,
+  }, null, 2);
+
+  const allContent = `# Optimized Content
+
+## Title
+${variant.title}
+
+## Description
+${variant.description}
+
+## Features
+${variant.features?.map(f => `- ${f}`).join('\n') || ''}
+
+## Structured Data (JSON-LD)
+\`\`\`json
+${jsonLd}
+\`\`\`
+`;
+
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-        Selected Variant
-      </h3>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+          Optimized Copy Output
+        </h3>
+        <div className="flex gap-2">
+          <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-accent-muted)', color: 'var(--color-accent)' }}>
+            Fitness: {variant.fitness?.toFixed(1)}
+          </span>
+        </div>
+      </div>
 
       <div className="space-y-4">
-        <div>
-          <label className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Title</label>
-          <p className="font-medium" style={{ color: 'var(--color-text)' }}>{variant.title}</p>
-        </div>
+        {/* Title */}
+        <CopyableSection label="TITLE" content={variant.title || ''} />
 
-        <div>
-          <label className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Description</label>
-          <p className="text-sm" style={{ color: 'var(--color-text-soft)' }}>{variant.description}</p>
-        </div>
+        {/* Description */}
+        <CopyableSection label="DESCRIPTION" content={variant.description || ''} />
 
-        <div>
-          <label className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Features</label>
-          <ul className="list-disc list-inside text-sm" style={{ color: 'var(--color-text-soft)' }}>
-            {variant.features?.map((f, i) => <li key={i}>{f}</li>)}
+        {/* Features */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>FEATURES</span>
+            <button
+              onClick={() => navigator.clipboard.writeText(variant.features?.join('\n') || '')}
+              className="text-xs px-2 py-1 rounded flex items-center gap-1"
+              style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {variant.features?.map((f, i) => (
+              <li key={i} className="flex items-start gap-2" style={{ color: 'var(--color-text-mid)' }}>
+                <span style={{ color: 'var(--color-accent)' }}>•</span>
+                {f}
+              </li>
+            ))}
           </ul>
         </div>
 
+        {/* JSON-LD */}
+        <CopyableSection label="STRUCTURED DATA (JSON-LD)" content={jsonLd} isCode />
+
+        {/* Brand Voice Consistency */}
         {voiceConsistency && (
           <div className="p-3 rounded" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex justify-between items-center">
@@ -600,16 +656,14 @@ function VariantDetail({
           </div>
         )}
 
-        <div className="flex gap-2">
-          <button
-            className="btn btn-primary flex-1"
-            onClick={() => {
-              navigator.clipboard.writeText(`${variant.title}\n\n${variant.description}\n\n${variant.features?.join('\n')}`);
-            }}
-          >
-            Copy to Clipboard
-          </button>
-        </div>
+        {/* Copy All Button */}
+        <button
+          onClick={() => navigator.clipboard.writeText(allContent)}
+          className="w-full py-3 rounded-lg text-sm font-medium transition-colors"
+          style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+        >
+          Copy All Optimized Content
+        </button>
       </div>
     </div>
   );
@@ -667,6 +721,147 @@ function GenerationProgress({
   );
 }
 
+function ThinkingPanel({
+  thinkingLog,
+  isRunning,
+}: {
+  thinkingLog: ThinkingStep[];
+  isRunning: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new entries are added
+  useEffect(() => {
+    if (panelRef.current && isRunning) {
+      panelRef.current.scrollTop = panelRef.current.scrollHeight;
+    }
+  }, [thinkingLog, isRunning]);
+
+  const getTypeStyle = (type: ThinkingStep['type']) => {
+    switch (type) {
+      case 'generation':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'fidelity':
+        return 'bg-red-500/20 text-red-400';
+      case 'scoring':
+        return 'bg-yellow-500/20 text-yellow-400';
+      case 'selection':
+        return 'bg-green-500/20 text-green-400';
+      case 'mutation':
+        return 'bg-purple-500/20 text-purple-400';
+      case 'analysis':
+        return 'bg-cyan-500/20 text-cyan-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
+    }
+  };
+
+  return (
+    <div className="card p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-medium" style={{ color: 'var(--color-text)' }}>
+          Visible Thinking
+        </h3>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-xs px-2 py-1 rounded"
+          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-soft)' }}
+        >
+          {isExpanded ? 'Hide' : 'Show'}
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div
+          ref={panelRef}
+          className="h-[300px] overflow-y-auto space-y-2 font-mono text-xs"
+          style={{ backgroundColor: 'var(--color-bg)', borderRadius: '8px', padding: '12px' }}
+        >
+          {thinkingLog.length === 0 && !isRunning && (
+            <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
+              Thinking will appear here during optimization...
+            </div>
+          )}
+          {thinkingLog.map((step, i) => (
+            <div key={i} className="flex gap-2 items-start">
+              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${getTypeStyle(step.type)}`}>
+                {step.type.toUpperCase()}
+              </span>
+              <span style={{ color: 'var(--color-text-mid)' }}>
+                {step.content}
+              </span>
+            </div>
+          ))}
+          {isRunning && (
+            <div className="flex gap-1 py-2">
+              <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-accent)', animationDelay: '300ms' }} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CopyableSection({
+  label,
+  content,
+  isCode = false,
+}: {
+  label: string;
+  content: string;
+  isCode?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>{label}</span>
+        <button
+          onClick={handleCopy}
+          className="text-xs px-2 py-1 rounded flex items-center gap-1 transition-colors"
+          style={{ backgroundColor: 'var(--color-surface)', color: copied ? 'var(--color-score-high)' : 'var(--color-accent)' }}
+        >
+          {copied ? (
+            <>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Copied
+            </>
+          ) : (
+            <>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      {isCode ? (
+        <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap" style={{ color: 'var(--color-text-mid)' }}>
+          {content}
+        </pre>
+      ) : (
+        <p className={label === 'TITLE' ? 'text-lg font-medium' : 'text-sm'} style={{ color: 'var(--color-text)' }}>
+          {content}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ============================================================================
 // Main Page Component
 // ============================================================================
@@ -690,7 +885,16 @@ function PageOptimizerV3Inner() {
     weights: WEIGHT_PRESETS.balanced,
     userFeedback: '',
     userGuidedCount: 0,
+    thinkingLog: [],
   });
+
+  // Helper to add thinking steps
+  const addThinking = useCallback((type: ThinkingStep['type'], content: string) => {
+    setEvolution(prev => ({
+      ...prev,
+      thinkingLog: [...prev.thinkingLog, { timestamp: Date.now(), type, content }],
+    }));
+  }, []);
   const [selectedVariant, setSelectedVariant] = useState<ScoredVariant | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -716,19 +920,39 @@ function PageOptimizerV3Inner() {
       return;
     }
 
-    setEvolution(prev => ({ ...prev, status: 'fetching', errorMessage: null }));
+    // Clear previous state and start fresh
+    setEvolution(prev => ({
+      ...prev,
+      status: 'fetching',
+      errorMessage: null,
+      thinkingLog: [],
+      generations: [],
+      allVariants: [],
+      paretoFrontier: [],
+      bestVariant: null,
+    }));
+
+    addThinking('analysis', `Fetching content from ${url}...`);
 
     try {
       // Extract page content
       const original = await extractPageContent(url);
 
+      addThinking('analysis', `Extracted: "${original.title}" with ${original.features?.length || 0} features.`);
+      addThinking('analysis', `Description: ${(original.description || '').slice(0, 100)}...`);
+
       // Analyze baseline scores
       const kw = keyword || original.title?.split(' ')[0] || 'product';
       const baseline = analyzeBaseline(original, kw);
 
+      addThinking('scoring', `Baseline scores: AI=${baseline.ai}, SEO=${baseline.seo}, Human=${baseline.human}`);
+
       // Analyze brand voice
       const brandVoiceProfile = analyzeBrandVoice(original);
       const brandVoiceGuidelines = generateBrandVoiceGuidelines(brandVoiceProfile);
+
+      addThinking('analysis', `Brand voice: ${brandVoiceProfile.formality > 60 ? 'Formal' : 'Casual'}, ${brandVoiceProfile.enthusiasm > 60 ? 'Enthusiastic' : 'Reserved'}`);
+      addThinking('analysis', `Ready to optimize. Click "Start Optimization" to begin evolution.`);
 
       setEvolution(prev => ({
         ...prev,
@@ -740,15 +964,8 @@ function PageOptimizerV3Inner() {
         brandVoiceGuidelines,
       }));
 
-      // Short delay to show analysis state
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setEvolution(prev => ({
-        ...prev,
-        status: 'analyzing',
-      }));
-
     } catch (error) {
+      addThinking('analysis', `Error: ${error instanceof Error ? error.message : 'Failed to analyze page'}`);
       setEvolution(prev => ({
         ...prev,
         status: 'error',
@@ -762,6 +979,7 @@ function PageOptimizerV3Inner() {
     if (!evolution.original || !evolution.baseline) return;
 
     setEvolution(prev => ({ ...prev, status: 'evolving', currentGeneration: 1 }));
+    addThinking('generation', `Starting evolutionary optimization with ${EVOLUTION_CONFIG_V3.populationSize} variants over ${EVOLUTION_CONFIG_V3.generations} generations.`);
 
     try {
       let currentVariants: ScoredVariant[] = [];
@@ -771,6 +989,10 @@ function PageOptimizerV3Inner() {
       // Run 5 generations
       for (let gen = 1; gen <= 5; gen++) {
         setEvolution(prev => ({ ...prev, currentGeneration: gen }));
+        const model = getModelForGeneration(gen);
+        const useHumanJudge = shouldUseHumanJudge(gen);
+
+        addThinking('generation', `Generation ${gen}: Using ${model} for mutations. ${useHumanJudge ? 'Human Judge active.' : 'Estimator only.'}`);
 
         // Generate variants (in real implementation, this would call LLM)
         const newVariantsRaw = generateMockVariants(
@@ -779,6 +1001,8 @@ function PageOptimizerV3Inner() {
           gen,
           evolution.brandVoiceGuidelines || undefined
         );
+
+        addThinking('mutation', `Created ${newVariantsRaw.length} variant${newVariantsRaw.length > 1 ? 's' : ''} for Generation ${gen}.`);
 
         // Score variants
         const scored = newVariantsRaw.map(v => {
@@ -792,12 +1016,15 @@ function PageOptimizerV3Inner() {
           } as ScoredVariant;
         });
 
+        addThinking('scoring', `Scored ${scored.length} variants. Best: ${Math.max(...scored.map(v => v.penalizedFitness)).toFixed(1)}`);
+
         // Combine with elite from previous generation
         if (currentVariants.length > 0) {
           const elites = currentVariants
             .sort((a, b) => b.penalizedFitness - a.penalizedFitness)
             .slice(0, 2);
           scored.push(...elites);
+          addThinking('selection', `Preserved ${elites.length} elite variants from previous generation.`);
         }
 
         // Sort by fitness
@@ -806,15 +1033,18 @@ function PageOptimizerV3Inner() {
 
         // Log generation
         const fitnesses = scored.map(v => v.penalizedFitness);
+        const bestFitness = Math.max(...fitnesses);
         allGenerations.push({
           generation: gen,
           timestamp: Date.now(),
           variantsCount: scored.length,
-          bestFitness: Math.max(...fitnesses),
+          bestFitness,
           avgFitness: fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length,
-          model: getModelForGeneration(gen),
-          humanJudgeUsed: shouldUseHumanJudge(gen),
+          model,
+          humanJudgeUsed: useHumanJudge,
         });
+
+        addThinking('selection', `Gen ${gen} complete. Best fitness: ${bestFitness.toFixed(1)}. Top variant: "${scored[0]?.title?.slice(0, 50)}..."`);
 
         setEvolution(prev => ({
           ...prev,
@@ -827,6 +1057,8 @@ function PageOptimizerV3Inner() {
       }
 
       // Find Pareto frontier
+      addThinking('analysis', `Calculating Pareto frontier from ${currentVariants.length} final variants...`);
+
       const paretoInput = currentVariants.map(v => ({
         id: v.id,
         ai: v.scores.ai,
@@ -837,8 +1069,19 @@ function PageOptimizerV3Inner() {
       const frontier = findParetoFrontier(paretoInput);
       const namedFrontier = assignNicknames(frontier);
 
+      addThinking('selection', `Found ${frontier.length} variants on Pareto frontier.`);
+
+      // Log nicknames
+      namedFrontier.forEach(v => {
+        if (v.nickname) {
+          addThinking('selection', `"${v.nickname}": AI=${v.ai}, SEO=${v.seo}, Human=${v.human}${v.recommended ? ' [RECOMMENDED]' : ''}`);
+        }
+      });
+
       // Find best variant
       const bestVariant = currentVariants[0];
+
+      addThinking('analysis', `Evolution complete! Best overall variant: "${bestVariant?.title?.slice(0, 50)}..." with fitness ${bestVariant?.penalizedFitness?.toFixed(1)}`);
 
       setEvolution(prev => ({
         ...prev,
@@ -1108,13 +1351,24 @@ function PageOptimizerV3Inner() {
           </div>
         )}
 
-        {/* Evolution Progress */}
-        {(evolution.status === 'evolving' || evolution.status === 'complete') && (
-          <div className="mb-6">
-            <GenerationProgress
-              generations={evolution.generations}
-              currentGeneration={evolution.currentGeneration}
-              isRunning={evolution.status === 'evolving'}
+        {/* Evolution Progress + Thinking Panel */}
+        {(evolution.status === 'evolving' || evolution.status === 'complete' || evolution.status === 'analyzing' || evolution.status === 'fetching') && evolution.thinkingLog.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+            {/* Left: Progress or Results */}
+            <div className="space-y-4">
+              {(evolution.status === 'evolving' || evolution.status === 'complete') && (
+                <GenerationProgress
+                  generations={evolution.generations}
+                  currentGeneration={evolution.currentGeneration}
+                  isRunning={evolution.status === 'evolving'}
+                />
+              )}
+            </div>
+
+            {/* Right: Thinking Panel */}
+            <ThinkingPanel
+              thinkingLog={evolution.thinkingLog}
+              isRunning={evolution.status === 'evolving' || evolution.status === 'fetching'}
             />
           </div>
         )}
@@ -1139,7 +1393,7 @@ function PageOptimizerV3Inner() {
               />
             )}
 
-            {/* Selected Variant Detail */}
+            {/* Selected Variant Detail / Optimized Copy Output */}
             {selectedVariant && (
               <VariantDetail
                 variant={selectedVariant}
