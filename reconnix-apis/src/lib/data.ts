@@ -49,8 +49,9 @@ export const getConfirmatoryDimensions = (): Dimension[] => {
 };
 
 // Effect Sizes
+// Note: Using unknown to handle data structure mismatch
 export const getEffectSizes = (context = 'pooled'): EffectSize[] =>
-  (effectSizesData as EffectSize[]).filter((e) => e.context === context);
+  (effectSizesData as unknown as EffectSize[]).filter((e) => e.context === context);
 
 export const getEffectSize = (
   dim_id: string,
