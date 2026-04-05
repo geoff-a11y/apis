@@ -7,12 +7,12 @@ import { useState } from 'react';
 const navLinks = [
   { href: '/', label: 'Overview' },
   { href: '/models', label: 'Models' },
-  { href: '/fingerprints', label: 'Fingerprints' },
+  { href: '/genomes', label: 'Genomes' },
   { href: '/dimensions', label: 'Dimensions' },
   { href: '/score', label: 'Page Assessment' },
   { href: '/apis/benchmarks', label: 'Page Benchmarks' },
   { href: '/apis/pricing', label: 'Pricing Study' },
-  { href: '/apis/page-optimizer-v2', label: 'Page Optimizer' },
+  { href: '/apis/page-optimizer-v3', label: 'Page Optimizer' },
 ];
 
 export function TopNav() {

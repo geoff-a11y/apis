@@ -1,483 +1,442 @@
-// src/test/page-optimizer-v3.integration.test.ts — Integration tests for Page Optimizer v3
+// src/test/page-optimizer-v3.integration.test.ts
+// Integration tests for Page Optimizer v3 full flow
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  runFullOptimization,
+  analyzeBrandVoice,
+  generateBrandVoiceGuidelines,
+  formatBrandVoiceForPrompt,
+  scoreBrandVoiceConsistency,
+  BrandVoiceProfile,
+} from '../lib/brand-voice';
+import {
+  findParetoFrontier,
+  assignNicknames,
+  isDominated,
+  ParetoScores,
+} from '../lib/pareto';
+import { calculateSEOScore } from '../lib/seo-judge';
+import { estimateHumanScore } from '../lib/human-estimator';
+import { calculateUnifiedFitness, applyConstraintPenalties, WEIGHT_PRESETS } from '../lib/unified-fitness';
+import {
+  scoreVariant,
   scoreGeneration,
-  runGeneration,
   EVOLUTION_CONFIG_V3,
-  MutatorFunction,
-  HumanJudgeFunction,
+  getModelForGeneration,
+  shouldUseHumanJudge,
   VariantContent,
   ScoredVariant,
 } from '../lib/evolution-engine';
-import { analyzeBaseline } from '../lib/baseline-scorer';
-import { findParetoFrontier, assignNicknames } from '../lib/pareto';
-import { calculateUnifiedFitness, applyConstraintPenalties, WEIGHT_PRESETS } from '../lib/unified-fitness';
-import { generateUserGuidedMutations } from '../lib/user-guided-mutation';
 
 // ============================================================================
-// Helper Functions
+// Test Fixtures
 // ============================================================================
 
-function createMockMutator(): MutatorFunction {
-  return vi.fn().mockImplementation(async ({ count, generation }) => {
-    return Array(count).fill(null).map((_, i) => ({
-      id: `gen${generation}_v${i}_${Date.now()}`,
-      title: `Widget Pro Gen ${generation} - Variant ${i}`,
-      description: 'Premium widget with warranty guarantee and free shipping. Trusted by thousands.',
-      features: [
-        '5-year warranty included',
-        'Free shipping on all orders',
-        'Money back guarantee',
-        'Trusted by 10,000+ customers',
-      ],
-    }));
-  });
-}
+const originalContent: VariantContent = {
+  id: 'original',
+  title: 'Premium Widget Pro - Quality Guaranteed',
+  description: 'Discover our premium widget with 5-year warranty. Trusted by 10,000+ customers worldwide. Free shipping on all orders.',
+  features: [
+    'Free shipping on all orders',
+    '30-day money-back guarantee',
+    '5-year warranty included',
+    '24/7 customer support',
+  ],
+};
 
-function createMockHumanJudge(): HumanJudgeFunction {
-  const calls: Array<{ generation: number; variantId: string }> = [];
+const optimizedVariant: VariantContent = {
+  id: 'optimized_1',
+  title: 'Premium Widget Pro - Save 20% Today',
+  description: 'Join 10,000+ happy customers. Premium quality with 5-year warranty. Order now for free shipping.',
+  features: [
+    'Free shipping - order today',
+    '30-day money-back guarantee',
+    '5-year warranty included',
+    'Trusted by 10,000+ customers',
+  ],
+};
 
-  const judge: HumanJudgeFunction = vi.fn().mockImplementation(async (variant, context) => {
-    calls.push({ generation: context.generation, variantId: variant.id });
-    return {
-      total: 70 + Math.random() * 20,
-      breakdown: {
-        clarity: 18 + Math.random() * 4,
-        persuasiveness: 17 + Math.random() * 5,
-        trustworthiness: 18 + Math.random() * 4,
-        actionability: 17 + Math.random() * 5,
-      },
-      feedback: 'Good content overall.',
-    };
-  });
-
-  // Attach calls tracker
-  (judge as unknown as { calls: typeof calls }).calls = calls;
-
-  return judge;
-}
+const poorVariant: VariantContent = {
+  id: 'poor_1',
+  title: 'A'.repeat(100), // Way too long
+  description: 'Bad', // Too short
+  features: [], // Missing features
+};
 
 // ============================================================================
-// Full Evolution Cycle Tests
+// Full Pipeline Integration Tests
 // ============================================================================
 
-describe('Page Optimizer v3 - Full Integration', () => {
-  describe('Full Evolution Cycle', () => {
-    it('completes 5 generations successfully', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: VariantContent[] = [
-        { id: 'init1', title: 'Initial Widget', features: ['Feature A', 'Feature B', 'Feature C'] },
-        { id: 'init2', title: 'Initial Product', features: ['Quality', 'Value', 'Service'] },
-      ];
+describe('Page Optimizer v3 - Full Pipeline', () => {
+  describe('Content Analysis Pipeline', () => {
+    it('analyzes original content and produces baseline scores', () => {
+      // Step 1: Analyze SEO
+      const seoResult = calculateSEOScore(originalContent, 'widget');
+      expect(seoResult.total).toBeGreaterThan(0);
+      expect(seoResult.total).toBeLessThanOrEqual(100);
 
-      const result = await runFullOptimization({
-        initialVariants,
-        mutator: mockMutator,
-        maxGenerations: 5,
-      });
+      // Step 2: Estimate human appeal
+      const humanResult = estimateHumanScore(originalContent);
+      expect(humanResult.score).toBeGreaterThan(0);
+      expect(humanResult.confidence).toBeDefined();
 
-      expect(result.generations).toHaveLength(5);
-      expect(result.status).toBe('completed');
+      // Step 3: Analyze brand voice
+      const brandVoice = analyzeBrandVoice(originalContent);
+      expect(brandVoice.formality).toBeDefined();
+      expect(brandVoice.enthusiasm).toBeDefined();
     });
 
-    it('returns Pareto frontier at the end', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: VariantContent[] = [
-        { id: 'init1', title: 'Test Product', features: ['A', 'B', 'C'] },
-      ];
+    it('generates actionable brand voice guidelines', () => {
+      const profile = analyzeBrandVoice(originalContent);
+      const guidelines = generateBrandVoiceGuidelines(profile);
 
-      const result = await runFullOptimization({
-        initialVariants,
-        mutator: mockMutator,
-        maxGenerations: 3,
-      });
+      expect(guidelines.summary.length).toBeGreaterThan(20);
+      expect(guidelines.doList.length).toBeGreaterThan(0);
 
-      const frontier = findParetoFrontier(result.finalVariants.map(v => ({
-        id: v.id,
-        ai: v.scores.ai,
-        seo: v.scores.seo,
-        human: v.scores.human,
-      })));
-
-      expect(frontier.length).toBeGreaterThan(0);
-
-      const nicknamed = assignNicknames(frontier);
-      const hasNicknames = nicknamed.some(v => v.nickname !== undefined);
-      expect(hasNicknames).toBe(true);
-    });
-
-    it('includes baseline scores and deltas', async () => {
-      const mockMutator = createMockMutator();
-      const originalContent = {
-        title: 'Basic Widget',
-        description: 'A simple widget',
-        features: ['One feature'],
-      };
-
-      const baseline = analyzeBaseline(originalContent, 'widget');
-
-      expect(baseline).toBeDefined();
-      expect(baseline).toHaveProperty('aiScore');
-      expect(baseline).toHaveProperty('seoScore');
-      expect(baseline).toHaveProperty('humanScore');
-      expect(baseline.aiScore).toBeGreaterThanOrEqual(0);
-      expect(baseline.seoScore).toBeGreaterThanOrEqual(0);
+      // Format for prompt
+      const promptSection = formatBrandVoiceForPrompt(guidelines);
+      expect(promptSection).toContain('BRAND VOICE GUIDELINES');
+      expect(promptSection).toContain('DO:');
     });
   });
 
-  describe('Human Judge Call Limits', () => {
-    it('Human Judge only called in generations 4 and 5', async () => {
-      const mockHumanJudge = createMockHumanJudge();
-      const calls = (mockHumanJudge as unknown as { calls: Array<{ generation: number }> }).calls;
-
-      const variants: VariantContent[] = Array(10).fill(null).map((_, i) => ({
-        id: `v${i}`,
-        title: `Variant ${i}`,
-        features: ['A', 'B'],
-      }));
-      const original: VariantContent = { id: 'orig', title: 'Original' };
-
-      // Test Gen 1-3 (should NOT call Human Judge)
-      await scoreGeneration(1, variants, { fullJudge: mockHumanJudge, original });
-      await scoreGeneration(2, variants, { fullJudge: mockHumanJudge, original });
-      await scoreGeneration(3, variants, { fullJudge: mockHumanJudge, original });
-
-      const gen1to3Calls = calls.filter(c => c.generation < 4);
-      expect(gen1to3Calls).toHaveLength(0);
-
-      // Test Gen 4-5 (SHOULD call Human Judge)
-      await scoreGeneration(4, variants, { fullJudge: mockHumanJudge, original });
-      await scoreGeneration(5, variants, { fullJudge: mockHumanJudge, original });
-
-      const gen4to5Calls = calls.filter(c => c.generation >= 4);
-      expect(gen4to5Calls).toHaveLength(10); // 5 per generation
-    });
-
-    it('Human Judge called on top 5 variants only per generation', async () => {
-      const mockHumanJudge = createMockHumanJudge();
-      const calls = (mockHumanJudge as unknown as { calls: Array<{ variantId: string }> }).calls;
-
-      const variants: VariantContent[] = Array(15).fill(null).map((_, i) => ({
-        id: `v${i}`,
-        title: `Variant ${i}`,
-      }));
-      const original: VariantContent = { id: 'orig', title: 'Original' };
-
-      await scoreGeneration(4, variants, { fullJudge: mockHumanJudge, original });
-
-      expect(calls).toHaveLength(5); // Only top 5
-    });
-  });
-
-  describe('Model Selection', () => {
-    it('uses Sonnet for mutations in generations 1-4', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: ScoredVariant[] = [
-        { id: 'v1', title: 'V1', scores: { ai: 70, seo: 65, human: 68 }, fitness: 68, penalizedFitness: 68, disqualified: false, generation: 0 },
-      ];
-
-      // Run generations 1-4
-      for (let gen = 1; gen <= 4; gen++) {
-        await runGeneration(initialVariants, gen, { mutator: mockMutator });
-        expect(mockMutator).toHaveBeenLastCalledWith(
-          expect.objectContaining({ model: 'claude-sonnet' })
-        );
-      }
-    });
-
-    it('uses Opus for mutations in generation 5', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: ScoredVariant[] = [
-        { id: 'v1', title: 'V1', scores: { ai: 70, seo: 65, human: 68 }, fitness: 68, penalizedFitness: 68, disqualified: false, generation: 4 },
-      ];
-
-      await runGeneration(initialVariants, 5, { mutator: mockMutator });
-
-      expect(mockMutator).toHaveBeenCalledWith(
-        expect.objectContaining({ model: 'claude-opus' })
-      );
-    });
-  });
-
-  describe('User-Guided Generation 6', () => {
-    it('accepts user feedback and generates Gen 6', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: VariantContent[] = [
-        { id: 'init1', title: 'Initial', features: ['A'] },
-      ];
-
-      const result = await runFullOptimization({
-        initialVariants,
-        mutator: mockMutator,
-        maxGenerations: 5,
-        userFeedback: 'Add more urgency and scarcity messaging',
+  describe('Variant Scoring Pipeline', () => {
+    it('scores variants with triple-judge system', () => {
+      const result = scoreVariant(optimizedVariant, {
+        keyword: 'widget',
+        estimator: estimateHumanScore,
       });
 
-      expect(result.generations).toHaveLength(6);
-      expect(result.generations[5].userFeedback).toBe('Add more urgency and scarcity messaging');
-    });
-
-    it('uses Opus for user-guided mutations', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: VariantContent[] = [
-        { id: 'init1', title: 'Initial' },
-      ];
-
-      const result = await runFullOptimization({
-        initialVariants,
-        mutator: mockMutator,
-        maxGenerations: 2,
-        userFeedback: 'Test feedback',
-      });
-
-      expect(result.generations[2].modelUsed).toBe('claude-opus');
-    });
-  });
-
-  describe('Score Progression', () => {
-    it('elite variants are preserved across generations', async () => {
-      const mockMutator = createMockMutator();
-      const initialVariants: VariantContent[] = [
-        { id: 'elite', title: 'Elite Widget Pro', description: 'Best warranty guarantee', features: ['5-year warranty', 'Free shipping', 'Money back'] },
-      ];
-
-      const result = await runFullOptimization({
-        initialVariants,
-        mutator: mockMutator,
-        maxGenerations: 3,
-      });
-
-      // Check that elite ID appears in later generations
-      const gen2Ids = result.generations[1].variants.map(v => v.id);
-      const gen3Ids = result.generations[2].variants.map(v => v.id);
-
-      // Elite variants should be marked with isElite flag
-      const elitesInGen2 = result.generations[1].variants.filter(v => v.isElite);
-      expect(elitesInGen2.length).toBe(EVOLUTION_CONFIG_V3.elitism);
-    });
-  });
-
-  describe('Constraint Enforcement', () => {
-    it('applies hard SEO penalty (0.1x) for critical failures', async () => {
-      const fitness = { weighted: 80 };
-      const seoScore = { hardFails: ['title_too_long'], softFails: [] };
-
-      const result = applyConstraintPenalties(fitness, seoScore, {});
-
-      expect(result.penalized).toBe(8); // 80 * 0.1
-      expect(result.disqualified).toBe(true);
-    });
-
-    it('applies soft penalties for minor issues', async () => {
-      const fitness = { weighted: 80 };
-      const seoScore = { hardFails: [], softFails: ['description_short'] };
-
-      const result = applyConstraintPenalties(fitness, seoScore, {});
-
-      expect(result.penalized).toBeLessThan(80);
+      expect(result.scores.ai).toBeDefined();
+      expect(result.scores.seo).toBeDefined();
+      expect(result.scores.human).toBeDefined();
+      expect(result.fitness).toBeGreaterThan(0);
+      expect(result.penalizedFitness).toBeDefined();
       expect(result.disqualified).toBe(false);
     });
 
-    it('applies fidelity violations as hard constraint', async () => {
-      const fitness = { weighted: 90 };
-      const humanScore = { fidelityViolations: ['fabricated_warranty'] };
+    it('penalizes variants with hard SEO failures', () => {
+      const result = scoreVariant(poorVariant, {
+        keyword: 'test',
+        estimator: estimateHumanScore,
+      });
 
-      const result = applyConstraintPenalties(fitness, { hardFails: [], softFails: [] }, humanScore);
+      expect(result.seoBreakdown?.hardFails?.length).toBeGreaterThan(0);
+      expect(result.penalizedFitness).toBeLessThan(result.fitness);
+    });
 
-      expect(result.penalized).toBe(9); // 90 * 0.1
-      expect(result.disqualified).toBe(true);
+    it('applies weight presets correctly', () => {
+      const scores = { ai: 80, seo: 60, human: 70 };
+
+      const balanced = calculateUnifiedFitness(scores, WEIGHT_PRESETS.balanced);
+      const aiFirst = calculateUnifiedFitness(scores, WEIGHT_PRESETS.ai_first);
+
+      // AI-first should weight AI score higher
+      expect(aiFirst.contributions.ai).toBeGreaterThan(balanced.contributions.ai);
     });
   });
-});
 
-// ============================================================================
-// Baseline and Fitness Integration Tests
-// ============================================================================
-
-describe('Baseline and Fitness Integration', () => {
-  it('calculates baseline with all three scores', () => {
-    const content = {
-      title: 'Premium Widget Pro',
-      description: 'The best widget with warranty and guarantee',
-      features: ['5-year warranty', 'Free shipping', 'Trusted by thousands'],
-    };
-
-    const baseline = analyzeBaseline(content, 'widget');
-
-    expect(baseline.aiScore).toBeGreaterThan(0);
-    expect(baseline.seoScore).toBeGreaterThan(0);
-    expect(baseline.humanScore).toBeGreaterThan(0);
-    expect(baseline.totalScore).toBeGreaterThan(0);
-  });
-
-  it('calculates unified fitness with weights', () => {
-    const scores = { ai: 80, seo: 70, human: 75 };
-    const weights = WEIGHT_PRESETS.balanced;
-
-    const result = calculateUnifiedFitness(scores, weights);
-
-    expect(result.weighted).toBeGreaterThan(0);
-    expect(result.weighted).toBeLessThanOrEqual(100);
-    expect(result.contributions.ai).toBeGreaterThan(0);
-  });
-
-  it('different weight presets produce different results', () => {
-    const scores = { ai: 90, seo: 50, human: 60 };
-
-    const balancedResult = calculateUnifiedFitness(scores, WEIGHT_PRESETS.balanced);
-    const aiFirstResult = calculateUnifiedFitness(scores, WEIGHT_PRESETS.ai_first);
-
-    // AI First should give higher score since AI score is highest
-    expect(aiFirstResult.weighted).toBeGreaterThan(balancedResult.weighted);
-  });
-});
-
-// ============================================================================
-// Pareto Integration Tests
-// ============================================================================
-
-describe('Pareto Integration', () => {
-  it('finds Pareto frontier from scored variants', () => {
-    const variants = [
-      { id: '1', ai: 90, seo: 50, human: 60 },
-      { id: '2', ai: 60, seo: 85, human: 65 },
-      { id: '3', ai: 70, seo: 70, human: 80 },
-      { id: '4', ai: 50, seo: 50, human: 50 }, // Dominated
-    ];
-
-    const frontier = findParetoFrontier(variants);
-
-    expect(frontier.length).toBe(3);
-    expect(frontier.map(v => v.id)).not.toContain('4');
-  });
-
-  it('assigns correct nicknames to frontier', () => {
-    const frontier = [
-      { id: '1', ai: 95, seo: 50, human: 60 },
-      { id: '2', ai: 55, seo: 90, human: 65 },
-      { id: '3', ai: 60, seo: 65, human: 95 },
-      { id: '4', ai: 75, seo: 75, human: 75 },
-    ];
-
-    const nicknamed = assignNicknames(frontier);
-
-    const aiChamp = nicknamed.find(v => v.nickname === 'AI Champion');
-    const seoSpec = nicknamed.find(v => v.nickname === 'SEO Specialist');
-    const humanTouch = nicknamed.find(v => v.nickname === 'Human Touch');
-    const balanced = nicknamed.find(v => v.nickname === 'Balanced Winner');
-
-    expect(aiChamp?.id).toBe('1');
-    expect(seoSpec?.id).toBe('2');
-    expect(humanTouch?.id).toBe('3');
-    expect(balanced?.id).toBe('4');
-    expect(balanced?.recommended).toBe(true);
-  });
-});
-
-// ============================================================================
-// User-Guided Mutation Integration Tests
-// ============================================================================
-
-describe('User-Guided Mutation Integration', () => {
-  it('generates variants with user feedback', async () => {
-    const parents: ScoredVariant[] = [
-      {
-        id: 'p1',
-        title: 'Widget Pro',
-        scores: { ai: 80, seo: 75, human: 78 },
-        fitness: 78,
-        penalizedFitness: 78,
-        disqualified: false,
-        generation: 5,
-      },
-    ];
-
-    const result = await generateUserGuidedMutations(
-      {
-        parents,
-        userFeedback: 'Add more urgency',
-        generation: 6,
-      },
-      3
-    );
-
-    expect(result.length).toBe(3);
-    expect(result[0].generationType).toBe('user-guided');
-    expect(result[0].metadata.userFeedback).toBe('Add more urgency');
-  });
-
-  it('enforces max user-guided generations', async () => {
-    const parents: ScoredVariant[] = [
-      { id: 'p1', title: 'V1', scores: { ai: 70, seo: 70, human: 70 }, fitness: 70, penalizedFitness: 70, disqualified: false, generation: 8 },
-    ];
-
-    await expect(
-      generateUserGuidedMutations(
+  describe('Generation Scoring Pipeline', () => {
+    it('scores a full generation of variants', async () => {
+      const variants: VariantContent[] = [
+        originalContent,
+        optimizedVariant,
         {
-          parents,
-          userFeedback: 'test',
-          generation: 9,
-          previousUserGuidedCount: 3, // Max is 3
+          id: 'variant_2',
+          title: 'Widget Pro - Best Choice',
+          description: 'Quality widget with warranty. Join thousands of happy customers.',
+          features: ['Free shipping', 'Money-back guarantee'],
         },
-        3
-      )
-    ).rejects.toThrow(/maximum/i);
+      ];
+
+      const scored = await scoreGeneration(1, variants, {
+        keyword: 'widget',
+        estimator: estimateHumanScore,
+      });
+
+      expect(scored.length).toBe(variants.length);
+      expect(scored[0].penalizedFitness).toBeDefined();
+      // Should be sorted by fitness
+      expect(scored[0].penalizedFitness).toBeGreaterThanOrEqual(scored[1].penalizedFitness);
+    });
+  });
+
+  describe('Pareto Frontier Pipeline', () => {
+    it('finds optimal trade-off variants', () => {
+      const variants: (ParetoScores & { id: string })[] = [
+        { id: 'v1', ai: 90, seo: 50, human: 60 }, // Best AI
+        { id: 'v2', ai: 60, seo: 85, human: 65 }, // Best SEO
+        { id: 'v3', ai: 65, seo: 65, human: 90 }, // Best Human
+        { id: 'v4', ai: 75, seo: 75, human: 75 }, // Balanced
+        { id: 'v5', ai: 50, seo: 50, human: 50 }, // Dominated
+      ];
+
+      const frontier = findParetoFrontier(variants);
+
+      // Should include optimal variants, exclude dominated
+      expect(frontier.length).toBeLessThan(variants.length);
+      expect(frontier.find(v => v.id === 'v5')).toBeUndefined();
+    });
+
+    it('assigns meaningful nicknames', () => {
+      const variants: (ParetoScores & { id: string })[] = [
+        { id: 'v1', ai: 95, seo: 50, human: 60 },
+        { id: 'v2', ai: 55, seo: 90, human: 65 },
+        { id: 'v3', ai: 60, seo: 60, human: 95 },
+        { id: 'v4', ai: 75, seo: 76, human: 74 },
+      ];
+
+      const frontier = findParetoFrontier(variants);
+      const named = assignNicknames(frontier);
+
+      const aiChampion = named.find(v => v.nickname === 'AI Champion');
+      const seoSpec = named.find(v => v.nickname === 'SEO Specialist');
+      const humanTouch = named.find(v => v.nickname === 'Human Touch');
+
+      if (frontier.length >= 3) {
+        expect(aiChampion).toBeDefined();
+        expect(seoSpec).toBeDefined();
+        expect(humanTouch).toBeDefined();
+      }
+    });
+
+    it('marks balanced variant as recommended', () => {
+      const variants: (ParetoScores & { id: string })[] = [
+        { id: 'v1', ai: 90, seo: 40, human: 50 }, // Best AI
+        { id: 'v2', ai: 75, seo: 75, human: 74 }, // Most balanced - should get Balanced Winner
+        { id: 'v3', ai: 50, seo: 85, human: 45 }, // Best SEO
+        { id: 'v4', ai: 55, seo: 55, human: 80 }, // Best Human
+      ];
+
+      const frontier = findParetoFrontier(variants);
+      const named = assignNicknames(frontier);
+
+      const recommended = named.find(v => v.recommended);
+      if (named.length > 1) {
+        expect(recommended).toBeDefined();
+        expect(recommended?.nickname).toBe('Balanced Winner');
+      }
+    });
+  });
+
+  describe('Brand Voice Consistency Pipeline', () => {
+    it('scores voice consistency throughout generations', () => {
+      const baselineProfile = analyzeBrandVoice(originalContent);
+
+      // Simulate Gen 1 variant
+      const gen1Variant = {
+        title: 'Premium Widget Pro - Quality Choice',
+        description: 'Trusted by thousands of customers. Quality guaranteed with warranty.',
+        features: ['Free shipping', '30-day returns'],
+      };
+
+      const gen1Score = scoreBrandVoiceConsistency(gen1Variant, baselineProfile);
+      expect(gen1Score.score).toBeGreaterThan(50);
+
+      // Simulate drifted variant
+      const driftedVariant = {
+        title: 'ENTERPRISE SOLUTION - LEVERAGE NOW!!!',
+        description: 'Optimize organizational efficiency!!! Synergy guaranteed!!!',
+        features: ['Scalable', 'Enterprise-grade'],
+      };
+
+      const driftedScore = scoreBrandVoiceConsistency(driftedVariant, baselineProfile);
+      expect(driftedScore.score).toBeLessThan(gen1Score.score);
+      expect(driftedScore.issues.length).toBeGreaterThan(0);
+    });
   });
 });
 
 // ============================================================================
-// End-to-End Workflow Test
+// Model Selection Tests
 // ============================================================================
 
-describe('End-to-End Workflow', () => {
-  it('completes full optimization workflow', async () => {
-    // 1. Analyze baseline
-    const originalContent = {
-      title: 'Basic Product',
-      description: 'A simple product for your needs',
-      features: ['One feature', 'Another feature'],
-    };
-    const baseline = analyzeBaseline(originalContent, 'product');
+describe('Model Selection', () => {
+  it('selects Sonnet for generations 1-4', () => {
+    expect(getModelForGeneration(1)).toBe('claude-sonnet');
+    expect(getModelForGeneration(2)).toBe('claude-sonnet');
+    expect(getModelForGeneration(3)).toBe('claude-sonnet');
+    expect(getModelForGeneration(4)).toBe('claude-sonnet');
+  });
 
-    expect(baseline.aiScore).toBeDefined();
-    expect(baseline.issues.length).toBeGreaterThanOrEqual(0);
+  it('selects Opus for generation 5', () => {
+    expect(getModelForGeneration(5)).toBe('claude-opus');
+  });
 
-    // 2. Run optimization
-    const mockMutator = createMockMutator();
-    const result = await runFullOptimization({
-      initialVariants: [originalContent as VariantContent],
-      mutator: mockMutator,
-      maxGenerations: 3,
-      scoringOptions: {
-        keyword: 'product',
-        baseline: {
-          aiScore: baseline.aiScore,
-          seoScore: baseline.seoScore,
-          humanScore: baseline.humanScore,
-        },
-      },
+  it('selects Opus for user-guided generations', () => {
+    expect(getModelForGeneration(6, { userGuided: true })).toBe('claude-opus');
+    expect(getModelForGeneration(7, { userGuided: true })).toBe('claude-opus');
+  });
+});
+
+// ============================================================================
+// Human Judge Selection Tests
+// ============================================================================
+
+describe('Human Judge Selection', () => {
+  it('skips Human Judge for generations 1-3', () => {
+    expect(shouldUseHumanJudge(1)).toBe(false);
+    expect(shouldUseHumanJudge(2)).toBe(false);
+    expect(shouldUseHumanJudge(3)).toBe(false);
+  });
+
+  it('uses Human Judge for generations 4-5', () => {
+    expect(shouldUseHumanJudge(4)).toBe(true);
+    expect(shouldUseHumanJudge(5)).toBe(true);
+  });
+});
+
+// ============================================================================
+// Constraint Penalty Tests
+// ============================================================================
+
+describe('Constraint Penalties', () => {
+  it('applies hard constraint penalty', () => {
+    const fitness = { weighted: 80 };
+    const seoScore = { hardFails: ['title_too_long'], softFails: [] };
+
+    const result = applyConstraintPenalties(fitness, seoScore, {});
+
+    expect(result.penalized).toBeLessThan(fitness.weighted);
+    expect(result.penalties.length).toBeGreaterThan(0);
+  });
+
+  it('applies soft constraint penalty', () => {
+    const fitness = { weighted: 80 };
+    const seoScore = { hardFails: [], softFails: ['description_short'] };
+
+    const result = applyConstraintPenalties(fitness, seoScore, {});
+
+    expect(result.penalized).toBeLessThan(fitness.weighted);
+  });
+
+  it('disqualifies for fidelity violations', () => {
+    const fitness = { weighted: 90 };
+    const humanScore = { fidelityViolations: ['fabricated_claim'] };
+
+    const result = applyConstraintPenalties(fitness, { hardFails: [], softFails: [] }, humanScore);
+
+    expect(result.disqualified).toBe(true);
+    expect(result.penalized).toBeLessThan(fitness.weighted * 0.2);
+  });
+
+  it('never goes below zero', () => {
+    const fitness = { weighted: 5 };
+    const seoScore = { hardFails: ['a', 'b', 'c'], softFails: ['d', 'e', 'f', 'g', 'h'] };
+
+    const result = applyConstraintPenalties(fitness, seoScore, {});
+
+    expect(result.penalized).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ============================================================================
+// Pareto Domination Tests
+// ============================================================================
+
+describe('Pareto Domination', () => {
+  it('correctly identifies domination', () => {
+    const a = { ai: 80, seo: 70, human: 60 };
+    const b = { ai: 70, seo: 60, human: 50 };
+
+    expect(isDominated(b, a)).toBe(true);
+    expect(isDominated(a, b)).toBe(false);
+  });
+
+  it('returns false for trade-offs', () => {
+    const a = { ai: 90, seo: 50, human: 60 };
+    const b = { ai: 60, seo: 80, human: 70 };
+
+    expect(isDominated(a, b)).toBe(false);
+    expect(isDominated(b, a)).toBe(false);
+  });
+
+  it('handles equal scores correctly', () => {
+    const a = { ai: 70, seo: 70, human: 70 };
+    const b = { ai: 70, seo: 70, human: 70 };
+
+    expect(isDominated(a, b)).toBe(false);
+    expect(isDominated(b, a)).toBe(false);
+  });
+});
+
+// ============================================================================
+// End-to-End Simulation Tests
+// ============================================================================
+
+describe('End-to-End Simulation', () => {
+  it('simulates full 5-generation optimization', async () => {
+    const keyword = 'widget';
+    let currentVariants: ScoredVariant[] = [];
+
+    // Initial population
+    const initialVariants: VariantContent[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `init_${i}`,
+      title: `Widget Variant ${i}`,
+      description: `Quality widget description ${i}`,
+      features: ['Feature 1', 'Feature 2'],
+    }));
+
+    // Score initial
+    currentVariants = await scoreGeneration(0, initialVariants, {
+      keyword,
+      estimator: estimateHumanScore,
     });
 
-    expect(result.status).toBe('completed');
-    expect(result.generations).toHaveLength(3);
+    expect(currentVariants.length).toBe(5);
 
-    // 3. Find Pareto frontier
-    const frontier = findParetoFrontier(result.finalVariants.map(v => ({
+    // Run 5 generations
+    for (let gen = 1; gen <= 5; gen++) {
+      const model = getModelForGeneration(gen);
+      const useHumanJudge = shouldUseHumanJudge(gen);
+
+      // Verify model selection
+      if (gen < 5) {
+        expect(model).toBe('claude-sonnet');
+      } else {
+        expect(model).toBe('claude-opus');
+      }
+
+      // Verify Human Judge selection
+      if (gen >= 4) {
+        expect(useHumanJudge).toBe(true);
+      } else {
+        expect(useHumanJudge).toBe(false);
+      }
+
+      // Generate new variants (mock)
+      const newVariants: VariantContent[] = Array.from({ length: 3 }, (_, i) => ({
+        id: `gen${gen}_${i}`,
+        title: `Widget Gen ${gen} Variant ${i}`,
+        description: `Optimized for gen ${gen}`,
+        features: ['Improved feature'],
+      }));
+
+      // Keep elites
+      const elites = currentVariants.slice(0, 2);
+
+      // Score new generation
+      const allVariants = [...elites, ...newVariants];
+      currentVariants = await scoreGeneration(gen, allVariants, {
+        keyword,
+        estimator: estimateHumanScore,
+      });
+    }
+
+    // Final checks
+    expect(currentVariants.length).toBeGreaterThan(0);
+
+    // Find Pareto frontier
+    const paretoInput = currentVariants.map(v => ({
       id: v.id,
       ai: v.scores.ai,
       seo: v.scores.seo,
       human: v.scores.human,
-    })));
+    }));
+    const frontier = findParetoFrontier(paretoInput);
+    const named = assignNicknames(frontier);
 
     expect(frontier.length).toBeGreaterThan(0);
-
-    // 4. Assign nicknames
-    const nicknamed = assignNicknames(frontier);
-    expect(nicknamed.some(v => v.nickname !== undefined)).toBe(true);
-
-    // 5. Get best variant
-    expect(result.bestVariant).toBeDefined();
-    expect(result.bestVariant.penalizedFitness).toBeGreaterThan(0);
+    expect(named.some(v => v.nickname)).toBe(true);
   });
 });

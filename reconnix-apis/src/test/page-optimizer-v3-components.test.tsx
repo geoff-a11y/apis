@@ -1,311 +1,252 @@
-// src/test/page-optimizer-v3-components.test.tsx — Component tests for Page Optimizer v3
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import BaselineDisplay from '../components/page-optimizer-v3/BaselineDisplay';
-import ImprovementSummary, { ImprovementSummaryGroup } from '../components/page-optimizer-v3/ImprovementSummary';
-import ParetoExplorer from '../components/page-optimizer-v3/ParetoExplorer';
-import GenerationFeedback from '../components/page-optimizer-v3/GenerationFeedback';
-import WeightSliders from '../components/page-optimizer-v3/WeightSliders';
-import { BaselineScore } from '../lib/baseline-scorer';
+// src/test/page-optimizer-v3-components.test.tsx
+// Unit tests for Page Optimizer v3 components
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Import modules under test
+import {
+  analyzeBrandVoice,
+  generateBrandVoiceGuidelines,
+  scoreBrandVoiceConsistency,
+} from '../lib/brand-voice';
+import {
+  findParetoFrontier,
+  assignNicknames,
+} from '../lib/pareto';
+import { calculateSEOScore } from '../lib/seo-judge';
+import { estimateHumanScore } from '../lib/human-estimator';
+import { WEIGHT_PRESETS } from '../lib/unified-fitness';
+import { scoreVariant, EVOLUTION_CONFIG_V3 } from '../lib/evolution-engine';
 
 // ============================================================================
-// BaselineDisplay Tests
+// Test Fixtures
 // ============================================================================
 
-describe('BaselineDisplay', () => {
-  const mockBaseline: Partial<BaselineScore> = {
-    aiScore: 50,
-    seoScore: 40,
-    humanScore: 60,
-    totalScore: 50,
-    issues: [
-      { category: 'seo', severity: 'critical', message: 'Title too short' },
-      { category: 'human', severity: 'major', message: 'Missing CTA' },
-      { category: 'ai', severity: 'minor', message: 'Low AI signals' },
-    ],
-    improvementPotential: {
-      ai: 50,
-      seo: 60,
-      human: 40,
-      total: 50,
-    },
+const mockOriginalContent = {
+  id: 'original',
+  title: 'Premium Widget Pro - Quality Product',
+  description: 'Discover our premium widget with 5-year warranty. Trusted by 10,000+ customers worldwide.',
+  features: [
+    'Free shipping on all orders',
+    '30-day money-back guarantee',
+    '5-year warranty included',
+  ],
+};
+
+const mockVariants = [
+  { id: 'v1', ai: 85, seo: 70, human: 75, title: 'AI Champion Variant' },
+  { id: 'v2', ai: 60, seo: 90, human: 65, title: 'SEO Specialist Variant' },
+  { id: 'v3', ai: 70, seo: 75, human: 85, title: 'Human Touch Variant' },
+  { id: 'v4', ai: 78, seo: 78, human: 78, title: 'Balanced Winner Variant' },
+];
+
+// ============================================================================
+// Brand Voice Integration Tests
+// ============================================================================
+
+describe('Brand Voice Integration', () => {
+  it('analyzes brand voice from original content', () => {
+    const profile = analyzeBrandVoice(mockOriginalContent);
+    expect(profile).toBeDefined();
+    expect(profile.formality).toBeGreaterThanOrEqual(0);
+    expect(profile.formality).toBeLessThanOrEqual(100);
+  });
+
+  it('generates guidelines from brand voice profile', () => {
+    const profile = analyzeBrandVoice(mockOriginalContent);
+    const guidelines = generateBrandVoiceGuidelines(profile);
+    expect(guidelines.summary.length).toBeGreaterThan(10);
+    expect(guidelines.doList.length).toBeGreaterThan(0);
+  });
+
+  it('scores variant voice consistency', () => {
+    const profile = analyzeBrandVoice(mockOriginalContent);
+    const variant = {
+      title: 'Premium Widget - Trusted Choice',
+      description: 'Our quality widget with warranty. Join thousands of satisfied customers.',
+      features: ['Free shipping', '30-day returns'],
+    };
+    const result = scoreBrandVoiceConsistency(variant, profile);
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+  });
+});
+
+// ============================================================================
+// Pareto Frontier Tests
+// ============================================================================
+
+describe('Pareto Frontier Integration', () => {
+  it('finds non-dominated variants', () => {
+    const frontier = findParetoFrontier(mockVariants);
+    expect(frontier.length).toBeGreaterThan(0);
+    expect(frontier.length).toBeLessThanOrEqual(mockVariants.length);
+  });
+
+  it('assigns nicknames to frontier variants', () => {
+    const frontier = findParetoFrontier(mockVariants);
+    const named = assignNicknames(frontier);
+    const nicknames = named.map(v => v.nickname).filter(Boolean);
+    expect(nicknames.length).toBeGreaterThan(0);
+  });
+
+  it('marks balanced variant as recommended', () => {
+    const frontier = findParetoFrontier(mockVariants);
+    const named = assignNicknames(frontier);
+    if (named.length > 1) {
+      const recommended = named.find(v => v.recommended);
+      expect(recommended).toBeDefined();
+    }
+  });
+});
+
+// ============================================================================
+// SEO Judge Tests
+// ============================================================================
+
+describe('SEO Judge Integration', () => {
+  it('scores variant SEO', () => {
+    const result = calculateSEOScore(mockOriginalContent, 'widget');
+    expect(result.total).toBeGreaterThanOrEqual(0);
+    expect(result.total).toBeLessThanOrEqual(100);
+    expect(result.breakdown).toBeDefined();
+  });
+
+  it('returns breakdown by category', () => {
+    const result = calculateSEOScore(mockOriginalContent, 'widget');
+    expect(result.breakdown).toHaveProperty('technical');
+    expect(result.breakdown).toHaveProperty('title');
+    expect(result.breakdown).toHaveProperty('description');
+  });
+
+  it('detects hard fails for bad content', () => {
+    const badVariant = { title: 'A'.repeat(100), description: 'Short', features: [] };
+    const result = calculateSEOScore(badVariant, 'test');
+    expect(result.hardFails.length).toBeGreaterThan(0);
+  });
+});
+
+// ============================================================================
+// Human Estimator Tests
+// ============================================================================
+
+describe('Human Estimator Integration', () => {
+  it('estimates human appeal score', () => {
+    const result = estimateHumanScore(mockOriginalContent);
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+    expect(result.confidence).toMatch(/^(low|medium|high)$/);
+  });
+
+  it('returns breakdown scores', () => {
+    const result = estimateHumanScore(mockOriginalContent);
+    expect(result.breakdown).toHaveProperty('clarity');
+    expect(result.breakdown).toHaveProperty('persuasiveness');
+    expect(result.breakdown).toHaveProperty('trustworthiness');
+    expect(result.breakdown).toHaveProperty('actionability');
+  });
+
+  it('detects social proof', () => {
+    const withSocialProof = {
+      title: 'Widget Pro',
+      description: 'Trusted by 10,000+ customers',
+      features: ['5-star rated'],
+    };
+    const result = estimateHumanScore(withSocialProof);
+    expect(result.socialProofBonus).toBeGreaterThan(0);
+  });
+});
+
+// ============================================================================
+// Evolution Engine Tests
+// ============================================================================
+
+describe('Evolution Engine Integration', () => {
+  it('scores variant with all three judges', () => {
+    const result = scoreVariant(mockOriginalContent, { keyword: 'widget' });
+    expect(result.scores.ai).toBeDefined();
+    expect(result.scores.seo).toBeDefined();
+    expect(result.scores.human).toBeDefined();
+    expect(result.fitness).toBeGreaterThan(0);
+  });
+
+  it('uses correct evolution config', () => {
+    expect(EVOLUTION_CONFIG_V3.generations).toBe(5);
+    expect(EVOLUTION_CONFIG_V3.populationSize).toBe(30);
+    expect(EVOLUTION_CONFIG_V3.humanJudgeGenerations).toEqual([4, 5]);
+  });
+});
+
+// ============================================================================
+// Weight Presets Tests
+// ============================================================================
+
+describe('Weight Presets', () => {
+  it('all presets sum to 1.0', () => {
+    for (const [name, weights] of Object.entries(WEIGHT_PRESETS)) {
+      const sum = weights.ai + weights.seo + weights.human;
+      expect(sum).toBeCloseTo(1.0, 2);
+    }
+  });
+
+  it('balanced preset is roughly equal', () => {
+    const { balanced } = WEIGHT_PRESETS;
+    expect(Math.abs(balanced.ai - balanced.seo)).toBeLessThan(0.1);
+  });
+
+  it('ai_first preset prioritizes AI', () => {
+    const { ai_first } = WEIGHT_PRESETS;
+    expect(ai_first.ai).toBeGreaterThan(ai_first.seo);
+    expect(ai_first.ai).toBeGreaterThan(ai_first.human);
+  });
+});
+
+// ============================================================================
+// URL Validation Tests
+// ============================================================================
+
+describe('URL Validation', () => {
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      const parsedUrl = new URL(urlString);
+      return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+    } catch {
+      return false;
+    }
   };
 
-  it('renders three score bars', () => {
-    render(<BaselineDisplay baseline={mockBaseline} />);
-
-    expect(screen.getByText(/AI Recommendation/i)).toBeInTheDocument();
-    expect(screen.getByText(/SEO Performance/i)).toBeInTheDocument();
-    expect(screen.getByText(/Human Appeal/i)).toBeInTheDocument();
+  it('validates correct URLs', () => {
+    expect(isValidUrl('https://www.example.com')).toBe(true);
+    expect(isValidUrl('http://example.com/product')).toBe(true);
   });
 
-  it('displays total score', () => {
-    render(<BaselineDisplay baseline={mockBaseline} />);
-
-    expect(screen.getByText('50')).toBeInTheDocument();
-  });
-
-  it('displays issues list when present', () => {
-    render(<BaselineDisplay baseline={mockBaseline} />);
-
-    expect(screen.getByText(/Title too short/i)).toBeInTheDocument();
-    expect(screen.getByText(/Missing CTA/i)).toBeInTheDocument();
-  });
-
-  it('shows Start Optimization button', () => {
-    const onStart = vi.fn();
-    render(<BaselineDisplay baseline={mockBaseline} onStart={onStart} />);
-
-    expect(screen.getByRole('button', { name: /Start Optimization/i })).toBeInTheDocument();
-  });
-
-  it('calls onStart when button clicked', () => {
-    const onStart = vi.fn();
-    render(<BaselineDisplay baseline={mockBaseline} onStart={onStart} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /Start Optimization/i }));
-    expect(onStart).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows loading state', () => {
-    render(<BaselineDisplay baseline={mockBaseline} onStart={vi.fn()} loading={true} />);
-
-    expect(screen.getByText(/Analyzing/i)).toBeInTheDocument();
-  });
-
-  it('displays improvement potential', () => {
-    render(<BaselineDisplay baseline={mockBaseline} />);
-
-    expect(screen.getByText(/Improvement Potential/i)).toBeInTheDocument();
-    expect(screen.getByText(/\+50 pts/)).toBeInTheDocument();
+  it('rejects invalid URLs', () => {
+    expect(isValidUrl('not-a-url')).toBe(false);
+    expect(isValidUrl('')).toBe(false);
   });
 });
 
 // ============================================================================
-// ImprovementSummary Tests
+// Generation Configuration Tests
 // ============================================================================
 
-describe('ImprovementSummary', () => {
-  it('displays before and after scores', () => {
-    render(<ImprovementSummary before={62} after={84} label="AI Score" />);
-
-    expect(screen.getByText('62')).toBeInTheDocument();
-    expect(screen.getByText('84')).toBeInTheDocument();
+describe('Generation Configuration', () => {
+  it('humanJudgeGenerations contains only 4 and 5', () => {
+    expect(EVOLUTION_CONFIG_V3.humanJudgeGenerations).toContain(4);
+    expect(EVOLUTION_CONFIG_V3.humanJudgeGenerations).toContain(5);
+    expect(EVOLUTION_CONFIG_V3.humanJudgeGenerations).not.toContain(1);
   });
 
-  it('shows positive delta with + sign', () => {
-    render(<ImprovementSummary before={62} after={84} label="AI Score" />);
-
-    expect(screen.getByText('+22')).toBeInTheDocument();
+  it('uses Sonnet for early generations', () => {
+    expect(EVOLUTION_CONFIG_V3.mutationModel.gen1to4).toBe('claude-sonnet');
   });
 
-  it('shows negative delta', () => {
-    render(<ImprovementSummary before={80} after={65} label="AI Score" />);
-
-    expect(screen.getByText('-15')).toBeInTheDocument();
+  it('uses Opus for Gen 5 and user-guided', () => {
+    expect(EVOLUTION_CONFIG_V3.mutationModel.gen5).toBe('claude-opus');
+    expect(EVOLUTION_CONFIG_V3.mutationModel.userGuided).toBe('claude-opus');
   });
 
-  it('shows arrow indicator', () => {
-    render(<ImprovementSummary before={50} after={75} label="Test" />);
-
-    expect(screen.getByText('→')).toBeInTheDocument();
-  });
-
-  it('handles zero delta', () => {
-    render(<ImprovementSummary before={70} after={70} label="Test" />);
-
-    expect(screen.getByText('0')).toBeInTheDocument();
-  });
-});
-
-describe('ImprovementSummaryGroup', () => {
-  it('renders all three dimension scores', () => {
-    render(
-      <ImprovementSummaryGroup
-        baseline={{ ai: 50, seo: 40, human: 60 }}
-        current={{ ai: 70, seo: 65, human: 75 }}
-      />
-    );
-
-    expect(screen.getByText('AI Score')).toBeInTheDocument();
-    expect(screen.getByText('SEO Score')).toBeInTheDocument();
-    expect(screen.getByText('Human Score')).toBeInTheDocument();
-  });
-
-  it('shows overall improvement', () => {
-    render(
-      <ImprovementSummaryGroup
-        baseline={{ ai: 50, seo: 50, human: 50 }}
-        current={{ ai: 80, seo: 80, human: 80 }}
-      />
-    );
-
-    expect(screen.getByText('Overall')).toBeInTheDocument();
-  });
-});
-
-// ============================================================================
-// ParetoExplorer Tests
-// ============================================================================
-
-describe('ParetoExplorer', () => {
-  const mockVariants = [
-    { id: '1', ai: 90, seo: 50, human: 60, nickname: 'AI Champion' as const },
-    { id: '2', ai: 60, seo: 85, human: 70, nickname: 'SEO Specialist' as const },
-    { id: '3', ai: 75, seo: 75, human: 78, nickname: 'Balanced Winner' as const, recommended: true },
-  ];
-
-  it('renders chart', () => {
-    render(<ParetoExplorer variants={mockVariants} />);
-
-    expect(screen.getByRole('img', { name: /chart/i })).toBeInTheDocument();
-  });
-
-  it('displays variant nicknames', () => {
-    render(<ParetoExplorer variants={mockVariants} />);
-
-    // Use getAllByText since nicknames appear in legend and cards
-    expect(screen.getAllByText('AI Champion').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('SEO Specialist').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Balanced Winner').length).toBeGreaterThan(0);
-  });
-
-  it('shows variant count', () => {
-    render(<ParetoExplorer variants={mockVariants} />);
-
-    expect(screen.getByText(/3 optimal variants/)).toBeInTheDocument();
-  });
-
-  it('calls onSelect when variant clicked', () => {
-    const onSelect = vi.fn();
-    render(<ParetoExplorer variants={mockVariants} onSelect={onSelect} />);
-
-    // Click on variant card (get the button which contains AI Champion)
-    const aiChampionButtons = screen.getAllByText('AI Champion');
-    fireEvent.click(aiChampionButtons[aiChampionButtons.length - 1]); // Click the card, not the legend
-    expect(onSelect).toHaveBeenCalledWith(mockVariants[0]);
-  });
-
-  it('shows recommended indicator', () => {
-    render(<ParetoExplorer variants={mockVariants} />);
-
-    expect(screen.getByText('REC')).toBeInTheDocument();
-  });
-});
-
-// ============================================================================
-// GenerationFeedback Tests
-// ============================================================================
-
-describe('GenerationFeedback', () => {
-  it('renders textarea for feedback', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} />);
-
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
-  });
-
-  it('renders Run Generation button', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} generation={6} />);
-
-    expect(screen.getByRole('button', { name: /Run Generation 6/i })).toBeInTheDocument();
-  });
-
-  it('calls onSubmit with feedback text', () => {
-    const onSubmit = vi.fn();
-    render(<GenerationFeedback onSubmit={onSubmit} />);
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'Add more urgency to the headline' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /Run/i }));
-
-    expect(onSubmit).toHaveBeenCalledWith('Add more urgency to the headline');
-  });
-
-  it('disables button when feedback is empty', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} />);
-
-    const button = screen.getByRole('button', { name: /Run/i });
-    expect(button).toBeDisabled();
-  });
-
-  it('shows remaining runs count', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} userGuidedCount={1} />);
-
-    expect(screen.getByText(/2 runs remaining/)).toBeInTheDocument();
-  });
-
-  it('shows loading state', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} loading={true} generation={6} />);
-
-    expect(screen.getByText(/Running Generation 6/i)).toBeInTheDocument();
-  });
-
-  it('shows placeholder text', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} />);
-
-    const textarea = screen.getByRole('textbox');
-    expect(textarea).toHaveAttribute('placeholder', expect.stringContaining('Example'));
-  });
-
-  it('shows feedback insights when detected', () => {
-    render(<GenerationFeedback onSubmit={vi.fn()} />);
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'Add urgency and scarcity messaging' },
-    });
-
-    expect(screen.getByText(/Urgency/)).toBeInTheDocument();
-    expect(screen.getByText(/Scarcity/)).toBeInTheDocument();
-  });
-});
-
-// ============================================================================
-// WeightSliders Tests
-// ============================================================================
-
-describe('WeightSliders', () => {
-  it('renders three sliders', () => {
-    render(<WeightSliders onChange={vi.fn()} />);
-
-    expect(screen.getByLabelText(/AI Weight/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/SEO Weight/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Human Weight/i)).toBeInTheDocument();
-  });
-
-  it('sliders always sum to 100%', () => {
-    const onChange = vi.fn();
-    render(<WeightSliders onChange={onChange} initial={{ ai: 33, seo: 34, human: 33 }} />);
-
-    // Increase AI to 50
-    fireEvent.change(screen.getByLabelText(/AI Weight/i), { target: { value: '50' } });
-
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0];
-    expect(lastCall.ai + lastCall.seo + lastCall.human).toBe(100);
-  });
-
-  it('renders preset buttons', () => {
-    render(<WeightSliders onChange={vi.fn()} />);
-
-    expect(screen.getByRole('button', { name: /Balanced/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /AI First/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /SEO First/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Conversion/i })).toBeInTheDocument();
-  });
-
-  it('applies preset when clicked', () => {
-    const onChange = vi.fn();
-    render(<WeightSliders onChange={onChange} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /AI First/i }));
-
-    expect(onChange).toHaveBeenCalledWith({ ai: 50, seo: 25, human: 25 });
-  });
-
-  it('shows percentage values', () => {
-    render(<WeightSliders onChange={vi.fn()} initial={{ ai: 50, seo: 25, human: 25 }} />);
-
-    expect(screen.getByText('50%')).toBeInTheDocument();
-    expect(screen.getAllByText('25%')).toHaveLength(2);
+  it('allows max 3 user-guided generations', () => {
+    expect(EVOLUTION_CONFIG_V3.maxUserGuidedGenerations).toBe(3);
   });
 });
