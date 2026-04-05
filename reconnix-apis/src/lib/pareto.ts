@@ -104,8 +104,9 @@ export function assignNicknames<T extends ParetoScores & { id: string }>(
     return [];
   }
 
-  // Clone variants to avoid mutation
-  const result = variants.map(v => ({ ...v }));
+  // Clone variants to avoid mutation - explicitly type to include optional properties
+  type ResultType = T & { nickname?: NicknameType; recommended?: boolean };
+  const result: ResultType[] = variants.map(v => ({ ...v } as ResultType));
 
   // Track assigned nicknames to avoid duplicates
   const assigned = new Set<string>();
