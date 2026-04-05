@@ -107,13 +107,14 @@ export function getBenchmarkCategories(type: BenchmarkType = 'products'): Catego
 }
 
 // Get dimension analysis for specified benchmark type
+// Note: Using unknown to handle type mismatch in benchmark data
 export function getDimensionAnalysis(type: BenchmarkType = 'products'): DimensionAnalysis[] {
   switch (type) {
     case 'services':
-      return servicesBenchmark.dimension_analysis as DimensionAnalysis[];
+      return (servicesBenchmark as unknown as { dimension_analysis?: DimensionAnalysis[] }).dimension_analysis || [];
     case 'products':
     default:
-      return productsBenchmark.dimension_analysis as DimensionAnalysis[];
+      return (productsBenchmark as unknown as { dimension_analysis?: DimensionAnalysis[] }).dimension_analysis || [];
   }
 }
 
