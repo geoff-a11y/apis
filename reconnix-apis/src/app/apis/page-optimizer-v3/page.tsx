@@ -89,7 +89,7 @@ async function extractPageContent(url: string): Promise<VariantContent> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
-    signal: AbortSignal.timeout(60000)
+    signal: AbortSignal.timeout(120000)
   });
 
   if (!response.ok) {
