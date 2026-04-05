@@ -1,5 +1,8 @@
 // src/lib/human-estimator.ts — Fast rule-based Human score estimation
 // Used for Gen 1-3 to avoid LLM costs. NO LLM calls.
+// Includes optional brand voice consistency checking.
+
+import { BrandVoiceProfile, scoreBrandVoiceConsistency, analyzeBrandVoice } from './brand-voice';
 
 export type ConfidenceLevel = 'low' | 'medium' | 'high';
 
@@ -11,6 +14,8 @@ export interface EstimatedHumanScore {
   socialProofBonus: number;
   clarityScore: number;
   lengthPenalty: number;
+  brandVoiceScore?: number;       // 0-100, present if baseline provided
+  brandVoiceIssues?: string[];    // Issues if voice drifted
   breakdown: {
     clarity: number;
     persuasiveness: number;
@@ -151,11 +156,20 @@ function calculateLengthPenalty(text: string, features: string[]): number {
   return 0; // Good length
 }
 
+export interface EstimatorOptions {
+  baselineProfile?: BrandVoiceProfile;  // For brand voice consistency checking
+  baselineContent?: VariantContent;     // Alternative: analyze on the fly
+}
+
 /**
  * Estimate human appeal score without LLM
  * Fast, rule-based scoring for generations 1-3
+ * Optionally includes brand voice consistency checking
  */
-export function estimateHumanScore(variant: VariantContent): EstimatedHumanScore {
+export function estimateHumanScore(
+  variant: VariantContent,
+  options?: EstimatorOptions
+): EstimatedHumanScore {
   const allText = [
     variant.title || '',
     variant.description || '',
@@ -195,6 +209,28 @@ export function estimateHumanScore(variant: VariantContent): EstimatedHumanScore
   score += lengthPenalty;
   score -= specPenalty;
 
+  // Brand voice consistency check (optional)
+  let brandVoiceScore: number | undefined;
+  let brandVoiceIssues: string[] | undefined;
+
+  if (options?.baselineProfile || options?.baselineContent) {
+    const baselineProfile = options.baselineProfile ||
+      (options.baselineContent ? analyzeBrandVoice(options.baselineContent) : undefined);
+
+    if (baselineProfile) {
+      const voiceResult = scoreBrandVoiceConsistency(variant, baselineProfile);
+      brandVoiceScore = voiceResult.score;
+      brandVoiceIssues = voiceResult.issues;
+
+      // Apply a moderate penalty for voice drift (max 15 points)
+      // Weight it less than full judge since this is fast estimation
+      if (voiceResult.score < 70) {
+        const voicePenalty = Math.round((70 - voiceResult.score) * 0.2);
+        score -= voicePenalty;
+      }
+    }
+  }
+
   // Clamp to 0-100
   score = Math.max(0, Math.min(100, score));
 
@@ -214,6 +250,8 @@ export function estimateHumanScore(variant: VariantContent): EstimatedHumanScore
     socialProofBonus: socialProofResult.score,
     clarityScore,
     lengthPenalty,
+    brandVoiceScore,
+    brandVoiceIssues,
     breakdown,
   };
 }

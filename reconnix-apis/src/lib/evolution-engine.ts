@@ -1,10 +1,18 @@
 // src/lib/evolution-engine.ts — Evolution engine configuration and scoring for v3
 // Manages generation flow with cost-optimized model selection
+// Includes brand voice preservation for Opus-powered generations (Gen 5+)
 
 import { calculateUnifiedFitness, applyConstraintPenalties, Weights, WEIGHT_PRESETS } from './unified-fitness';
 import { estimateHumanScore, EstimatedHumanScore } from './human-estimator';
 import { calculateSEOScore, SEOScore, VariantContent as SEOVariantContent } from './seo-judge';
 import { VariantScores } from './baseline-scorer';
+import {
+  BrandVoiceProfile,
+  BrandVoiceGuidelines,
+  analyzeBrandVoice,
+  generateBrandVoiceGuidelines,
+  formatBrandVoiceForPrompt,
+} from './brand-voice';
 
 // ============================================================================
 // Configuration
@@ -107,6 +115,8 @@ export interface ScoringOptions {
   keyword?: string;
   baseline?: VariantScores;
   original?: VariantContent;
+  brandVoiceProfile?: BrandVoiceProfile;
+  brandVoiceGuidelines?: BrandVoiceGuidelines;
 }
 
 // ============================================================================
@@ -337,11 +347,14 @@ export interface MutatorFunction {
     model: string;
     count: number;
     userFeedback?: string;
+    brandVoiceGuidelines?: BrandVoiceGuidelines;  // For Opus generations
+    brandVoicePrompt?: string;                     // Formatted for LLM
   }): Promise<VariantContent[]>;
 }
 
 /**
  * Run a single generation
+ * For Gen 5 and user-guided: Includes brand voice guidelines for Opus
  */
 export async function runGeneration(
   previousVariants: ScoredVariant[],
@@ -361,6 +374,22 @@ export async function runGeneration(
   // Select parents for mutation
   const parents = selectParents(previousVariants, config.topK);
 
+  // For Opus generations (Gen 5+ or user-guided), include brand voice guidelines
+  let brandVoiceGuidelines: BrandVoiceGuidelines | undefined;
+  let brandVoicePrompt: string | undefined;
+
+  const isOpusGeneration = model === config.mutationModel.gen5 || model === config.mutationModel.userGuided;
+  if (isOpusGeneration && options.scoringOptions?.original) {
+    // Use provided guidelines or generate from original content
+    brandVoiceGuidelines = options.scoringOptions.brandVoiceGuidelines;
+    if (!brandVoiceGuidelines) {
+      const profile = options.scoringOptions.brandVoiceProfile ||
+        analyzeBrandVoice(options.scoringOptions.original);
+      brandVoiceGuidelines = generateBrandVoiceGuidelines(profile);
+    }
+    brandVoicePrompt = formatBrandVoiceForPrompt(brandVoiceGuidelines);
+  }
+
   // Generate mutations
   const mutationCount = config.populationSize - elites.length;
   const newVariants = await options.mutator({
@@ -369,6 +398,8 @@ export async function runGeneration(
     model,
     count: mutationCount,
     userFeedback: options.userFeedback,
+    brandVoiceGuidelines,
+    brandVoicePrompt,
   });
 
   // Combine elites with new variants
@@ -417,6 +448,7 @@ export interface OptimizationResult {
 
 /**
  * Run full optimization (5 generations + optional user-guided)
+ * IMPORTANT: Analyzes brand voice from original content and preserves it in Opus generations
  */
 export async function runFullOptimization(options: {
   initialVariants: VariantContent[];
@@ -428,14 +460,26 @@ export async function runFullOptimization(options: {
   const maxGens = options.maxGenerations || EVOLUTION_CONFIG_V3.generations;
   const generations: GenerationResult[] = [];
 
+  // Analyze brand voice from original content for Opus generations
+  let enrichedScoringOptions = { ...options.scoringOptions };
+  if (enrichedScoringOptions.original && !enrichedScoringOptions.brandVoiceGuidelines) {
+    const profile = analyzeBrandVoice(enrichedScoringOptions.original);
+    const guidelines = generateBrandVoiceGuidelines(profile);
+    enrichedScoringOptions = {
+      ...enrichedScoringOptions,
+      brandVoiceProfile: profile,
+      brandVoiceGuidelines: guidelines,
+    };
+  }
+
   // Score initial population (Generation 0)
-  let currentVariants = await scoreGeneration(0, options.initialVariants, options.scoringOptions);
+  let currentVariants = await scoreGeneration(0, options.initialVariants, enrichedScoringOptions);
 
   // Run standard generations
   for (let gen = 1; gen <= maxGens; gen++) {
     const result = await runGeneration(currentVariants, gen, {
       mutator: options.mutator,
-      scoringOptions: options.scoringOptions,
+      scoringOptions: enrichedScoringOptions,  // Use enriched options with brand voice
     });
 
     generations.push(result);
@@ -454,7 +498,7 @@ export async function runFullOptimization(options: {
 
     const result = await runGeneration(currentVariants, userGuidedGen, {
       mutator: options.mutator,
-      scoringOptions: options.scoringOptions,
+      scoringOptions: enrichedScoringOptions,  // Use enriched options with brand voice
       userFeedback: options.userFeedback,
     });
 

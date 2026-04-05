@@ -1,7 +1,14 @@
 // src/lib/user-guided-mutation.ts — User-guided mutation for Generation 6+
-// Injects user feedback into mutation prompts
+// Injects user feedback AND brand voice guidelines into mutation prompts
 
 import { ScoredVariant, VariantContent, EVOLUTION_CONFIG_V3 } from './evolution-engine';
+import {
+  BrandVoiceProfile,
+  BrandVoiceGuidelines,
+  analyzeBrandVoice,
+  generateBrandVoiceGuidelines,
+  formatBrandVoiceForPrompt,
+} from './brand-voice';
 
 // ============================================================================
 // Types
@@ -13,6 +20,8 @@ export interface MutationContext {
   userFeedback: string;
   generation: number;
   previousUserGuidedCount?: number;
+  brandVoiceProfile?: BrandVoiceProfile;
+  brandVoiceGuidelines?: BrandVoiceGuidelines;
 }
 
 export interface GeneratedVariant extends VariantContent {
@@ -50,11 +59,13 @@ export interface UserGuidedMutationOptions {
 
 /**
  * Build a prompt for user-guided mutation
+ * CRITICAL: Includes brand voice guidelines to maintain voice consistency
  */
 function buildUserGuidedPrompt(
   parents: ScoredVariant[],
   userFeedback: string,
-  baseline?: VariantContent
+  baseline?: VariantContent,
+  brandVoiceGuidelines?: BrandVoiceGuidelines
 ): string {
   // Format parent variants for the prompt
   const parentSummaries = parents.slice(0, 3).map((parent, i) => {
@@ -75,10 +86,15 @@ ${baseline.description ? `Description: ${baseline.description}` : ''}
 ${baseline.features?.length ? `Features:\n${baseline.features.map(f => `- ${f}`).join('\n')}` : ''}
 ` : '';
 
+  // Format brand voice guidelines - CRITICAL for maintaining consistency
+  const brandVoiceSection = brandVoiceGuidelines
+    ? formatBrandVoiceForPrompt(brandVoiceGuidelines)
+    : '';
+
   return `You are an expert content optimizer creating new variants based on user feedback.
 
 ${baselineSummary}
-
+${brandVoiceSection}
 ## Top Performing Parent Variants
 These variants performed well in previous generations. Preserve their strengths while incorporating the user's feedback.
 
@@ -89,11 +105,12 @@ ${parentSummaries}
 
 ## Instructions
 Create 3 new variants that:
-1. Address the user's specific feedback above
-2. Preserve what made the parent variants successful (high scores)
-3. Maintain factual accuracy - do not fabricate claims
-4. Keep SEO best practices (title 50-60 chars, description 150-160 chars)
-5. Include clear calls-to-action for human appeal
+1. **CRITICAL: Maintain the exact brand voice described above** - this is the most important requirement
+2. Address the user's specific feedback above
+3. Preserve what made the parent variants successful (high scores)
+4. Maintain factual accuracy - do not fabricate claims
+5. Keep SEO best practices (title 50-60 chars, description 150-160 chars)
+6. Include clear calls-to-action for human appeal
 
 ## Response Format
 Respond with a JSON array of 3 variant objects:
@@ -198,6 +215,7 @@ const mockLLMClient: LLMClient = async (options) => {
 
 /**
  * Generate user-guided mutations based on feedback
+ * CRITICAL: Includes brand voice guidelines for Opus to maintain voice consistency
  */
 export async function generateUserGuidedMutations(
   context: MutationContext,
@@ -217,11 +235,20 @@ export async function generateUserGuidedMutations(
     );
   }
 
-  // Build the prompt
+  // Extract or use provided brand voice guidelines
+  let brandVoiceGuidelines = context.brandVoiceGuidelines;
+  if (!brandVoiceGuidelines && context.baseline) {
+    // Analyze baseline to extract brand voice
+    const profile = context.brandVoiceProfile || analyzeBrandVoice(context.baseline);
+    brandVoiceGuidelines = generateBrandVoiceGuidelines(profile);
+  }
+
+  // Build the prompt with brand voice guidelines
   const prompt = buildUserGuidedPrompt(
     context.parents,
     context.userFeedback,
-    context.baseline
+    context.baseline,
+    brandVoiceGuidelines
   );
 
   // Call the LLM
