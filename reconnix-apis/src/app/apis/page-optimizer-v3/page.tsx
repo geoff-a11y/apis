@@ -44,6 +44,39 @@ const API_URL = process.env.NEXT_PUBLIC_ML_SCORE_API_URL || 'https://apis-scorin
 // Types
 // ============================================================================
 
+// Content block types from enhanced scraper
+type ContentBlockType = 'headline' | 'subheadline' | 'paragraph' | 'list' |
+  'table' | 'spec_table' | 'pricing' | 'testimonial' |
+  'faq' | 'image_caption' | 'cta' | 'badge' | 'stat';
+
+interface ContentBlock {
+  block_type: ContentBlockType;
+  level?: number; // 1-6 for headlines
+  content: string;
+  children?: ContentBlock[];
+  metadata?: Record<string, unknown>;
+}
+
+interface PageStructure {
+  url: string;
+  title: string;
+  meta_description?: string;
+  og_data?: Record<string, string>;
+  schema_org?: Record<string, unknown>;
+  content_blocks: ContentBlock[];
+  detected_page_type: 'product' | 'service' | 'saas' | 'landing' | 'unknown';
+  detected_context: 'b2b' | 'b2c' | 'mixed';
+  extraction_quality: 'full' | 'partial' | 'minimal';
+}
+
+interface EnhancedOriginal extends VariantContent {
+  structure?: PageStructure;
+  allParagraphs?: string[];
+  allHeadlines?: string[];
+  allLists?: string[][];
+  schemaOrg?: Record<string, unknown>;
+}
+
 interface BaselineScores {
   ai: number;
   seo: number;
@@ -71,7 +104,7 @@ interface ThinkingStep {
 interface EvolutionStateV3 {
   status: 'idle' | 'fetching' | 'analyzing' | 'evolving' | 'complete' | 'error';
   url: string;
-  original: VariantContent | null;
+  original: EnhancedOriginal | null;
   baseline: BaselineScores | null;
   brandVoiceProfile: BrandVoiceProfile | null;
   brandVoiceGuidelines: BrandVoiceGuidelines | null;
@@ -91,8 +124,9 @@ interface EvolutionStateV3 {
 // Helper Functions
 // ============================================================================
 
-async function extractPageContent(url: string): Promise<VariantContent> {
-  const response = await fetch(`${API_URL}/scrape`, {
+async function extractPageContent(url: string): Promise<EnhancedOriginal> {
+  // Use enhanced scraper to get full page structure
+  const response = await fetch(`${API_URL}/scrape-enhanced`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
@@ -105,11 +139,35 @@ async function extractPageContent(url: string): Promise<VariantContent> {
   }
 
   const data = await response.json();
+  const structure: PageStructure | undefined = data.structure;
+
+  // Extract all paragraphs from content blocks
+  const allParagraphs: string[] = [];
+  const allHeadlines: string[] = [];
+  const allLists: string[][] = [];
+
+  if (structure?.content_blocks) {
+    for (const block of structure.content_blocks) {
+      if (block.block_type === 'paragraph') {
+        allParagraphs.push(block.content);
+      } else if (block.block_type === 'headline' || block.block_type === 'subheadline') {
+        allHeadlines.push(block.content);
+      } else if (block.block_type === 'list' && block.children) {
+        allLists.push(block.children.map(c => c.content));
+      }
+    }
+  }
+
   return {
     id: 'original',
     title: data.title || 'Product',
     description: data.description || '',
     features: data.features || ['Quality product', 'Great value', 'Trusted brand'],
+    structure,
+    allParagraphs,
+    allHeadlines,
+    allLists,
+    schemaOrg: structure?.schema_org,
   };
 }
 
@@ -545,6 +603,271 @@ function WeightSliders({
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function OriginalContentDisplay({
+  original,
+}: {
+  original: EnhancedOriginal;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
+
+  // Build full content text for copy
+  const buildFullContent = () => {
+    const parts: string[] = [];
+
+    parts.push(`# Original Page Content\n`);
+    parts.push(`## Title\n${original.title}\n`);
+
+    if (original.description) {
+      parts.push(`## Meta Description\n${original.description}\n`);
+    }
+
+    if (original.allHeadlines && original.allHeadlines.length > 0) {
+      parts.push(`## Headlines\n${original.allHeadlines.map(h => `- ${h}`).join('\n')}\n`);
+    }
+
+    if (original.allParagraphs && original.allParagraphs.length > 0) {
+      parts.push(`## Body Copy\n${original.allParagraphs.join('\n\n')}\n`);
+    }
+
+    if (original.features && original.features.length > 0) {
+      parts.push(`## Features\n${original.features.map(f => `- ${f}`).join('\n')}\n`);
+    }
+
+    if (original.allLists && original.allLists.length > 0) {
+      parts.push(`## Lists\n`);
+      original.allLists.forEach((list, i) => {
+        parts.push(`### List ${i + 1}\n${list.map(item => `- ${item}`).join('\n')}\n`);
+      });
+    }
+
+    if (original.schemaOrg) {
+      parts.push(`## Existing Schema.org Data\n\`\`\`json\n${JSON.stringify(original.schemaOrg, null, 2)}\n\`\`\`\n`);
+    }
+
+    return parts.join('\n');
+  };
+
+  const handleCopyAll = () => {
+    navigator.clipboard.writeText(buildFullContent());
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 2000);
+  };
+
+  const totalBlocks = original.structure?.content_blocks?.length || 0;
+  const pageType = original.structure?.detected_page_type || 'unknown';
+  const context = original.structure?.detected_context || 'unknown';
+  const hasSchema = original.schemaOrg && Object.keys(original.schemaOrg).length > 0;
+
+  return (
+    <div className="card p-6">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+            Original Page Content
+          </h3>
+          <div className="flex gap-2 mt-1">
+            <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)' }}>
+              {pageType.toUpperCase()}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)' }}>
+              {context.toUpperCase()}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)' }}>
+              {totalBlocks} blocks
+            </span>
+            {hasSchema && (
+              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--color-success-muted)', color: 'var(--color-success)' }}>
+                Schema.org ✓
+              </span>
+            )}
+          </div>
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-xs px-3 py-1 rounded"
+          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-soft)' }}
+        >
+          {isExpanded ? 'Collapse' : 'Expand All'}
+        </button>
+      </div>
+
+      {/* Title */}
+      <CopyableSection label="TITLE" content={original.title || ''} />
+
+      {/* Meta Description */}
+      {original.description && (
+        <div className="mt-4">
+          <CopyableSection label="META DESCRIPTION" content={original.description} />
+        </div>
+      )}
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="space-y-4 mt-4">
+          {/* Headlines */}
+          {original.allHeadlines && original.allHeadlines.length > 0 && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>
+                  HEADLINES ({original.allHeadlines.length})
+                </span>
+                <button
+                  onClick={() => navigator.clipboard.writeText(original.allHeadlines!.join('\n'))}
+                  className="text-xs px-2 py-1 rounded"
+                  style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                >
+                  Copy
+                </button>
+              </div>
+              <div className="space-y-2">
+                {original.allHeadlines.map((h, i) => (
+                  <div key={i} className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                    {h}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Body Paragraphs */}
+          {original.allParagraphs && original.allParagraphs.length > 0 && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>
+                  BODY COPY ({original.allParagraphs.length} paragraphs)
+                </span>
+                <button
+                  onClick={() => navigator.clipboard.writeText(original.allParagraphs!.join('\n\n'))}
+                  className="text-xs px-2 py-1 rounded"
+                  style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                >
+                  Copy
+                </button>
+              </div>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {original.allParagraphs.map((p, i) => (
+                  <p key={i} className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                    {p}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Features */}
+          {original.features && original.features.length > 0 && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>
+                  FEATURES ({original.features.length})
+                </span>
+                <button
+                  onClick={() => navigator.clipboard.writeText(original.features!.join('\n'))}
+                  className="text-xs px-2 py-1 rounded"
+                  style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)' }}
+                >
+                  Copy
+                </button>
+              </div>
+              <ul className="space-y-1">
+                {original.features.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                    <span style={{ color: 'var(--color-accent)' }}>•</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Lists */}
+          {original.allLists && original.allLists.length > 0 && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>
+                ADDITIONAL LISTS ({original.allLists.length})
+              </span>
+              <div className="space-y-3 mt-2">
+                {original.allLists.map((list, i) => (
+                  <div key={i} className="pl-2 border-l-2" style={{ borderColor: 'var(--color-border-subtle)' }}>
+                    {list.map((item, j) => (
+                      <div key={j} className="text-sm" style={{ color: 'var(--color-text-mid)' }}>
+                        • {item}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Schema.org */}
+          {original.schemaOrg && Object.keys(original.schemaOrg).length > 0 && (
+            <CopyableSection
+              label="EXISTING SCHEMA.ORG DATA"
+              content={JSON.stringify(original.schemaOrg, null, 2)}
+              isCode
+            />
+          )}
+
+          {/* Content Blocks (full structure) */}
+          {original.structure?.content_blocks && original.structure.content_blocks.length > 0 && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <span className="text-xs font-medium" style={{ color: 'var(--color-text-soft)' }}>
+                ALL CONTENT BLOCKS ({original.structure.content_blocks.length})
+              </span>
+              <div className="mt-2 space-y-2 max-h-96 overflow-y-auto text-xs font-mono">
+                {original.structure.content_blocks.map((block, i) => (
+                  <div
+                    key={i}
+                    className="p-2 rounded"
+                    style={{ backgroundColor: 'var(--color-surface)' }}
+                  >
+                    <span className="text-xs px-1 rounded mr-2" style={{
+                      backgroundColor:
+                        block.block_type === 'headline' ? 'var(--color-accent-muted)' :
+                        block.block_type === 'cta' ? 'var(--color-success-muted)' :
+                        block.block_type === 'testimonial' ? 'var(--color-warning-muted)' :
+                        'var(--color-surface)',
+                      color: 'var(--color-text-muted)'
+                    }}>
+                      {block.block_type}{block.level ? ` (H${block.level})` : ''}
+                    </span>
+                    <span style={{ color: 'var(--color-text-mid)' }}>{block.content}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Copy All Button */}
+      <button
+        onClick={handleCopyAll}
+        className="w-full py-3 mt-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+      >
+        {copiedAll ? (
+          <>
+            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Copied!
+          </>
+        ) : (
+          <>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            Copy All Original Content
+          </>
+        )}
+      </button>
     </div>
   );
 }
@@ -1393,14 +1716,22 @@ function PageOptimizerV3Inner() {
               />
             )}
 
-            {/* Selected Variant Detail / Optimized Copy Output */}
-            {selectedVariant && (
-              <VariantDetail
-                variant={selectedVariant}
-                baseline={evolution.baseline}
-                brandVoiceProfile={evolution.brandVoiceProfile}
-              />
-            )}
+            {/* Side-by-side: Optimized Copy and Original Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Optimized Copy Output */}
+              {selectedVariant && (
+                <VariantDetail
+                  variant={selectedVariant}
+                  baseline={evolution.baseline}
+                  brandVoiceProfile={evolution.brandVoiceProfile}
+                />
+              )}
+
+              {/* Original Content */}
+              {evolution.original && (
+                <OriginalContentDisplay original={evolution.original} />
+              )}
+            </div>
 
             {/* User-Guided Generation */}
             <GenerationFeedback
